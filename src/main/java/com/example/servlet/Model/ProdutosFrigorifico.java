@@ -1,5 +1,7 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.StatusProduto;
+
 import java.time.LocalDate;
 
 // Atributos
@@ -9,33 +11,49 @@ public class ProdutosFrigorifico {
     private Frigorificos frigorificos;
     private Produto produto;
     private LocalDate dtValidade;
-    private String status;
+    private StatusProduto status;
     private int lote;
+    private int quantidade;
 
     // Construtor vazio
     public ProdutosFrigorifico() {
     }
 
     // Construtor sem id
-    public ProdutosFrigorifico(int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, String status, int lote) {
+    public ProdutosFrigorifico(int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int lote, int quantidade) {
         this.idNotificacao = idNotificacao;
         this.frigorificos = frigorificos;
         this.produto = produto;
         this.dtValidade = dtValidade;
-        this.status = status;
+        this.status = StatusProduto.calcularStatus(dtValidade);
         this.lote = lote;
+        this.quantidade = quantidade;
     }
 
     // Construtor com id
-    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, String status, int lote) {
+    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int lote,  int quantidade) {
         this.idProdutosFrigorifico = idProdutosFrigorifico;
         this.idNotificacao = idNotificacao;
         this.frigorificos = frigorificos;
         this.produto = produto;
         this.dtValidade = dtValidade;
-        this.status = status;
+        this.status = StatusProduto.calcularStatus(dtValidade);
         this.lote = lote;
+        this.quantidade = quantidade;
     }
+
+    // construtor sem lote
+
+    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int quantidade) {
+        this.idProdutosFrigorifico = idProdutosFrigorifico;
+        this.idNotificacao = idNotificacao;
+        this.frigorificos = frigorificos;
+        this.produto = produto;
+        this.dtValidade = dtValidade;
+        this.status = StatusProduto.calcularStatus(dtValidade);
+        this.quantidade = quantidade;
+    }
+
 
     // GETTERS E SETTERS
 
@@ -77,13 +95,14 @@ public class ProdutosFrigorifico {
 
     public void setDtValidade(LocalDate dtValidade) {
         this.dtValidade = dtValidade;
+        this.status = StatusProduto.calcularStatus(dtValidade);
     }
 
-    public String getStatus() {
-        return status;
+    public StatusProduto getStatus() {
+        return StatusProduto.calcularStatus(dtValidade);
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusProduto status) {
         this.status = status;
     }
 
@@ -95,6 +114,15 @@ public class ProdutosFrigorifico {
         this.lote = lote;
     }
 
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+
     @Override
     public String toString() {
         return "ProdutosFrigorifico{" +
@@ -103,8 +131,8 @@ public class ProdutosFrigorifico {
                 "Frigorifico: \t" + frigorificos.toString() + "\n" +
                 "Produto: \t" + produto.toString() + "\n" +
                 "dtValidade: " + dtValidade + "\n" +
-                "status: " + status + "\n" +
-                "Lote: " + lote + "\n" +
+                "status: " + status.name() + "\n" +
+                "Quantidade: " + quantidade + "\n" +
                 '}';
     }
 }

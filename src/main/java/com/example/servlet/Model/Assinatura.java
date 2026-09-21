@@ -1,11 +1,13 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.TipoAssinatura;
+
 public class Assinatura {
     // atributos
     private int idAssinatura;
     private Usuario usuario;
     private Empresa empresa;
-    private String tipoAssinatura;
+    private TipoAssinatura tipoAssinatura;
     private double valor;
     private String nome;
     private String descricao;
@@ -16,16 +18,18 @@ public class Assinatura {
     }
 
     // construtor para planos dos usuarios sem id
-    public Assinatura(Usuario usuario, String tipoAssinatura, double valor, String nome, String descricao) {
+    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = valor;
         this.nome = nome;
         this.descricao = descricao;
     }
+
 
     // construtor para planos dos usuarios com id
-    public Assinatura(int idAssinatura, Usuario usuario, String tipoAssinatura, double valor, String nome, String descricao) {
+
+    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
         this.idAssinatura = idAssinatura;
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
@@ -34,8 +38,19 @@ public class Assinatura {
         this.descricao = descricao;
     }
 
+    // contrutor para planos dos usuarios sem descricao
+    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome) {
+        this.idAssinatura = idAssinatura;
+        this.usuario = usuario;
+        this.tipoAssinatura = tipoAssinatura;
+        this.valor = valor;
+        this.nome = nome;
+    }
+
+
     // construtor para planos das empresas sem id
-    public Assinatura(Empresa empresa, String tipoAssinatura, double valor, String nome, String descricao) {
+
+    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = valor;
@@ -43,9 +58,9 @@ public class Assinatura {
         this.descricao = descricao;
     }
 
-
     // construtor para planos das empresas com id
-    public Assinatura(int idAssinatura, Empresa empresa, String tipoAssinatura, double valor, String nome, String descricao) {
+
+    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
         this.idAssinatura = idAssinatura;
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
@@ -54,6 +69,14 @@ public class Assinatura {
         this.descricao = descricao;
     }
 
+    // construtor para planos das empresas sem descrição
+    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome) {
+        this.idAssinatura = idAssinatura;
+        this.empresa = empresa;
+        this.tipoAssinatura = tipoAssinatura;
+        this.valor = valor;
+        this.nome = nome;
+    }
 
 
     // getters e setters
@@ -82,11 +105,11 @@ public class Assinatura {
         this.empresa = empresa;
     }
 
-    public String getTipoAssinatura() {
+    public TipoAssinatura getTipoAssinatura() {
         return tipoAssinatura;
     }
 
-    public void setTipoAssinatura(String tipoAssinatura) {
+    public void setTipoAssinatura(TipoAssinatura tipoAssinatura) {
         this.tipoAssinatura = tipoAssinatura;
     }
 

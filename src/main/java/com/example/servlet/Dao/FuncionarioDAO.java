@@ -4,10 +4,7 @@ import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Funcionario;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 

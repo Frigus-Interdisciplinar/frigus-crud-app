@@ -1,11 +1,12 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.StatusArmazenamento;
+
 // Atributos
 public class Frigorificos {
     private int idFrigorifico;
     private Empresa empresa;
-    private int capacidade;
-    private String status;
+    private StatusArmazenamento status;
     private int quantidade;
     private Endereco endereco;
     private String tipo;
@@ -15,10 +16,8 @@ public class Frigorificos {
     }
 
     // Construtor sem id
-
-    public Frigorificos(Empresa empresa, int capacidade, String status, int quantidade, Endereco endereco, String tipo) {
+    public Frigorificos(Empresa empresa, StatusArmazenamento status, int quantidade, Endereco endereco, String tipo) {
         this.empresa = empresa;
-        this.capacidade = capacidade;
         this.status = status;
         this.quantidade = quantidade;
         this.endereco = endereco;
@@ -27,11 +26,9 @@ public class Frigorificos {
 
 
     // Construtor com id
-
-    public Frigorificos(int idFrigorifico, Empresa empresa, int capacidade, String status, int quantidade, Endereco endereco, String tipo) {
+    public Frigorificos(int idFrigorifico, Empresa empresa, StatusArmazenamento status, int quantidade, Endereco endereco, String tipo) {
         this.idFrigorifico = idFrigorifico;
         this.empresa = empresa;
-        this.capacidade = capacidade;
         this.status = status;
         this.quantidade = quantidade;
         this.endereco = endereco;
@@ -74,19 +71,12 @@ public class Frigorificos {
         this.idFrigorifico = idFrigorifico;
     }
 
-    public int getCapacidade() {
-        return capacidade;
-    }
 
-    public void setCapacidade(int capacidade) {
-        this.capacidade = capacidade;
-    }
-
-    public String getStatus() {
+    public StatusArmazenamento getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusArmazenamento status) {
         this.status = status;
     }
 
@@ -103,8 +93,7 @@ public class Frigorificos {
         return "Frigorificos{" + "\n" +
                 "Id do Frigorifico: " + idFrigorifico + "\n" +
                 "Empresa: \t" + empresa.toString() + "\n" +
-                "Capacidade: " + capacidade + "\n" +
-                "Status: " + status + "\n" +
+                "Status: " + status.name() + "\n" +
                 "Quantidade: " + quantidade + "\n" +
                 "Endereço: \t" + endereco.toString() + "\n" +
                 "Tipo: " + tipo + "\n" +

@@ -1,11 +1,13 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.StatusArmazenamento;
+
 // Atributos
 public class Geladeira {
     private int idGeladeira;
     private Usuario usuario;
     private int quantidade;
-    private String status;
+    private StatusArmazenamento status;
     private String tipo;
 
     // Construtor vazio
@@ -13,16 +15,23 @@ public class Geladeira {
     }
 
     // Construtor sem id
-    public Geladeira(Usuario usuario, int quantidade, String status, String tipo) {
+    public Geladeira(Usuario usuario, int quantidade, StatusArmazenamento status, String tipo) {
         this.usuario = usuario;
         this.quantidade = quantidade;
         this.status = status;
         this.tipo = tipo;
     }
 
+    // construtor sem tipo
+    public Geladeira(int idGeladeira, Usuario usuario, int quantidade, StatusArmazenamento status) {
+        this.idGeladeira = idGeladeira;
+        this.usuario = usuario;
+        this.quantidade = quantidade;
+        this.status = status;
+    }
 
     // Construtor com id
-    public Geladeira(int idGeladeira, Usuario usuario, int quantidade, String status, String tipo) {
+    public Geladeira(int idGeladeira, Usuario usuario, int quantidade, StatusArmazenamento status, String tipo) {
         this.idGeladeira = idGeladeira;
         this.usuario = usuario;
         this.quantidade = quantidade;
@@ -55,11 +64,11 @@ public class Geladeira {
         this.quantidade = quantidade;
     }
 
-    public String getStatus() {
+    public StatusArmazenamento getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusArmazenamento status) {
         this.status = status;
     }
 
@@ -77,7 +86,7 @@ public class Geladeira {
                 "Id da Geladeira: " + idGeladeira + "\n" +
                 "Usuario: \t" + usuario.toString() + "\n" +
                 "Quantidade: " + quantidade + "\n" +
-                "Status: " + status + "\n" +
+                "Status: " + status.name() + "\n" +
                 "Tipo: " + tipo + "\n" +
                 '}';
     }

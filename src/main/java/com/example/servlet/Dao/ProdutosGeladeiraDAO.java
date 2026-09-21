@@ -5,11 +5,9 @@ import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.ProdutosGeladeira;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.Categoria;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +21,20 @@ public class ProdutosGeladeiraDAO {
 
         try{
             // insere as informações relacionada aos produtos domesticos
-            String comandoSql = "insert into ProdutosGeladeira (idNotificacao, idGeladeira, idProdutos, DtValidade, status, lote) values (?,?,?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            String comandoSql = "insert into ProdutosGeladeira (idNotificacao, idGeladeira, idProdutos, DtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // definindo parâmetros da instrução
             pstmt.setInt(1, pg.getIdNotificacao());
             pstmt.setInt(2, pg.getGeladeira().getIdGeladeira());
             pstmt.setInt(3, pg.getProduto().getIdProdutos());
             pstmt.setObject(4, pg.getDtValidade());
-            pstmt.setString(5, pg.getStatus());
+            pstmt.setString(5, pg.getStatus().name());
             pstmt.setInt(6, pg.getLote());
+            pstmt.setInt(7, pg.getQuantidade());
 
             if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) pg.setIdProdutosGeladeira(chaves.getInt(1));
                 return 1;// verifica se deu certo
             }
             else {
@@ -58,16 +59,17 @@ public class ProdutosGeladeiraDAO {
 
         try{
             // altera as informações relacionada aos produtos domesticos
-            String comandoSql = "Update ProdutosGeladeira set idNotificacao = ?, idGeladeira = ?, idProdutos = ?, DtValidade = ?, status = ?, lote = ? where id = ?;";
+            String comandoSql = "Update ProdutosGeladeira set idNotificacao = ?, idGeladeira = ?, idProdutos = ?, DtValidade = ?, status = ?, lote = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // definindo parâmetros da instrução
             pstmt.setInt(1, pg.getIdNotificacao());
             pstmt.setInt(2, pg.getGeladeira().getIdGeladeira());
             pstmt.setInt(3, pg.getProduto().getIdProdutos());
             pstmt.setObject(4, pg.getDtValidade());
-            pstmt.setString(5, pg.getStatus());
+            pstmt.setString(5, pg.getStatus().name());
             pstmt.setInt(6, pg.getLote());
-            pstmt.setInt(7, pg.getIdProdutosGeladeira());
+            pstmt.setInt(7, pg.getQuantidade());
+            pstmt.setInt(8, pg.getIdProdutosGeladeira());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -135,7 +137,12 @@ public class ProdutosGeladeiraDAO {
         ResultSet rset = null; // consulta a tabela
 
         try{
-            String comandoSql = "select p.*, pg.*, g.* from produtosGeladeira pg join produtos p on p.id = pg.idProdutos join geladeira g on g.id = pg.idGeladeira;"; // procura as informações dos produtos armazenados na tabela produtos Geladeira
+            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
+                    "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "from produtos p " +
+                    "join produtosGeladeira pg on p.id = pg.idProdutos " +
+                    "join geladeira g on g.id = pg.idGeladeira;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             rset = pstmt.executeQuery(); // executa a consulta SQL
 
@@ -145,7 +152,7 @@ public class ProdutosGeladeiraDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
@@ -169,8 +176,8 @@ public class ProdutosGeladeiraDAO {
                         geladeira,
                         produto,
                         rset.getObject("dtValidade", LocalDate.class),
-                        rset.getString("status"),
-                        rset.getInt("lote")
+                        rset.getInt("lote"),
+                        rset.getInt("quantidade")
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
                 lista.add(pg);
@@ -198,7 +205,13 @@ public class ProdutosGeladeiraDAO {
         ResultSet rset = null;
 
         try{
-            String comandoSql = "select p.*, pg.*, g.* from produtos p join produtosGeladeira pg on p.id = pg.idProdutos join geladeira g on g.id = pg.idGeladeira where pg.lote = ?;";
+            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
+                    "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "from produtos p " +
+                    "join produtosGeladeira pg on p.id = pg.idProdutos " +
+                    "join geladeira g on g.id = pg.idGeladeira " +
+                    "where pg.lote = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             pstmt.setInt(1, lote);
             rset = pstmt.executeQuery();
@@ -208,7 +221,7 @@ public class ProdutosGeladeiraDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
@@ -232,8 +245,8 @@ public class ProdutosGeladeiraDAO {
                         geladeira,
                         produto,
                         rset.getObject("dtValidade", LocalDate.class),
-                        rset.getString("status"),
-                        rset.getInt("lote")
+                        rset.getInt("lote"),
+                        rset.getInt("quantidade")
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
                 lista.add(pg);
@@ -258,7 +271,13 @@ public class ProdutosGeladeiraDAO {
         ResultSet rset = null;
 
         try{
-            String comandoSql = "select p.*, pg.*, g.* from produtos p join produtosGeladeira pg on p.id = pg.idProdutos join geladeira g on g.id = pg.idGeladeira where pg.DtValidade = ?;";
+            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
+                    "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "from produtos p " +
+                    "join produtosGeladeira pg on p.id = pg.idProdutos " +
+                    "join geladeira g on g.id = pg.idGeladeira " +
+                    "where pg.DtValidade = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando valores para o comando
             pstmt.setObject(1, dtValidade);
@@ -269,7 +288,7 @@ public class ProdutosGeladeiraDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
@@ -293,8 +312,8 @@ public class ProdutosGeladeiraDAO {
                         geladeira,
                         produto,
                         rset.getObject("dtValidade", LocalDate.class),
-                        rset.getString("status"),
-                        rset.getInt("lote")
+                        rset.getInt("lote"),
+                        rset.getInt("quantidade")
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
                 lista.add(pg);
@@ -321,7 +340,13 @@ public class ProdutosGeladeiraDAO {
         ProdutosGeladeira pg = null;
 
         try{
-            String comandoSql = "select p.*, pg.*, g.* from produtos p join produtosGeladeira pg on p.id = pg.idProdutos join geladeira g on g.id = pg.idGeladeira where p.id = ?;";
+            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
+                    "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "from produtos p " +
+                    "join produtosGeladeira pg on p.id = pg.idProdutos " +
+                    "join geladeira g on g.id = pg.idGeladeira " +
+                    "where p.id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             pstmt.setInt(1,produto.getIdProdutos());// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
@@ -330,7 +355,7 @@ public class ProdutosGeladeiraDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
@@ -354,8 +379,8 @@ public class ProdutosGeladeiraDAO {
                         geladeira,
                         produto,
                         rset.getObject("dtValidade", LocalDate.class),
-                        rset.getString("status"),
-                        rset.getInt("lote")
+                        rset.getInt("lote"),
+                        rset.getInt("quantidade")
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
             }
@@ -381,7 +406,13 @@ public class ProdutosGeladeiraDAO {
         ProdutosGeladeira pg = null;
 
         try{
-            String comandoSql = "select p.*, pg.*, g.* from produtos p join produtosGeladeira pg on p.id = pg.idProdutos join geladeira g on g.id = pg.idGeladeira where lower(p.nome) like ?;";
+            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
+                    "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "from produtos p " +
+                    "join produtosGeladeira pg on p.id = pg.idProdutos " +
+                    "join geladeira g on g.id = pg.idGeladeira " +
+                    "where lower(p.nome) like ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             pstmt.setString(1,  "%" + produto.getNome().toLowerCase() + "%");// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
@@ -390,7 +421,7 @@ public class ProdutosGeladeiraDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
@@ -414,8 +445,8 @@ public class ProdutosGeladeiraDAO {
                         geladeira,
                         produto,
                         rset.getObject("dtValidade", LocalDate.class),
-                        rset.getString("status"),
-                        rset.getInt("lote")
+                        rset.getInt("lote"),
+                        rset.getInt("quantidade")
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
             }
@@ -428,4 +459,42 @@ public class ProdutosGeladeiraDAO {
         }
         return pg;
     }// BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
+
+
+
+
+    // CALCULA A QUANTIDADE TOTAL DE PRODUTOS NA GELADEIRA
+    public int buscarQuantidadeTotal(int idGeladeira) {
+
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        int quantidadeTotal = 0;
+
+        try {
+
+            String comandoSql =
+                    "SELECT COALESCE(SUM(quantidade), 0) AS total " +
+                            "FROM ProdutosGeladeira " +
+                            "WHERE idGeladeira = ?;";
+
+            PreparedStatement pstmt =
+                    conn.prepareStatement(comandoSql);
+
+            pstmt.setInt(1, idGeladeira);
+
+            ResultSet rset = pstmt.executeQuery();
+
+            if (rset.next()) {
+                quantidadeTotal = rset.getInt("total");
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            conexao.desconectar(conn);
+        }
+
+        return quantidadeTotal;
+    }// CALCULA A QUANTIDADE TOTAL DE PRODUTOS NA GELADEIRA
 }

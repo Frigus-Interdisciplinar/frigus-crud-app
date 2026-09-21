@@ -1,5 +1,7 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.StatusProduto;
+
 import java.time.LocalDate;
 
 // Atributos
@@ -9,32 +11,46 @@ public class ProdutosGeladeira {
     private Geladeira geladeira;
     private Produto produto;
     private LocalDate dtValidade;
-    private String status;
+    private StatusProduto status;
     private int lote;
+    private int quantidade;
 
     // Construtor vazio
     public ProdutosGeladeira() {
     }
 
     // Construtor sem id
-    public ProdutosGeladeira(int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, String status, int lote) {
+    public ProdutosGeladeira(int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int lote,  int quantidade) {
         this.idNotificacao = idNotificacao;
         this.geladeira = geladeira;
         this.produto = produto;
         this.dtValidade = dtValidade;
-        this.status = status;
+        this.status = StatusProduto.calcularStatus(dtValidade);
         this.lote = lote;
+        this.quantidade = quantidade;
     }
 
     // Construtor com id
-    public ProdutosGeladeira(int idProdutosGeladeira, int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, String status, int lote) {
+    public ProdutosGeladeira(int idProdutosGeladeira, int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int lote,  int quantidade) {
         this.idProdutosGeladeira = idProdutosGeladeira;
         this.idNotificacao = idNotificacao;
         this.geladeira = geladeira;
         this.produto = produto;
         this.dtValidade = dtValidade;
-        this.status = status;
+        this.status = StatusProduto.calcularStatus(dtValidade);
         this.lote = lote;
+        this.quantidade = quantidade;
+    }
+
+    // construtor sem lote
+    public ProdutosGeladeira(int idProdutosGeladeira, int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int quantidade) {
+        this.idProdutosGeladeira = idProdutosGeladeira;
+        this.idNotificacao = idNotificacao;
+        this.geladeira = geladeira;
+        this.produto = produto;
+        this.dtValidade = dtValidade;
+        this.status = StatusProduto.calcularStatus(dtValidade);
+        this.quantidade = quantidade;
     }
 
     // GETTERS E SETTERS
@@ -76,13 +92,14 @@ public class ProdutosGeladeira {
 
     public void setDtValidade(LocalDate dtValidade) {
         this.dtValidade = dtValidade;
+        this.status = StatusProduto.calcularStatus(dtValidade);
     }
 
-    public String getStatus() {
-        return status;
+    public StatusProduto getStatus() {
+        return StatusProduto.calcularStatus(dtValidade);
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusProduto status) {
         this.status = status;
     }
 
@@ -94,16 +111,25 @@ public class ProdutosGeladeira {
         this.lote = lote;
     }
 
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
     @Override
     public String toString() {
-        return "Produto na Geladeira{" +
+        return "Produto na Geladeira{" +"\n" +
                 "Id do Produto na Geladeira: " + idProdutosGeladeira + "\n" +
                 "Notificação: \t" + idNotificacao + "\n" +
                 "Geladeira: \t" + geladeira.toString() + "\n" +
                 "Produto: \t" + produto.toString() + "\n" +
                 "Data da Validade: " + dtValidade + "\n" +
-                "Status: " + status + "\n" +
+                "Status: " + status.name() + "\n" +
                 "Lote: " + lote + "\n" +
+                "Quantidade: " + quantidade + "\n" +
                 '}';
     }
 }

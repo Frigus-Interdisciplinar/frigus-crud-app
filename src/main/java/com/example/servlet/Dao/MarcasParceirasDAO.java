@@ -5,10 +5,7 @@ import com.example.servlet.Model.MarcasParcerias;
 import com.example.servlet.Model.Produto;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +18,7 @@ public class MarcasParceirasDAO {
 
         try{
             String comandoSql = "insert into marcasParceiras (idEmpresa, idProdutos, observacoes) values (?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a operação
             pstmt.setString(1, parcerias.getEmpresa().getCnpj());
             pstmt.setInt(2, parcerias.getProduto().getIdProdutos());
@@ -29,6 +26,8 @@ public class MarcasParceirasDAO {
 
             // verifica se deu certo
             if(pstmt.executeUpdate() > 0){
+                ResultSet chaves =pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if(chaves.next()) parcerias.setIdMarcasParcerias(chaves.getInt(1));
                 return 1;// deu certo
             }else{
                 return 0;// deu errado!!
@@ -114,7 +113,6 @@ public class MarcasParceirasDAO {
                     "join produtos p on p.id = mp.idProdutos join empresa e on e.cnpj = mp.idEmpresa " +
                     "where e.cnpj = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            rset = pstmt.executeQuery();
             // setando o valor do cnpj para a operação
             pstmt.setString(1, parcerias.getEmpresa().getCnpj());
             rset = pstmt.executeQuery();

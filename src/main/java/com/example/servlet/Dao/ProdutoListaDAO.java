@@ -6,10 +6,7 @@ import com.example.servlet.Model.ProdutoLista;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ProdutoListaDAO {
 
@@ -20,13 +17,15 @@ public class ProdutoListaDAO {
 
         try{
             String comandoSql = "Insert into produtoLista (idListaCompras, idProdutos, quantidade) values(?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a execução
             pstmt.setInt(1, produtoLista.getListaCompras().getIdLista());
             pstmt.setInt(2, produtoLista.getProduto().getIdProdutos());
             pstmt.setInt(3, produtoLista.getQuantidade());
 
             if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) produtoLista.setIdProdutoLista(chaves.getInt(1));
                 return 1; // inseriu as informações no banco
             }
             else{

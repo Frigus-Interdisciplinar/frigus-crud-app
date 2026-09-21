@@ -1,12 +1,14 @@
 package com.example.servlet.Model;
 
+import com.example.servlet.Util.Enum.Categoria;
+
 public class Produto {
     // Atributos
     private int idProdutos;
     private String nome;
     private String descricao;
     private double preco;
-    private String categoria;
+    private Categoria categoria;
     private String marca;
     private String unidadeMedida;
 
@@ -15,7 +17,7 @@ public class Produto {
     }
 
     // Construtor sem id
-    public Produto(String nome, String descricao, double preco, String categoria, String marca, String unidadeMedida) {
+    public Produto(String nome, String descricao, double preco, Categoria categoria, String marca, String unidadeMedida) {
         this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
@@ -26,10 +28,20 @@ public class Produto {
 
 
     // Construtor com id
-    public Produto(int idProdutos, String nome, String descricao, double preco, String categoria, String marca, String unidadeMedida) {
+    public Produto(int idProdutos, String nome, String descricao, double preco, Categoria categoria, String marca, String unidadeMedida) {
         this.idProdutos = idProdutos;
         this.nome = nome;
         this.descricao = descricao;
+        this.preco = preco;
+        this.categoria = categoria;
+        this.marca = marca;
+        this.unidadeMedida = unidadeMedida;
+    }
+
+    // conrtrutor sem descricao
+    public Produto(int idProdutos, String nome, double preco, Categoria categoria, String marca, String unidadeMedida) {
+        this.idProdutos = idProdutos;
+        this.nome = nome;
         this.preco = preco;
         this.categoria = categoria;
         this.marca = marca;
@@ -69,11 +81,11 @@ public class Produto {
         this.preco = preco;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
@@ -100,7 +112,7 @@ public class Produto {
                 "Nome: " + nome + "\n" +
                 "Descricao: " + descricao + "\n" +
                 "Preco: " + preco + "\n" +
-                "Categoria: " + categoria + "\n" +
+                "Categoria: " + categoria.name() + "\n" +
                 "Marca: " + marca + "\n" +
                 "Unidade de Medida: " + unidadeMedida + "\n" +
                 "}";

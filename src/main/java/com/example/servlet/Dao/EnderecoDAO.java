@@ -5,10 +5,7 @@ import com.example.servlet.Model.Endereco;
 import com.example.servlet.Model.Frigorificos;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +18,7 @@ public class EnderecoDAO {
 
         try{
             String comandoSql = "insert into enderecos (rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade) values (?,?,?,?,?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a operação
             pstmt.setString(1, endereco.getRua());
             pstmt.setString(2, endereco.getBairro());
@@ -31,8 +28,10 @@ public class EnderecoDAO {
             pstmt.setString(6, endereco.getCep());
             pstmt.setString(7, endereco.getNumero());
             pstmt.setString(8, endereco.getNomeUnidade());
-            // verifica se conseguiuexecutar o comando
+            // verifica se conseguiu executar o comando e se sim adiciona a chave criada pelo banco
             if(pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();
+                if (chaves.next()) endereco.setIdEndereco(chaves.getInt(1));// adicionando a chave criada pelo banco
                 return 1;// sim
             }
             else {

@@ -13,18 +13,29 @@ public class ListaCompras {
     public ListaCompras() {
     }
 
-    // Construtor sem id
-    public ListaCompras(Usuario usuario, Empresa empresa, LocalDate dtLista) {
+    // Construtor para usuario sem id
+    public ListaCompras(Usuario usuario, LocalDate dtLista) {
         this.usuario = usuario;
-        this.empresa = empresa;
         this.dtLista = dtLista;
     }
 
 
-    // Construtor sem id
-    public ListaCompras(int idLista, Usuario usuario, Empresa empresa, LocalDate dtLista) {
+    // Construtor para usuario com id
+    public ListaCompras(int idLista, Usuario usuario, LocalDate dtLista) {
         this.idLista = idLista;
         this.usuario = usuario;
+        this.dtLista = dtLista;
+    }
+
+    // construtor para empresa sem id
+    public ListaCompras(Empresa empresa, LocalDate dtLista) {
+        this.empresa = empresa;
+        this.dtLista = dtLista;
+    }
+
+    // construtor para empresa com id
+    public ListaCompras(int idLista, Empresa empresa, LocalDate dtLista) {
+        this.idLista = idLista;
         this.empresa = empresa;
         this.dtLista = dtLista;
     }

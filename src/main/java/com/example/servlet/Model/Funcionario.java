@@ -27,6 +27,19 @@ public class Funcionario {
         this.senha = senha;
     }
 
+    // construtor sem telefone
+
+    public Funcionario(String cpf, Empresa empresa, String email, String nome, String sobrenome, String cargo, String senha) {
+        this.cpf = cpf;
+        this.empresa = empresa;
+        this.email = email;
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.cargo = cargo;
+        this.senha = senha;
+    }
+
+
     // GETTERS E SETTERS
 
 

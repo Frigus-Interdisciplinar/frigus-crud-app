@@ -13,13 +13,20 @@ public class Empresa {
     }
 
     // Construtor
-
     public Empresa(String cnpj, String nome, String email, String senha, String descricao) {
         this.cnpj = cnpj;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.descricao = descricao;
+    }
+
+    // construtor sem descricao
+    public Empresa(String cnpj, String nome, String email, String senha) {
+        this.cnpj = cnpj;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
     }
 
 

@@ -23,6 +23,14 @@ public class Usuario {
         this.telefone = telefone;
     }
 
+    // construtor sem telefone
+    public Usuario(String cpf, String nome, String sobrenome, String email, String senha) {
+        this.cpf = cpf;
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.senha = senha;
+    }
 
     // GETTERS E SETTERS
     public String getCpf() {

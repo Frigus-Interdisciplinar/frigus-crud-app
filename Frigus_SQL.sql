@@ -18,7 +18,7 @@ CREATE TABLE Empresa(
 
 CREATE TABLE Funcionario(
     cpf         varchar(11)  primary key,
-    idEmpresa   varchar(14)      null,
+    idEmpresa   varchar(14)  not null,
     nome        varchar(20)  not null,
     Sobrenome   varchar(60)  not null,
     cargo       varchar(50)  not null,
@@ -43,6 +43,7 @@ CREATE TABLE Assinatura(
     nome            varchar(50)     not null,
     descricao       text                null
 );
+
 
 CREATE TABLE Receita(
     id            serial      primary key,
@@ -90,10 +91,9 @@ CREATE TABLE Frigorificos(
     id              serial      primary key,
     idEndereco      int         not null,
     idEmpresa       varchar(14) not null,
-    capacidade      int         not null,
+    quantidade      int         not null,
     status          varchar(20) not null default 'Ocupacao_media',
-    quantidade      int         not null default 0, 
-    tipo            varchar(20)     null
+    tipo            varchar(20) not null default 'Freezer'
 );
 
 CREATE TABLE ProdutosFrigorifico(
@@ -103,7 +103,8 @@ CREATE TABLE ProdutosFrigorifico(
     idProdutos        int         not null,
     dtValidade        date        not null,
     status            varchar(20) not null default 'Regular',
-    lote              int             null
+    lote              int             null,
+    quantidade        int         not null default 0
 );
 
 CREATE TABLE Compra(
@@ -120,7 +121,7 @@ CREATE TABLE Geladeira(
     idUsuario      varchar(11) not null,
     status         varchar(20) not null default 'Ocupacao_moderada',
     quantidade     int         not null default 0,
-    tipo           varchar(20)     null
+    tipo           varchar(20)     null default 'Geladeira'
 );
 
 CREATE TABLE ProdutosGeladeira(
@@ -130,7 +131,9 @@ CREATE TABLE ProdutosGeladeira(
     idProdutos        int         not null,
     dtValidade        date        not null,
     status            varchar(20) not null default 'Regular',
-    lote              varchar(30)     null
+    lote              varchar(30)     null,
+    quantidade        int         not null default 0
+
 );
 
 CREATE TABLE Notificacao(
@@ -140,15 +143,15 @@ CREATE TABLE Notificacao(
 );
 
 CREATE TABLE Enderecos(
-		id          serial primary key,
-		rua         varchar(150),
-		bairro      varchar(150),
-		cidade      varchar(150),
-		uf          char(2),
-		pais        varchar(150),
-		cep         varchar(9),
-		numero      varchar(20),
-		nomeUnidade varchar(50) not null
+		id          serial           primary key,
+		rua         varchar(150)     not null,
+		bairro      varchar(150)     not null,
+		cidade      varchar(150)     not null default 'São Paulo',
+		uf          char(2)          not null default 'SP',
+		pais        varchar(150)     not null default 'Brasil',
+		cep         varchar(9)       not null,
+		numero      varchar(20)      not null,
+		nomeUnidade varchar(50)      not null
 );
 
 
@@ -324,11 +327,22 @@ alter table Ingredientes
 alter table ProdutoLista
     add constraint chk_quantidade_produtolista
     check (quantidade >= 0);
+    
+alter table ProdutosGeladeira
+    add constraint chk_quantidade_produtolista
+    check (quantidade >= 0);
+    
+alter table ProdutosFrigorifico
+    add constraint chk_quantidade_produtolista
+    check (quantidade >= 0);
 
 alter table Usuario
-	  add constraint chk_telefone_formato
+	add constraint chk_telefone_formato
     check (telefone ~ '^\(?[1-9]{2}\)?\s?(?:9[0-9]{4}|[2-8][0-9]{3})\-?[0-9]{4}$');
 
 alter table Enderecos
-	  add constraint chk_cep_formato
+	add constraint chk_cep_formato
     check (cep ~ '^\d{5}-?\d{3}$');
+
+
+

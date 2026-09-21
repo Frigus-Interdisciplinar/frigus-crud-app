@@ -4,9 +4,7 @@ import com.example.servlet.Model.Ingredientes;
 import com.example.servlet.Model.Receita;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ReceitaDAO {
 
@@ -19,7 +17,7 @@ public class ReceitaDAO {
 
         try{
             String comandoSql = "insert into receita (idUsuario, nome, descricao, modoPreparo, dtReceita, foiFeita) values (?,?,?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
             pstmt.setString(1, receita.getUsuario().getCpf());
@@ -30,6 +28,8 @@ public class ReceitaDAO {
             pstmt.setBoolean(6, receita.isFoiFeita());
 
             if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if(chaves.next()) receita.setIdReceita(chaves.getInt(1));
                 return 1; // verifica se deu certo
             }
             else{

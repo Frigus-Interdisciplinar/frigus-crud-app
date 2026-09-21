@@ -48,6 +48,16 @@ public class Receita {
         this.foiFeita = foiFeita;
     }
 
+    // Construtor para receitas de usuarios sem descricao
+    public Receita(int idReceita, Usuario usuario, String nome, String modoPreparo, LocalDate dtReceita, boolean foiFeita) {
+        this.idReceita = idReceita;
+        this.usuario = usuario;
+        this.nome = nome;
+        this.modoPreparo = modoPreparo;
+        this.dtReceita = dtReceita;
+        this.foiFeita = foiFeita;
+    }
+
     // Construtor para receitas de restaurantes com id
     public Receita(int idReceita, Empresa empresa, String nome, String descricao, String modoPreparo, LocalDate dtReceita, boolean foiFeita) {
         this.idReceita = idReceita;
@@ -64,6 +74,16 @@ public class Receita {
         this.empresa = empresa;
         this.nome = nome;
         this.descricao = descricao;
+        this.modoPreparo = modoPreparo;
+        this.dtReceita = dtReceita;
+        this.foiFeita = foiFeita;
+    }
+
+    // Construtor para receitas de restaurantes sem descricao
+    public Receita(int idReceita, Empresa empresa, String nome, String modoPreparo, LocalDate dtReceita, boolean foiFeita) {
+        this.idReceita = idReceita;
+        this.empresa = empresa;
+        this.nome = nome;
         this.modoPreparo = modoPreparo;
         this.dtReceita = dtReceita;
         this.foiFeita = foiFeita;

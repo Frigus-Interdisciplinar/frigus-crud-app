@@ -3,10 +3,7 @@ package com.example.servlet.Dao;
 import com.example.servlet.Model.*;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,12 +16,14 @@ public class ListaComprasDAO {
 
         try{
             String comandoSql = "insert into listaCompras (idUsuario, dtLista) values(?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a operação
             pstmt.setString(1, listaCompras.getUsuario().getCpf());
             pstmt.setObject(2, listaCompras.getDtLista());
             // verificando se deu foi possivel executar
             if (pstmt.executeUpdate() > 0 ){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) listaCompras.setIdLista(chaves.getInt(1));
                 return 1;// deu certo
             }
             else{

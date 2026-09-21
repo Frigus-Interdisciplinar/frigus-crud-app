@@ -5,6 +5,7 @@ import com.example.servlet.Dao.ProdutosGeladeiraDAO;
 import com.example.servlet.Model.Geladeira;
 import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.ProdutosGeladeira;
+import com.example.servlet.Util.Enum.StatusProduto;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,27 +25,28 @@ public class Main {
 
         ProdutoDAO produtoDAO = new ProdutoDAO();
 
-//        Geladeira g = new Geladeira();
-//        g.setIdGeladeira(1);
-
-
-
-//        ProdutosGeladeira pg = new ProdutosGeladeira(
-//                1,
-//                g,
-//                prod,
-//                LocalDate.of(2026, 9, 14),
-//                "proximo da validade",
-//                134
-//        );
-
+////        Geladeira g = new Geladeira();
+////        g.setIdGeladeira(1);
+//
+//
+//
+////        ProdutosGeladeira pg = new ProdutosGeladeira(
+////                1,
+////                g,
+////                prod,
+////                LocalDate.of(2026, 9, 14),
+////                "proximo da validade",
+////                134
+////        );
+//
         System.out.println(produtoDAO.inserirProduto(prod));
         produtoDAO.buscarproduto(prod);
-        //produtoDAO.buscarproduto()
-
-//        ProdutosGeladeiraDAO pgdao = new ProdutosGeladeiraDAO();
+        produtoDAO.buscarproduto(prod);
 //
-//        pgdao.inserirProdutoGeladeira(pg);
-//        System.out.println(pgdao.inserirProdutoGeladeira(pg));
+//        ProdutosGeladeiraDAO pgdao = new ProdutosGeladeiraDAO();
+////
+////        pgdao.inserirProdutoGeladeira(pg);
+////        System.out.println(pgdao.inserirProdutoGeladeira(pg));
+        StatusProduto.values();
     }
 }

@@ -4,11 +4,9 @@ import com.example.servlet.Model.Ingredientes;
 import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.Receita;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.Categoria;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class IngredienteDAO {
 
         try{
             String comandoSql = "insert into ingredientes (idReceita, idProdutos, quantidade) values (?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
             pstmt.setInt(1, ingrediente.getReceita().getIdReceita());
@@ -29,6 +27,8 @@ public class IngredienteDAO {
             pstmt.setInt(3, ingrediente.getQuantidade());
 
             if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) ingrediente.setIdIngredientes(chaves.getInt(1));
                 return 1; // verifica se deu certo
             }
             else{
@@ -172,7 +172,7 @@ public class IngredienteDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidadeMedida")
                 );
@@ -226,7 +226,7 @@ public class IngredienteDAO {
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidadeMedida")
                 );

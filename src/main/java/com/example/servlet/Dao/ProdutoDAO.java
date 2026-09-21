@@ -2,8 +2,8 @@ package com.example.servlet.Dao;
 
 
 import com.example.servlet.Model.Produto;
-import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.Categoria;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,17 +18,19 @@ public class ProdutoDAO {
         try {
             // insere as informações do produto
             String comandoSql = "insert into produtos(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // definindo parâmetros da instrução
             pstmt.setString(1, produto.getNome());
             pstmt.setString(2, produto.getDescricao());
             pstmt.setDouble(3, produto.getPreco());
-            pstmt.setString(4, produto.getCategoria());
+            pstmt.setString(4, produto.getCategoria().name());
             pstmt.setString(5, produto.getMarca());
             pstmt.setString(6, produto.getUnidadeMedida());
 
             if (pstmt.executeUpdate() > 0) {
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) produto.setIdProdutos(chaves.getInt(1));
                 return 1; // verifica se deu certo
             } else {
                 return 0; // não foi possivel executar
@@ -55,7 +57,7 @@ public class ProdutoDAO {
             pstmt.setString(1, produto.getNome());
             pstmt.setString(2, produto.getDescricao());
             pstmt.setDouble(3, produto.getPreco());
-            pstmt.setString(4, produto.getCategoria());
+            pstmt.setString(4, produto.getCategoria().name());
             pstmt.setString(5, produto.getMarca());
             pstmt.setString(6, produto.getUnidadeMedida());
             pstmt.setInt(7, produto.getIdProdutos());
@@ -102,14 +104,13 @@ public class ProdutoDAO {
 
 
 
-
-
+    // =========== BUSCAR ===========
     public List<Produto> buscarproduto(Produto produto){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
-        List<Produto> usuario = new ArrayList<>();
+        List<Produto> produtos = new ArrayList<>();
         try{
             String comandoSql = "select * from produtos where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -119,14 +120,15 @@ public class ProdutoDAO {
 
             if (rset.next()) {
                 produto = new Produto(
-                        rset.getInt("idProduto"),
+                        rset.getInt("id"),
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
-                        rset.getString("categoria"),
+                        Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
+                produtos.add(produto);
             }
         }catch (SQLException sqle){
             sqle.printStackTrace();
@@ -134,7 +136,8 @@ public class ProdutoDAO {
         finally {
             conexao.desconectar(conn); // fechando a conexao com o banco
         }
-        return usuario;
-    }
+        return produtos;
+    }// =========== BUSCAR ===========
+
 }
 

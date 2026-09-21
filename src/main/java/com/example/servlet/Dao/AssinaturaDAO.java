@@ -9,8 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class AssinaturaDAO {
 
@@ -28,7 +27,7 @@ public class AssinaturaDAO {
 
             // setando os valores para a operação
             pstmt.setString(1, assinatura.getUsuario().getCpf());
-            pstmt.setString(2, assinatura.getTipoAssinatura());
+            pstmt.setString(2, assinatura.getTipoAssinatura().name());
             pstmt.setDouble(3, assinatura.getValor());
             pstmt.setString(4, assinatura.getNome());
             pstmt.setString(5, assinatura.getDescricao());
@@ -78,7 +77,7 @@ public class AssinaturaDAO {
 
 
 
-    // ============ BUSCANDO A ASSINATURA DO USUARIO POR ID ============
+    // ============ BUSCANDO A ASSINATURA DO USUARIO POR CPF ============
     public Assinatura buscarAssinaturaUsuario(Assinatura assinatura){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
@@ -114,7 +113,7 @@ public class AssinaturaDAO {
             conexao.desconectar(conn); // fechando a conexão
         }
         return assinatura;
-    }// ============ BUSCANDO A ASSINATURA DO USUARIO POR ID ============
+    }// ============ BUSCANDO A ASSINATURA DO USUARIO POR CPF ============
 
 
 
@@ -191,7 +190,7 @@ public class AssinaturaDAO {
 
 
 
-    // ============ BUSCANDO A ASSINATURA DA EMPRESA POR ID ============
+    // ============ BUSCANDO A ASSINATURA DA EMPRESA POR CNPJ ============
     public Assinatura buscarAssinaturaEmpresa(Assinatura assinatura){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
@@ -227,7 +226,7 @@ public class AssinaturaDAO {
             conexao.desconectar(conn); // fechando a conexão
         }
         return assinatura;
-    }// ============ BUSCANDO A ASSINATURA DA EMPRESA POR ID ============
+    }// ============ BUSCANDO A ASSINATURA DA EMPRESA POR CNPJ ============
 
     // ========================================== EMPRESA  ==========================================
 
