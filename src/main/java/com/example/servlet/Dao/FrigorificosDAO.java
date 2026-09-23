@@ -1,10 +1,12 @@
 package com.example.servlet.Dao;
 
+import com.example.servlet.Model.Empresa;
+import com.example.servlet.Model.Endereco;
 import com.example.servlet.Model.Frigorificos;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.StatusArmazenamento;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into frigorificos (idEmpresa, status, quantidade, endereco, tipo) values (?,?,?,?,?);";
+            String comandoSql = "insert into frigorificos (idEmpresa, status, quantidade, idEndereco, tipo) values (?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para o comando
             pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
@@ -54,7 +56,7 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, quantidade = ?, endereco = ?, tipo = ?  where id = ?;";
+            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, quantidade = ?, idEndereco = ?, tipo = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
             pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
@@ -79,4 +81,47 @@ public class FrigorificosDAO {
             conexao.desconectar(conn);// fechando a conexão
         }
     }// ==============ALTERAR===============
+
+
+
+    // ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
+    public List<Frigorificos> buscarFrigorificoEmpresa(Empresa empresa){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao
+
+        ResultSet rset = null;
+        List<Frigorificos> listaFrigorificos = new ArrayList<>();
+
+        try{
+            String comandoSql = "select * from frigorificos where idEmpresa = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o valor do id da empresa
+            pstmt.setString(1, empresa.getCnpj());
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                // criando o objeto endereço
+                Endereco endereco = new Endereco();
+                endereco.setIdEndereco(rset.getInt("idEndereco"));
+
+                // criando o objeto empresa
+                empresa = new Empresa();
+                empresa.setCnpj(rset.getString("idEmpresa"));
+                // criando o objeto frigorifico
+                Frigorificos frigorifico = new Frigorificos(
+                        rset.getInt("id"),
+                        empresa,
+                        StatusArmazenamento.valueOf(rset.getString("status")),
+                        rset.getInt("quantidade"),
+                        endereco,
+                        rset.getString("tipo")
+                );
+                listaFrigorificos.add(frigorifico);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao
+        }
+        return listaFrigorificos;
+    }// ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
 }

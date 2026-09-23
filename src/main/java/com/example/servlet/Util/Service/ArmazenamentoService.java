@@ -24,7 +24,7 @@ public class ArmazenamentoService {
         Connection conn = conexao.conectar();
         int total = 0;
         try {
-            String sql = "SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosGeladira WHERE idGeladira = ?";
+            String sql = "SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosGeladeira WHERE idGeladeira = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idGeladeira);
             ResultSet rs = pstmt.executeQuery();

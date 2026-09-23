@@ -109,7 +109,7 @@ public class MarcasParceirasDAO {
         List<MarcasParcerias> listaParcerias = new ArrayList<>();
 
         try{
-            String comandoSql = "select p.*, e.nome as Empresa, mp.observacoes from marcasParceiras mp " +
+            String comandoSql = "select p.id as idProdutos, e.nome as Empresa, mp.observacoes from marcasParceiras mp " +
                     "join produtos p on p.id = mp.idProdutos join empresa e on e.cnpj = mp.idEmpresa " +
                     "where e.cnpj = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);

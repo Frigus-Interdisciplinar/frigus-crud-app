@@ -1,8 +1,8 @@
 package com.example.servlet.Dao;
 
-import com.example.servlet.Model.Frigorificos;
-import com.example.servlet.Model.Geladeira;
+import com.example.servlet.Model.*;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.StatusArmazenamento;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -74,4 +74,43 @@ public class GeladeiraDAO {
             conexao.desconectar(conn);// fechando a conexão
         }
     }// ==============ALTERAR===============
+
+
+
+    // ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
+    public List<Geladeira> buscarGeladeiraUsuario(Usuario usuario){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao
+
+        ResultSet rset = null;
+        List<Geladeira> listaGeladeira = new ArrayList<>();
+
+        try{
+            String comandoSql = "select * from geladeira where idUsuario = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o valor do id da empresa
+            pstmt.setString(1, usuario.getCpf());
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                // criando o objeto usuario
+                usuario = new Usuario();
+                usuario.setCpf(rset.getString("idUsuario"));
+
+                // criando o objeto geladeira
+                Geladeira geladeira = new Geladeira(
+                    rset.getInt("id"),
+                    usuario,
+                    rset.getInt("quantidade"),
+                    StatusArmazenamento.valueOf(rset.getString("status")),
+                    rset.getString("tipo")
+                );
+                listaGeladeira.add(geladeira);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao
+        }
+        return listaGeladeira;
+    }// ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
 }
