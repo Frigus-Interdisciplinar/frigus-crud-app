@@ -9,7 +9,6 @@ public class Assinatura {
     private Empresa empresa;
     private TipoAssinatura tipoAssinatura;
     private double valor;
-    private String nome;
     private String descricao;
 
 
@@ -18,64 +17,58 @@ public class Assinatura {
     }
 
     // construtor para planos dos usuarios sem id
-    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
+    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String descricao) {
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
         this.descricao = descricao;
     }
 
 
     // construtor para planos dos usuarios com id
 
-    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
+    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String descricao) {
         this.idAssinatura = idAssinatura;
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
         this.descricao = descricao;
     }
 
     // contrutor para planos dos usuarios sem descricao
-    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String nome) {
+    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor) {
         this.idAssinatura = idAssinatura;
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
     }
 
 
     // construtor para planos das empresas sem id
 
-    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
+    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String descricao) {
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
         this.descricao = descricao;
     }
 
     // construtor para planos das empresas com id
 
-    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome, String descricao) {
+    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String descricao) {
         this.idAssinatura = idAssinatura;
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
         this.descricao = descricao;
     }
 
     // construtor para planos das empresas sem descrição
-    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String nome) {
+    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor) {
         this.idAssinatura = idAssinatura;
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = valor;
-        this.nome = nome;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
     }
 
 
@@ -121,14 +114,6 @@ public class Assinatura {
         this.valor = valor;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public String getDescricao() {
         return descricao;
     }
@@ -147,8 +132,7 @@ public class Assinatura {
                 "Empresa: " + empresa + "\n" +
                 "Tipo de Assinatura: " + tipoAssinatura + "\n" +
                 "Valor: " + valor + "\n" +
-                "Nome: " + nome + "\n" +
-                "Descricao: " + descricao +
+                "Descricao: " + descricao + "\n" +
                 '}';
     }
 }

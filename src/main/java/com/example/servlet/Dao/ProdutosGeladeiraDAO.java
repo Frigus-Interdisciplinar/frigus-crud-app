@@ -6,6 +6,7 @@ import com.example.servlet.Model.ProdutosGeladeira;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Enum.StatusArmazenamento;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -43,7 +44,7 @@ public class ProdutosGeladeiraDAO {
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
-            return -1;
+            return -1;// erro!!
         }
         finally {
             conexao.desconectar(conn);// desconectar
@@ -160,13 +161,13 @@ public class ProdutosGeladeiraDAO {
 
                 // criando o objeto usuario com id vindo do resultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         rset.getInt("Quantidade"),
-                        rset.getString("Status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
                 geladeira.setIdGeladeira(rset.getInt("idGeladeira"));
@@ -229,13 +230,13 @@ public class ProdutosGeladeiraDAO {
 
                 // criando o objeto usuario com id vindo do resultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         rset.getInt("Quantidade"),
-                        rset.getString("Status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
                 geladeira.setIdGeladeira(rset.getInt("idGeladeira"));
@@ -296,13 +297,13 @@ public class ProdutosGeladeiraDAO {
 
                 // criando o objeto usuario com id vindo do resultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         rset.getInt("Quantidade"),
-                        rset.getString("Status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
                 geladeira.setIdGeladeira(rset.getInt("idGeladeira"));
@@ -363,13 +364,13 @@ public class ProdutosGeladeiraDAO {
 
                 // criando o objeto usuario com id vindo do resultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         rset.getInt("Quantidade"),
-                        rset.getString("Status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
                 geladeira.setIdGeladeira(rset.getInt("idGeladeira"));
@@ -429,13 +430,13 @@ public class ProdutosGeladeiraDAO {
 
                 // criando o objeto usuario com id vindo do resultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         rset.getInt("Quantidade"),
-                        rset.getString("Status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
                 geladeira.setIdGeladeira(rset.getInt("idGeladeira"));
@@ -459,42 +460,4 @@ public class ProdutosGeladeiraDAO {
         }
         return pg;
     }// BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
-
-
-
-
-    // CALCULA A QUANTIDADE TOTAL DE PRODUTOS NA GELADEIRA
-    public int buscarQuantidadeTotal(int idGeladeira) {
-
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        int quantidadeTotal = 0;
-
-        try {
-
-            String comandoSql =
-                    "SELECT COALESCE(SUM(quantidade), 0) AS total " +
-                            "FROM ProdutosGeladeira " +
-                            "WHERE idGeladeira = ?;";
-
-            PreparedStatement pstmt =
-                    conn.prepareStatement(comandoSql);
-
-            pstmt.setInt(1, idGeladeira);
-
-            ResultSet rset = pstmt.executeQuery();
-
-            if (rset.next()) {
-                quantidadeTotal = rset.getInt("total");
-            }
-
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        } finally {
-            conexao.desconectar(conn);
-        }
-
-        return quantidadeTotal;
-    }// CALCULA A QUANTIDADE TOTAL DE PRODUTOS NA GELADEIRA
 }

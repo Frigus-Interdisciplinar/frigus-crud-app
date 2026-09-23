@@ -120,7 +120,7 @@ public class IngredienteDAO {
         ResultSet rset = null;
 
         try {
-            String comandoSql = "Select i.*, p.*, r.* from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where i.id = ?;";
+            String comandoSql = "Select i.id as idIngrediente, i.idReceita, i.idProdutos, i.quantidade, p.*, r.* from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where i.id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
             pstmt.setInt(1, ingrediente.getIdIngredientes());

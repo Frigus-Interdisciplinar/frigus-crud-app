@@ -4,6 +4,7 @@ import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.TipoAssinatura;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,15 +23,14 @@ public class AssinaturaDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into assinatura (cpf, tipoAssinatura, valor, nome, descricao) values(?,?,?,?,?);";
+            String comandoSql = "insert into assinatura (idUsuario, tipoAssinatura, valor, descricao) values(?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
             pstmt.setString(1, assinatura.getUsuario().getCpf());
             pstmt.setString(2, assinatura.getTipoAssinatura().name());
             pstmt.setDouble(3, assinatura.getValor());
-            pstmt.setString(4, assinatura.getNome());
-            pstmt.setString(5, assinatura.getDescricao());
+            pstmt.setString(4, assinatura.getDescricao());
 
             if(pstmt.executeUpdate() > 0){
                 return 1; // verifica se deu certo
@@ -47,6 +47,35 @@ public class AssinaturaDAO {
     }// ============ INSERIR ASSINATURA PARA O USUARIO ============
 
 
+
+    // ============ ALTERAR ASSINATURA PARA O USUARIO ============
+    public int alterarAssinUsuario(Assinatura assinatura){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        try{
+            String comandoSql = "update assinatura set idUsuario = ?, tipoAssinatura = ?, valor = ?, descricao = ? where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valor para a operação
+            pstmt.setString(1, assinatura.getUsuario().getCpf());
+            pstmt.setString(2, assinatura.getTipoAssinatura().name());
+            pstmt.setDouble(3, assinatura.getValor());
+            pstmt.setString(4, assinatura.getDescricao());
+            pstmt.setInt(5, assinatura.getIdAssinatura());
+
+            if (pstmt.executeUpdate() > 0){
+                return 1;// deu certo
+            }else{
+                return 0;// nao foi possivel realizar o comando
+            }
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;// erro!!
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+    }// ============ ALTERAR ASSINATURA PARA O USUARIO ============
 
 
     // ============ DELETAR ASSINATURA DO USUARIO ============
@@ -99,9 +128,8 @@ public class AssinaturaDAO {
                 // criando o objeto Assinatura
                 assinatura = new Assinatura(
                         usuario,
-                        rset.getString("tipoAssinatura"),
+                        TipoAssinatura.valueOf(rset.getString("tipoAssinatura")),
                         rset.getDouble("valor"),
-                        rset.getString("nome"),
                         rset.getString("descricao")
                 );
             }
@@ -135,15 +163,14 @@ public class AssinaturaDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into assinatura (cnpj, tipoAssinatura, valor, nome, descricao) values(?,?,?,?,?);";
+            String comandoSql = "insert into assinatura (idEmpresa, tipoAssinatura, valor, descricao) values(?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
             pstmt.setString(1, assinatura.getEmpresa().getCnpj());
-            pstmt.setString(2, assinatura.getTipoAssinatura());
+            pstmt.setString(2, assinatura.getTipoAssinatura().name());
             pstmt.setDouble(3, assinatura.getValor());
-            pstmt.setString(4, assinatura.getNome());
-            pstmt.setString(5, assinatura.getDescricao());
+            pstmt.setString(4, assinatura.getDescricao());
 
             if(pstmt.executeUpdate() > 0){
                 return 1; // verifica se deu certo
@@ -158,6 +185,37 @@ public class AssinaturaDAO {
             conexao.desconectar(conn);
         }
     }// ============ INSERIR ASSINATURA PARA A EMPRESA ============
+
+
+
+    // ============ ALTERAR ASSINATURA PARA A EMPRESA ============
+    public int alterarAssinEmpresa(Assinatura assinatura){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        try{
+            String comandoSql = "update assinatura set idEmpresa = ?, tipoAssinatura = ?, valor = ?, descricao = ? where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valor para a operação
+            pstmt.setString(1, assinatura.getEmpresa().getCnpj());
+            pstmt.setString(2, assinatura.getTipoAssinatura().name());
+            pstmt.setDouble(3, assinatura.getValor());
+            pstmt.setString(4, assinatura.getDescricao());
+            pstmt.setInt(5, assinatura.getIdAssinatura());
+
+            if (pstmt.executeUpdate() > 0){
+                return 1;// deu certo
+            }else{
+                return 0;// nao foi possivel realizar o comando
+            }
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;// erro!!
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+    }// ============ ALTERAR ASSINATURA PARA A EMPRESA============
 
 
 
@@ -212,9 +270,8 @@ public class AssinaturaDAO {
                 // criando o objeto Assinatura
                 assinatura = new Assinatura(
                         empresa,
-                        rset.getString("tipoAssinatura"),
+                        TipoAssinatura.valueOf(rset.getString("tipoAssinatura")),
                         rset.getDouble("valor"),
-                        rset.getString("nome"),
                         rset.getString("descricao")
                 );
             }
@@ -229,37 +286,4 @@ public class AssinaturaDAO {
     }// ============ BUSCANDO A ASSINATURA DA EMPRESA POR CNPJ ============
 
     // ========================================== EMPRESA  ==========================================
-
-
-
-
-    // ============ ALTERAR UNIVERSAL ============
-    public int alterarAssinatura(Assinatura assinatura){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        try{
-            String comandoSql = "update assinatura set tipoAssinatura = ?, valor = ?, nome = ?, descricao = ? where id = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-
-            // setando os valores para a operação
-            pstmt.setString(1, assinatura.getTipoAssinatura());
-            pstmt.setDouble(2, assinatura.getValor());
-            pstmt.setString(3, assinatura.getNome());
-            pstmt.setString(4, assinatura.getDescricao());
-            pstmt.setInt(5, assinatura.getIdAssinatura());
-
-            if(pstmt.executeUpdate() > 0){
-                return 1; // verifica se deu certo
-            }else{
-                return 0; // deu errado!!
-            }
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;
-        }
-        finally {
-            conexao.desconectar(conn);
-        }
-    }// ============ ALTERAR UNIVERSAL ============
 }

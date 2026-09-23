@@ -3,6 +3,7 @@ package com.example.servlet.Dao;
 import com.example.servlet.Model.*;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Service.ArmazenamentoService;
 
 import java.sql.*;
@@ -146,7 +147,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade, " +
-                    "        f.id as idFrigorifico, f.idEmpresa, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, em.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorificos pf on p.id = pf.idProdutos " +
@@ -179,7 +180,7 @@ public class ProdutosFrigorificoDAO {
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
-                        rset.getString("status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
@@ -221,7 +222,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade, " +
-                    "        f.id as idFrigorifico, f.idEmpresa, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, em.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorificos pf on p.id = pf.idProdutos " +
@@ -255,7 +256,7 @@ public class ProdutosFrigorificoDAO {
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
-                        rset.getString("status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
@@ -297,7 +298,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade, " +
-                    "        f.id as idFrigorifico, f.idEmpresa, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, em.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorificos pf on p.id = pf.idProdutos " +
@@ -332,7 +333,7 @@ public class ProdutosFrigorificoDAO {
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
-                        rset.getString("status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
@@ -376,7 +377,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade, " +
-                    "        f.id as idFrigorifico, f.idEmpresa, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, em.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorificos pf on p.id = pf.idProdutos " +
@@ -409,7 +410,7 @@ public class ProdutosFrigorificoDAO {
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
-                        rset.getString("status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
@@ -451,7 +452,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade, " +
-                    "        f.id as idFrigorifico, f.idEmpresa, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, em.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorificos pf on p.id = pf.idProdutos " +
@@ -484,7 +485,7 @@ public class ProdutosFrigorificoDAO {
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
-                        rset.getString("status"),
+                        StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
