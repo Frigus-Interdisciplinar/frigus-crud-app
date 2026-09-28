@@ -113,32 +113,64 @@ public class IngredienteDAO {
     // ========== BUSCAR ==========
 
     // ============= BUSCAR 1 INGREDIENTE(PRODUTO) POR ID =============
-    public Ingredientes buscarIngrediente(Ingredientes ingrediente){
+    public Ingredientes buscarIngrediente(int idIngrediente){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
+        Ingredientes ingrediente = null;
 
         try {
-            String comandoSql = "Select i.id as idIngrediente, i.idReceita, i.idProdutos, i.quantidade, p.*, r.* from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where i.id = ?;";
+            String comandoSql = "SELECT " +
+                    "i.id AS idIngrediente, " +
+                    "i.quantidade AS quantidadeIngrediente, " +
+
+                    "p.id AS idProduto, " +
+                    "p.nome AS nomeProduto, " +
+                    "p.descricao AS descricaoProduto, " +
+                    "p.preco, " +
+                    "p.categoria, " +
+                    "p.marca, " +
+                    "p.unidadeMedida, " +
+
+                    "r.id AS idReceita, " +
+                    "r.nome AS nomeReceita, " +
+                    "r.descricao AS descricaoReceita, " +
+                    "r.modoPreparo, " +
+                    "r.dtReceita, " +
+                    "r.foiFeita "  +
+                    " from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where i.id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
-            pstmt.setInt(1, ingrediente.getIdIngredientes());
+            pstmt.setInt(1, idIngrediente);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
                 // criando o objeto receita
-                Receita receita = new Receita();
-                receita.setIdReceita(rset.getInt("idReceita"));
+                Receita receita = new Receita(
+                        rset.getInt("idReceita"),
+                        rset.getString("nomeReceita"),
+                        rset.getString("descricaoReceita"),
+                        rset.getString("modoPreparo"),
+                        rset.getObject("dtReceita", LocalDate.class),
+                        rset.getBoolean("foiFeita")
+                );
                 // criando o objeto Produto
-                Produto produto = new Produto();
-                produto.setIdProdutos(rset.getInt("idProdutos"));
+                Produto produto = new Produto(
+                        rset.getInt("idProduto"),
+                        rset.getString("nomeProduto"),
+                        rset.getString("descricaoProduto"),
+                        rset.getDouble("preco"),
+                        Categoria.valueOf(rset.getString("categoria")),
+                        rset.getString("marca"),
+                        rset.getString("unidadeMedida")
+                );
                 // criando o objeto ingrediente
                 ingrediente = new Ingredientes(
                         rset.getInt("idIngrediente"),
                         receita,
                         produto,
-                        rset.getInt("quantidade")
+                        rset.getInt("quantidadeIngrediente")
                 );
             }
         }catch (SQLException sqle){
@@ -151,26 +183,49 @@ public class IngredienteDAO {
 
 
     //METODO PARA BUSCAR 1 RECEITA
-    public Ingredientes buscarReceita(Receita receita){
+    public List<Ingredientes> buscarReceita(int idReceita){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
-        Ingredientes ingrediente = null;
+        List<Ingredientes> lista = new ArrayList<>();
 
         try {
-            String comandoSql = "Select i.*, p.*, r.id, r.nome, r.descricao, r.modoPreparo, r.dtReceita, r.foiFeita from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where r.id = ?;";
+            String comandoSql = "SELECT " +
+                    "i.id AS idIngrediente, " +
+                    "i.quantidade AS quantidadeIngrediente, " +
+
+                    "p.id AS idProduto, " +
+                    "p.nome AS nomeProduto, " +
+                    "p.descricao AS descricaoProduto, " +
+                    "p.preco, " +
+                    "p.categoria, " +
+                    "p.marca, " +
+                    "p.unidadeMedida, " +
+
+                    "r.id AS idReceita, " +
+                    "r.nome AS nomeReceita, " +
+                    "r.descricao AS descricaoReceita, " +
+                    "r.modoPreparo, " +
+                    "r.dtReceita, " +
+                    "r.foiFeita " +
+
+                    "FROM ingredientes i " +
+                    "JOIN produtos p ON p.id = i.idProdutos " +
+                    "JOIN receita r ON r.id = i.idReceita " +
+                    "WHERE r.id = ?";
+
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
-            pstmt.setInt(1, receita.getIdReceita());
+            pstmt.setInt(1, idReceita);
             rset = pstmt.executeQuery();
 
-            if (rset.next()){
+            while (rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto(
-                        rset.getInt("idProdutos"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
+                        rset.getInt("idProduto"),
+                        rset.getString("nomeProduto"),
+                        rset.getString("descricaoProduto"),
                         rset.getDouble("preco"),
                         Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
@@ -178,28 +233,29 @@ public class IngredienteDAO {
                 );
 
                 // criando o objeto receita
-                receita = new Receita(
+                Receita receita = new Receita(
                         rset.getInt("idReceita"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
+                        rset.getString("nomeReceita"),
+                        rset.getString("descricaoReceita"),
                         rset.getString("modoPreparo"),
                         rset.getObject("dtReceita", LocalDate.class),
                         rset.getBoolean("foiFeita")
                 );
                 // criando o objeto ingrediente
-                ingrediente = new Ingredientes(
-                        rset.getInt("idIngredientes"),
+                Ingredientes ingrediente = new Ingredientes(
+                        rset.getInt("idIngrediente"),
                         receita,
                         produto,
-                        rset.getInt("quantidade")
+                        rset.getInt("quantidadeIngrediente")
                 );
+                lista.add(ingrediente);
             }
         }catch (SQLException sqle){
             sqle.printStackTrace();
         }finally {
             conexao.desconectar(conn);// fechando a conexao com o banco
         }
-        return ingrediente;
+        return lista;
     }//METODO PARA BUSCAR 1 RECEITA
 
 
@@ -213,18 +269,40 @@ public class IngredienteDAO {
         List<Ingredientes> receitas = new ArrayList<>();
 
         try{
-            String comandoSql = "Select i.*, p.*, r.id, r.nome, r.descricao, r.modoPreparo, r.dtReceita, r.foiFeita "
-            + "from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita "
-            + "order by random() limit 10;";
+            String comandoSql = "SELECT " +
+                    "i.id AS idIngrediente, " +
+                    "i.quantidade AS quantidadeIngrediente, " +
+
+                    "p.id AS idProduto, " +
+                    "p.nome AS nomeProduto, " +
+                    "p.descricao AS descricaoProduto, " +
+                    "p.preco, " +
+                    "p.categoria, " +
+                    "p.marca, " +
+                    "p.unidadeMedida, " +
+
+                    "r.id AS idReceita, " +
+                    "r.nome AS nomeReceita, " +
+                    "r.descricao AS descricaoReceita, " +
+                    "r.modoPreparo, " +
+                    "r.dtReceita, " +
+                    "r.foiFeita " +
+
+                    "FROM ingredientes i " +
+                    "JOIN produtos p ON p.id = i.idProdutos " +
+                    "JOIN (" +
+                    "select * from receita order by random() limit 10 )" +
+                    " r ON r.id = i.idReceita;";
+
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             rset = pstmt.executeQuery();
 
             while (rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto(
-                        rset.getInt("idProdutos"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
+                        rset.getInt("idProduto"),
+                        rset.getString("nomeProduto"),
+                        rset.getString("descricaoProduto"),
                         rset.getDouble("preco"),
                         Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
@@ -234,18 +312,18 @@ public class IngredienteDAO {
                 // criando o objeto receita
                 Receita receita = new Receita(
                         rset.getInt("idReceita"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
+                        rset.getString("nomeReceita"),
+                        rset.getString("descricaoReceita"),
                         rset.getString("modoPreparo"),
                         rset.getObject("dtReceita", LocalDate.class),
                         rset.getBoolean("foiFeita")
                 );
                 // criando o objeto ingrediente
                 Ingredientes ingredientes = new Ingredientes(
-                        rset.getInt("idIngredientes"),
+                        rset.getInt("idIngrediente"),
                         receita,
                         produto,
-                        rset.getInt("quantidade")
+                        rset.getInt("quantidadeIngrediente")
                 );
                 receitas.add(ingredientes);
             }

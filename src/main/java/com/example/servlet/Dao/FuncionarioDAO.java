@@ -4,7 +4,10 @@ import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Funcionario;
 import com.example.servlet.Util.Conexao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,17 +108,18 @@ public class FuncionarioDAO {
 
 
     // VER O FUNCIONARIO PELO CPF
-    public Funcionario buscarFuncionarioPorcpf(Funcionario funcionario){
+    public Funcionario buscarFuncionarioPorcpf(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         ResultSet rset = null;
+        Funcionario funcionario = null;
 
         try{
             String comandoSql ="select * from funcionario where cpf =? ;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor do cpf para a operação
-            pstmt.setString(1, funcionario.getCpf());
+            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
             if(rset.next()){
                 // criando o objeto empresa com o id vindo do result set
@@ -146,7 +150,7 @@ public class FuncionarioDAO {
 
 
     // VER TODOS OS  FUNCIONARIOS DE UMA EMPRESA
-    public List<Funcionario> buscarFuncionariosPorEmpresa(Funcionario funcionario){
+    public List<Funcionario> buscarFuncionariosPorEmpresa(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -157,7 +161,7 @@ public class FuncionarioDAO {
             String comandoSql = "select f.* from funcionario f join empresa e on f.idEmpresa = e.cnpj where e.cnpj = ? ;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor do cnpj da empresa para a operação
-            pstmt.setString(1, funcionario.getEmpresa().getCnpj());
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             while (rset.next()){
@@ -165,7 +169,7 @@ public class FuncionarioDAO {
                 Empresa empresa = new Empresa();
                 empresa.setCnpj(rset.getString("idEmpresa"));
                 // criando o objeto funcionario com o atributos vindos do result set
-                funcionario = new Funcionario(
+                Funcionario funcionario = new Funcionario(
                         rset.getString("cpf"),
                         empresa,
                         rset.getString("email"),

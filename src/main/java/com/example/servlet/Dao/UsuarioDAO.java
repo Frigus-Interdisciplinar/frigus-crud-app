@@ -136,17 +136,18 @@ public class UsuarioDAO {
 
 
     // ================ BUSCAR ================
-    public Usuario buscarUsuario(Usuario usuario){
+    public Usuario buscarUsuario(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
+        Usuario usuario = null;
 
         try{
             String comandoSql = "select * from usuario where cpf = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, usuario.getCpf());
+            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
 
             if (rset.next()){

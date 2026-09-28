@@ -31,21 +31,19 @@ public class ProdutosFrigorifico {
     }
 
     // Construtor com id
-    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int lote,  int quantidade) {
+    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, StatusProduto status, int lote,  int quantidade) {
         this.idProdutosFrigorifico = idProdutosFrigorifico;
         this.idNotificacao = idNotificacao;
         this.frigorificos = frigorificos;
         this.produto = produto;
         this.dtValidade = dtValidade;
-        this.status = StatusProduto.calcularStatus(dtValidade);
+        this.status = status;
         this.lote = lote;
         this.quantidade = quantidade;
     }
 
     // construtor sem lote
-
-    public ProdutosFrigorifico(int idProdutosFrigorifico, int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int quantidade) {
-        this.idProdutosFrigorifico = idProdutosFrigorifico;
+    public ProdutosFrigorifico(int idNotificacao, Frigorificos frigorificos, Produto produto, LocalDate dtValidade, int quantidade) {
         this.idNotificacao = idNotificacao;
         this.frigorificos = frigorificos;
         this.produto = produto;
@@ -99,7 +97,7 @@ public class ProdutosFrigorifico {
     }
 
     public StatusProduto getStatus() {
-        return StatusProduto.calcularStatus(dtValidade);
+        return status;
     }
 
     public void setStatus(StatusProduto status) {

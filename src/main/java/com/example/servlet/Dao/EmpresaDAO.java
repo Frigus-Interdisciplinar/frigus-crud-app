@@ -136,17 +136,18 @@ public class EmpresaDAO {
 
 
     // ================ BUSCAR ================
-    public Empresa buscarEmpresa(Empresa empresa){
+    public Empresa buscarEmpresa(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
+        Empresa empresa = null;
         ResultSet rset = null; // declarando o Result Set
 
         try{
             String comandoSql = "select * from empresa where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, empresa.getCnpj());
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             if (rset.next()){

@@ -39,8 +39,7 @@ public class Produto {
     }
 
     // conrtrutor sem descricao
-    public Produto(int idProdutos, String nome, double preco, Categoria categoria, String marca, String unidadeMedida) {
-        this.idProdutos = idProdutos;
+    public Produto(String nome, double preco, Categoria categoria, String marca, String unidadeMedida) {
         this.nome = nome;
         this.preco = preco;
         this.categoria = categoria;
@@ -107,7 +106,7 @@ public class Produto {
 
     @Override
     public String toString() {
-        return "Produto{" +
+        return "Produto{" + "\n" +
                 "Id do Produto: " + idProdutos + "\n" +
                 "Nome: " + nome + "\n" +
                 "Descricao: " + descricao + "\n" +

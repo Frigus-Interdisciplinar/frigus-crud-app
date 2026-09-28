@@ -17,7 +17,7 @@ public class EnderecoDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "insert into enderecos (rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade) values (?,?,?,?,?,?,?,?);";
+            String comandoSql = "insert into endereco (rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade) values (?,?,?,?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a operação
             pstmt.setString(1, endereco.getRua());
@@ -54,7 +54,7 @@ public class EnderecoDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "update enderecos set rua = ?, bairro = ?, cidade = ?, uf = ?, pais = ?, cep = ?, numero = ?, nomeUnidade = ? where id = ?;";
+            String comandoSql = "update endereco set rua = ?, bairro = ?, cidade = ?, uf = ?, pais = ?, cep = ?, numero = ?, nomeUnidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setString(1, endereco.getRua());
@@ -91,7 +91,7 @@ public class EnderecoDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "delete from enderecos where id = ?;";
+            String comandoSql = "delete from endereco where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setInt(1, endereco.getIdEndereco());
@@ -123,7 +123,7 @@ public class EnderecoDAO {
         try{
             String comandoSql = "select distinct en.* " +
             "from frigorificos f " +
-            "join enderecos en on en.id = f.idEndereco " +
+            "join endereco en on en.id = f.idEndereco " +
             "where f.idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valore para a operação

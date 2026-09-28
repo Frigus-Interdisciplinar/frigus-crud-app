@@ -2,9 +2,9 @@ package com.example.servlet.Util.Enum;
 
 public enum StatusArmazenamento {
     VAZIO,
-    POUCA_OCUPACAO,
+    OCUPACAO_BAIXA,
     OCUPACAO_MODERADA,
-    ALTA_OCUPACAO,
+    OCUPACAO_ALTA,
     CHEIA,
     ILIMITADO;
 
@@ -16,11 +16,11 @@ public enum StatusArmazenamento {
         } else if(quantidadeProd <= 0){
             return VAZIO;
         } else if (quantidadeProd < (totalArmazenamento / 3)) {
-            return POUCA_OCUPACAO;
+            return OCUPACAO_BAIXA;
         } else if (quantidadeProd < ((totalArmazenamento / 3) * 2)) {
             return OCUPACAO_MODERADA;
         } else if (quantidadeProd < (totalArmazenamento -1)) {
-            return ALTA_OCUPACAO;
+            return OCUPACAO_ALTA;
         }else {
             return CHEIA;
         }
