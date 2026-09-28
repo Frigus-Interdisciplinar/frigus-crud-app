@@ -1,11 +1,11 @@
 package com.example.servlet.Dao;
 
-import com.example.servlet.Model.*;
+import com.example.servlet.Model.Geladeira;
+import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.StatusArmazenamento;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,9 +76,35 @@ public class GeladeiraDAO {
     }// ==============ALTERAR===============
 
 
+    // ================ ALTERAR STATUS ================
+    public int atualizarStatus(Geladeira geladeira){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão com o banco
+
+        try{
+            String comandoSlq = "update geladeira set status = ? where id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSlq);
+            // setando os valores para a operação
+            pstmt.setString(1, geladeira.getStatus().name());
+            pstmt.setInt(2, geladeira.getIdGeladeira());
+            // verifica se foi possivel alterar o banco
+            if (pstmt.executeUpdate() > 0){
+                return 1;// deu certo
+            }else {
+                return 0;// não deu certo
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            return -1;// deu erro!!!
+        }
+        finally {
+            conexao.desconectar(conn);// fechando a conexão com o banco
+        }
+    }// ================ ALTERAR STATUS ================
 
     // ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
-    public List<Geladeira> buscarGeladeiraUsuario(Usuario usuario){
+    public List<Geladeira> buscarGeladeiraUsuario(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
 
@@ -89,11 +115,11 @@ public class GeladeiraDAO {
             String comandoSql = "select * from geladeira where idUsuario = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor do id da empresa
-            pstmt.setString(1, usuario.getCpf());
+            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
             while (rset.next()){
                 // criando o objeto usuario
-                usuario = new Usuario();
+                Usuario usuario = new Usuario();
                 usuario.setCpf(rset.getString("idUsuario"));
 
                 // criando o objeto geladeira

@@ -5,6 +5,7 @@ import com.example.servlet.Util.Conexao;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListaComprasDAO {
@@ -72,22 +73,22 @@ public class ListaComprasDAO {
 
 
     // ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELO USUARIO==========
-    public ProdutoLista buscarListaPelaDataUsuario(ListaCompras listaCompras){
+    public List<ProdutoLista> buscarListaPelaDataUsuario(String cpf, LocalDate dtValidade){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
-        ProdutoLista produtoLista = null;
+        List<ProdutoLista> lista = new ArrayList<>();
 
         try{
-            String comandoSql = "select pl.idProdutos,pl.quantidade, lc.idUsuario as cpf, lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idUsuario = ?;";
+            String comandoSql = "select pl.id as idProdutoLista, pl.idProdutos,pl.quantidade, lc.id as idListaCompras, lc.idUsuario as cpf, lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idUsuario = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor da data
-            pstmt.setObject(1, listaCompras.getDtLista());
-            pstmt.setString(2, listaCompras.getUsuario().getCpf());
+            pstmt.setObject(1, dtValidade);
+            pstmt.setString(2, cpf);
             rset = pstmt.executeQuery();
 
-            if(rset.next()){
+            while(rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto();
                 produto.setIdProdutos(rset.getInt("idProdutos"));
@@ -97,15 +98,19 @@ public class ListaComprasDAO {
                 usuario.setCpf(rset.getString("cpf"));
 
                 // criando o objeto lista de compras
-                listaCompras = new ListaCompras();
+                ListaCompras listaCompras = new ListaCompras();
+                listaCompras.setIdLista(rset.getInt("idListaCompras"));
                 listaCompras.setDtLista(rset.getObject("dtLista", LocalDate.class));
                 listaCompras.setUsuario(usuario);
 
                 // criando o objeto produto na lista
-                produtoLista = new ProdutoLista();
-                produtoLista.setProduto(produto);
-                produtoLista.setQuantidade(rset.getInt("quantidade"));
-                produtoLista.setListaCompras(listaCompras);
+                ProdutoLista produtoLista = new ProdutoLista(
+                        rset.getInt("IdProdutoLista"),
+                        listaCompras,
+                        produto,
+                        rset.getInt("quantidade")
+                );
+                lista.add(produtoLista);
             }
 
         }catch (SQLException sqle){
@@ -113,7 +118,7 @@ public class ListaComprasDAO {
         }finally {
             conexao.desconectar(conn);// fechando a conexao com o banco
         }
-        return produtoLista;
+        return lista;
     }// ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELO USUARIO==========
 
 
@@ -134,12 +139,14 @@ public class ListaComprasDAO {
 
         try{
             String comandoSql = "insert into listaCompras (idEmpresa, dtLista) values(?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a operação
             pstmt.setString(1, listaCompras.getEmpresa().getCnpj());
             pstmt.setObject(2, listaCompras.getDtLista());
             // verificando se deu foi possivel executar
             if (pstmt.executeUpdate() > 0 ){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) listaCompras.setIdLista(chaves.getInt(1));
                 return 1;// deu certo
             }
             else{
@@ -169,7 +176,7 @@ public class ListaComprasDAO {
             pstmt.setString(1, listaCompras.getEmpresa().getCnpj());
             pstmt.setObject(2, listaCompras.getDtLista());
             pstmt.setInt(3, listaCompras.getIdLista());
-            // verificando se deu foi possivel executar
+            // verificando se foi possivel executar
             if (pstmt.executeUpdate() > 0 ){
                 return 1;// deu certo
             }
@@ -188,22 +195,23 @@ public class ListaComprasDAO {
 
 
     // ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELA EMPRESA ==========
-    public ProdutoLista buscarListaPelaDataEmpresa(ListaCompras listaCompras){
+    public List<ProdutoLista> buscarListaPelaDataEmpresa(String cnpj, LocalDate dtValideade){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
+        List<ProdutoLista> lista = new ArrayList<>();
         ProdutoLista produtoLista = null;
 
         try{
-            String comandoSql = "select pl.idProdutos,pl.quantidade, lc.idEmpresa as cnpj lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idEmpresa = ?;";
+            String comandoSql = "select pl.id as idProdutoLista pl.idProdutos,pl.quantidade, lc.id as idListaCompras, lc.idEmpresa as cnpj, lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor da data
-            pstmt.setObject(1, listaCompras.getDtLista());
-            pstmt.setString(2, listaCompras.getEmpresa().getCnpj());
+            pstmt.setObject(1, dtValideade);
+            pstmt.setString(2, cnpj);
             rset = pstmt.executeQuery();
 
-            if(rset.next()){
+            while(rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto();
                 produto.setIdProdutos(rset.getInt("idProdutos"));
@@ -213,15 +221,18 @@ public class ListaComprasDAO {
                 empresa.setCnpj(rset.getString("cnpj"));
 
                 // criando o objeto lista de compras
-                listaCompras = new ListaCompras();
+                ListaCompras listaCompras = new ListaCompras();
+                listaCompras.setIdLista(rset.getInt("idListaCompras"));
                 listaCompras.setDtLista(rset.getObject("dtLista", LocalDate.class));
                 listaCompras.setEmpresa(empresa);
 
                 // criando o objeto produto na lista
                 produtoLista = new ProdutoLista();
+                produtoLista.setIdProdutoLista(rset.getInt("idProdutoLista"));
                 produtoLista.setProduto(produto);
                 produtoLista.setQuantidade(rset.getInt("quantidade"));
                 produtoLista.setListaCompras(listaCompras);
+                lista.add(produtoLista);
             }
 
         }catch (SQLException sqle){
@@ -229,7 +240,7 @@ public class ListaComprasDAO {
         }finally {
             conexao.desconectar(conn);// fechando a conexao com o banco
         }
-        return produtoLista;
+        return lista;
     }// ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELA EMPRESA==========
 
 

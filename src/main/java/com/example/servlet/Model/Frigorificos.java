@@ -16,9 +16,8 @@ public class Frigorificos {
     }
 
     // Construtor sem id
-    public Frigorificos(Empresa empresa, StatusArmazenamento status, int quantidade, Endereco endereco, String tipo) {
+    public Frigorificos(Empresa empresa, int quantidade, Endereco endereco, String tipo) {
         this.empresa = empresa;
-        this.status = status;
         this.quantidade = quantidade;
         this.endereco = endereco;
         this.tipo = tipo;

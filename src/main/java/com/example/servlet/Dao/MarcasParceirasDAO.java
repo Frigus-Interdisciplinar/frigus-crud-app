@@ -101,7 +101,7 @@ public class MarcasParceirasDAO {
 
 
     // =========== BUSCAR TODAS AS PARCERIAS COM O CNPJ DA EMPRESA ===========
-    public List<MarcasParcerias> buscarParceriasPorEmpresa(MarcasParcerias parcerias){
+    public List<MarcasParcerias> buscarParceriasPorEmpresa(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -109,12 +109,12 @@ public class MarcasParceirasDAO {
         List<MarcasParcerias> listaParcerias = new ArrayList<>();
 
         try{
-            String comandoSql = "select p.id as idProdutos, e.nome as Empresa, mp.observacoes from marcasParceiras mp " +
+            String comandoSql = "select p.id as idProdutos, e.cnpj, mp.id as idParceria, mp.observacoes from marcasParceiras mp " +
                     "join produtos p on p.id = mp.idProdutos join empresa e on e.cnpj = mp.idEmpresa " +
                     "where e.cnpj = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor do cnpj para a operação
-            pstmt.setString(1, parcerias.getEmpresa().getCnpj());
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             while (rset.next()){
@@ -125,8 +125,8 @@ public class MarcasParceirasDAO {
                 Empresa empresa = new Empresa();
                 empresa.setCnpj(rset.getString("cnpj"));
                 // criando o objeto parcerias
-                parcerias = new MarcasParcerias(
-                        rset.getInt("id"),
+                MarcasParcerias parcerias = new MarcasParcerias(
+                        rset.getInt("idParceria"),
                         empresa,
                         produto,
                         rset.getString("observacoes")
@@ -144,18 +144,18 @@ public class MarcasParceirasDAO {
 
 
     // ============== VERIFICAR SE A EMPRESA TEM PARCERIA ==============
-    public boolean temParceria(Empresa empresa){
+    public boolean temParceria(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
 
         try{
-            String comandoSql = "select 1 from marcasParcerias mp where mp.idEmpresa = ?";
+            String comandoSql = "select 1 from marcasParceiras mp where mp.idEmpresa = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando o valor do cnpj
-            pstmt.setString(1, empresa.getCnpj());
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             // verifica se tem parcerias ou não

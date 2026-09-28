@@ -166,7 +166,7 @@ public class ProdutosGeladeiraDAO {
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        rset.getInt("Quantidade"),
+                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -235,7 +235,7 @@ public class ProdutosGeladeiraDAO {
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        rset.getInt("Quantidade"),
+                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -302,7 +302,7 @@ public class ProdutosGeladeiraDAO {
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        rset.getInt("Quantidade"),
+                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -333,7 +333,7 @@ public class ProdutosGeladeiraDAO {
 
 
     // BUSCAR 1 PRODUTO DA GELADEIRA POR ID DO PRODUTO
-    public ProdutosGeladeira buscarProdutoGeladeiraPorId(Produto produto){
+    public ProdutosGeladeira buscarProdutoGeladeiraPorId(int idProduto){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -349,10 +349,10 @@ public class ProdutosGeladeiraDAO {
                     "join geladeira g on g.id = pg.idGeladeira " +
                     "where p.id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setInt(1,produto.getIdProdutos());// setando os parâmetros da instrução
+            pstmt.setInt(1, idProduto);// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
             if (rset.next()){
-                produto = new Produto(
+                Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
@@ -369,7 +369,7 @@ public class ProdutosGeladeiraDAO {
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        rset.getInt("Quantidade"),
+                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -399,7 +399,7 @@ public class ProdutosGeladeiraDAO {
 
 
     // BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
-    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(Produto produto){
+    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(String nomeProduto){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -415,10 +415,10 @@ public class ProdutosGeladeiraDAO {
                     "join geladeira g on g.id = pg.idGeladeira " +
                     "where lower(p.nome) like ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1,  "%" + produto.getNome().toLowerCase() + "%");// setando os parâmetros da instrução
+            pstmt.setString(1,  "%" + nomeProduto.toLowerCase() + "%");// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
             if (rset.next()){
-                produto = new Produto(
+                Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
                         rset.getDouble("preco"),
@@ -435,7 +435,7 @@ public class ProdutosGeladeiraDAO {
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        rset.getInt("Quantidade"),
+                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );

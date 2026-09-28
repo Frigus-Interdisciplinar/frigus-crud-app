@@ -1,10 +1,8 @@
 package com.example.servlet.Util.Service;
 
-import com.example.servlet.Dao.ProdutosGeladeiraDAO;
 import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Frigorificos;
 import com.example.servlet.Model.Geladeira;
-import com.example.servlet.Model.ProdutosGeladeira;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Enum.TipoAssinatura;
@@ -39,16 +37,17 @@ public class ArmazenamentoService {
 
 
     // ATUALIZAR O STATUS DA GELADEIRA
-    public static void atualizarStatusGeladeira(Geladeira geladeira, Assinatura assinatura){
+    public static void calcularStatusGeladeira(Geladeira geladeira, Assinatura assinatura){
         // buscar a quantidade total de produtos na geladeira
-        int quatidadeProd = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
+        int quantidadeProd = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
         // buscar pelo tipo de plano para pegar a quantidade maxima dele
         int capacidade = TipoAssinatura.quantidadePorPlano(assinatura.getTipoAssinatura());
         // calcular o status comparando com o total de produtos que podem ser armazenados
-        StatusArmazenamento novoStatus = StatusArmazenamento.DefinirStatus(quatidadeProd,capacidade);
+        StatusArmazenamento novoStatus = StatusArmazenamento.DefinirStatus(quantidadeProd,capacidade);
         // aplicando no objeto geladeira
         geladeira.setStatus(novoStatus);
     }// ATUALIZAR O STATUS DA GELADEIRA
+
 
 
 
@@ -60,7 +59,7 @@ public class ArmazenamentoService {
         Connection conn = conexao.conectar();
         int total = 0;
         try {
-            String sql = "SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosFrigorifico WHERE idFrigorifico = ?";
+            String sql = "SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosFrigorifico WHERE idFrigorificos = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idFrigorifico);
             ResultSet rs = pstmt.executeQuery();
@@ -75,13 +74,13 @@ public class ArmazenamentoService {
 
 
     // ATUALIZAR O STATUS DO FRIGORIFICOS
-    public static void atualizarStatusFrigorifico(Frigorificos frigorifico, Assinatura assinatura){
+    public static void calcularStatusFrigorifico(Frigorificos frigorifico, Assinatura assinatura){
         // buscar a quantidade total de produtos na geladeira
-        int quatidadeProd = ArmazenamentoService.totalProdutosFrigorificos(frigorifico.getIdFrigorifico());
+        int quantidadeProd = ArmazenamentoService.totalProdutosFrigorificos(frigorifico.getIdFrigorifico());
         // buscar pelo tipo de plano para pegar a quantidade maxima dele
         int capacidade = TipoAssinatura.quantidadePorPlano(assinatura.getTipoAssinatura());
         // calcular o status comparando com o total de produtos que podem ser armazenados
-        StatusArmazenamento novoStatus = StatusArmazenamento.DefinirStatus(quatidadeProd,capacidade);
+        StatusArmazenamento novoStatus = StatusArmazenamento.DefinirStatus(quantidadeProd,capacidade);
         // aplicando no objeto geladeira
         frigorifico.setStatus(novoStatus);
     }// ATUALIZAR O STATUS DO FRIGORIFICOS

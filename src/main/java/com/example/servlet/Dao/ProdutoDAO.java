@@ -44,7 +44,7 @@ public class ProdutoDAO {
     }// ==============INSERIR===============o
 
     // ==============ALTERAR===============
-    public int alterarProduto(Produto produto) {
+    public int alterarProduto(Produto produtoAntigo, Produto novoProduto) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -54,13 +54,13 @@ public class ProdutoDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // definido os parâmetros da instrução
-            pstmt.setString(1, produto.getNome());
-            pstmt.setString(2, produto.getDescricao());
-            pstmt.setDouble(3, produto.getPreco());
-            pstmt.setString(4, produto.getCategoria().name());
-            pstmt.setString(5, produto.getMarca());
-            pstmt.setString(6, produto.getUnidadeMedida());
-            pstmt.setInt(7, produto.getIdProdutos());
+            pstmt.setString(1, novoProduto.getNome());
+            pstmt.setString(2, novoProduto.getDescricao());
+            pstmt.setDouble(3, novoProduto.getPreco());
+            pstmt.setString(4, novoProduto.getCategoria().name());
+            pstmt.setString(5, novoProduto.getMarca());
+            pstmt.setString(6, novoProduto.getUnidadeMedida());
+            pstmt.setInt(7, produtoAntigo.getIdProdutos());
 
             if (pstmt.executeUpdate() > 0) {
                 return 1; // verifica se deu certo
@@ -104,18 +104,18 @@ public class ProdutoDAO {
 
 
 
-    // =========== BUSCAR ===========
-    public List<Produto> buscarproduto(Produto produto){
+    // =========== BUSCAR UM UNICO PRODUTO ===========
+    public Produto buscarprodutoPorId(int idPorduto){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
-        List<Produto> produtos = new ArrayList<>();
+        Produto produto = null;
         try{
             String comandoSql = "select * from produtos where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setInt(1, produto.getIdProdutos());
+            pstmt.setInt(1, idPorduto);
             rset = pstmt.executeQuery();
 
             if (rset.next()) {
@@ -128,7 +128,7 @@ public class ProdutoDAO {
                         rset.getString("marca"),
                         rset.getString("unidademedida")
                 );
-                produtos.add(produto);
+
             }
         }catch (SQLException sqle){
             sqle.printStackTrace();
@@ -136,8 +136,44 @@ public class ProdutoDAO {
         finally {
             conexao.desconectar(conn); // fechando a conexao com o banco
         }
-        return produtos;
-    }// =========== BUSCAR ===========
+        return produto;
+    }// =========== BUSCAR UM UNICO PRODUTO ===========
+
+
+
+    // =========== BUSCAR TODOS OS PRODUTO ===========
+    public List<Produto> buscarTodosprodutos(){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        ResultSet rset = null;
+        List<Produto> lista = new ArrayList<>();
+        Produto produto = null;
+        try{
+            String comandoSql = "select * from produtos;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                produto = new Produto(
+                        rset.getInt("id"),
+                        rset.getString("nome"),
+                        rset.getString("descricao"),
+                        rset.getDouble("preco"),
+                        Categoria.valueOf(rset.getString("categoria")),
+                        rset.getString("marca"),
+                        rset.getString("unidademedida")
+                );
+                lista.add(produto);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn); // fechando a conexao com o banco
+        }
+        return lista;
+    }// =========== BUSCAR TODOS OS PRODUTO ===========
 
 }
 

@@ -17,18 +17,7 @@ public class Assinatura {
     }
 
     // construtor para planos dos usuarios sem id
-    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String descricao) {
-        this.usuario = usuario;
-        this.tipoAssinatura = tipoAssinatura;
-        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
-        this.descricao = descricao;
-    }
-
-
-    // construtor para planos dos usuarios com id
-
-    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String descricao) {
-        this.idAssinatura = idAssinatura;
+    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, String descricao) {
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
@@ -36,27 +25,23 @@ public class Assinatura {
     }
 
     // contrutor para planos dos usuarios sem descricao
-    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor) {
-        this.idAssinatura = idAssinatura;
+    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura) {
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
     }
 
-
-    // construtor para planos das empresas sem id
-
-    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String descricao) {
-        this.empresa = empresa;
+    // construtor para constuir o objeto vindo do banco com foco no usuario
+    public Assinatura(int idAssinatura, Usuario usuario, TipoAssinatura tipoAssinatura, double valor, String descricao) {
+        this.idAssinatura = idAssinatura;
+        this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
-        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
+        this.valor = valor;
         this.descricao = descricao;
     }
 
-    // construtor para planos das empresas com id
-
-    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String descricao) {
-        this.idAssinatura = idAssinatura;
+    // construtor para planos das empresas sem id
+    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, String descricao) {
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
@@ -64,11 +49,19 @@ public class Assinatura {
     }
 
     // construtor para planos das empresas sem descrição
-    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor) {
-        this.idAssinatura = idAssinatura;
+    public Assinatura( Empresa empresa, TipoAssinatura tipoAssinatura) {
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
+    }
+
+    // construtor para ver o objeto no banco com foco na empresa
+    public Assinatura(int idAssinatura, Empresa empresa, TipoAssinatura tipoAssinatura, double valor, String descricao) {
+        this.idAssinatura = idAssinatura;
+        this.empresa = empresa;
+        this.tipoAssinatura = tipoAssinatura;
+        this.valor = valor;
+        this.descricao = descricao;
     }
 
 
@@ -104,6 +97,7 @@ public class Assinatura {
 
     public void setTipoAssinatura(TipoAssinatura tipoAssinatura) {
         this.tipoAssinatura = tipoAssinatura;
+        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
     }
 
     public double getValor() {
@@ -132,7 +126,7 @@ public class Assinatura {
                 "Empresa: " + empresa + "\n" +
                 "Tipo de Assinatura: " + tipoAssinatura + "\n" +
                 "Valor: " + valor + "\n" +
-                "Descricao: " + descricao + "\n" +
+                "Descricao: " + String.valueOf(descricao) + "\n" +
                 '}';
     }
 }

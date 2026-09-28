@@ -6,10 +6,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 
 public class AssinaturaDAO {
@@ -24,7 +21,7 @@ public class AssinaturaDAO {
 
         try{
             String comandoSql = "insert into assinatura (idUsuario, tipoAssinatura, valor, descricao) values(?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
             pstmt.setString(1, assinatura.getUsuario().getCpf());
@@ -33,6 +30,8 @@ public class AssinaturaDAO {
             pstmt.setString(4, assinatura.getDescricao());
 
             if(pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();
+                if (chaves.next()) assinatura.setIdAssinatura(chaves.getInt(1));
                 return 1; // verifica se deu certo
             }else{
                 return 0; // deu errado!!
@@ -107,26 +106,28 @@ public class AssinaturaDAO {
 
 
     // ============ BUSCANDO A ASSINATURA DO USUARIO POR CPF ============
-    public Assinatura buscarAssinaturaUsuario(Assinatura assinatura){
+    public Assinatura buscarAssinaturaUsuario(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
+        Assinatura assinatura = null;
         ResultSet rset = null;
 
         try{
-            String comandoSql = "select * from assinatura where cpf = ?;";
+            String comandoSql = "select * from assinatura where idUsuario = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // sentado o valor do cpf
-            pstmt.setString(1, assinatura.getUsuario().getCpf());
+            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
                 // Criando o objeto usuario com o ID vindo do ResultSet
                 Usuario usuario = new Usuario();
-                usuario.setCpf(rset.getString("cpf"));
+                usuario.setCpf(rset.getString("idUsuario"));
 
                 // criando o objeto Assinatura
                 assinatura = new Assinatura(
+                        rset.getInt("id"),
                         usuario,
                         TipoAssinatura.valueOf(rset.getString("tipoAssinatura")),
                         rset.getDouble("valor"),
@@ -164,7 +165,7 @@ public class AssinaturaDAO {
 
         try{
             String comandoSql = "insert into assinatura (idEmpresa, tipoAssinatura, valor, descricao) values(?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
             pstmt.setString(1, assinatura.getEmpresa().getCnpj());
@@ -173,6 +174,8 @@ public class AssinaturaDAO {
             pstmt.setString(4, assinatura.getDescricao());
 
             if(pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();
+                if(chaves.next()) assinatura.setIdAssinatura(chaves.getInt(1));
                 return 1; // verifica se deu certo
             }else{
                 return 0; // deu errado!!
@@ -249,26 +252,28 @@ public class AssinaturaDAO {
 
 
     // ============ BUSCANDO A ASSINATURA DA EMPRESA POR CNPJ ============
-    public Assinatura buscarAssinaturaEmpresa(Assinatura assinatura){
+    public Assinatura buscarAssinaturaEmpresa(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
+        Assinatura assinatura = null;
         ResultSet rset = null;
 
         try{
             String comandoSql = "select * from assinatura where idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // sentado o valor do cnpj
-            pstmt.setString(1, assinatura.getEmpresa().getCnpj());
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
                 // Criando o objeto usuario com o ID vindo do ResultSet
                 Empresa empresa = new Empresa();
-                empresa.setCnpj(rset.getString("cnpj"));
+                empresa.setCnpj(rset.getString("idEmpresa"));
 
                 // criando o objeto Assinatura
-                assinatura = new Assinatura(
+                 assinatura = new Assinatura(
+                        rset.getInt("id"),
                         empresa,
                         TipoAssinatura.valueOf(rset.getString("tipoAssinatura")),
                         rset.getDouble("valor"),
