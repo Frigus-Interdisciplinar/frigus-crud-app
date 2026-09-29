@@ -17,11 +17,11 @@
         placeholder="Digite seu email">
         <br>
         <label for="senha"><b>Senha</b></label>
-        <input type="senha" id="senha" name="senha"
+        <input type="password" id="senha" name="senha"
         placeholder="Digite sua senha">
         <br>
         <label for="telefone"><b>Telefone</b></label>
-        <input type="telefone" id="telefone" name="telefone"
+        <input type="text" id="telefone" name="telefone"
         placeholder="Digite seu telefone">
 
         

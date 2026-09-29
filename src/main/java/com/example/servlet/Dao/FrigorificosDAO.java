@@ -18,14 +18,13 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into frigorificos (idEmpresa, status, quantidade, idEndereco, tipo) values (?,?,?,?,?);";
+            String comandoSql = "insert into frigorificos (idEmpresa, status, idEndereco, tipo) values (?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para o comando
             pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
             pstmt.setString(2, frigorifico.getStatus().name());
-            pstmt.setInt(3, frigorifico.getQuantidade());
-            pstmt.setInt(4, frigorifico.getEndereco().getIdEndereco());
-            pstmt.setString(5, frigorifico.getTipo());
+            pstmt.setInt(3, frigorifico.getEndereco().getIdEndereco());
+            pstmt.setString(4, frigorifico.getTipo());
 
             if (pstmt.executeUpdate() > 0){
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
@@ -54,15 +53,14 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, quantidade = ?, idEndereco = ?, tipo = ?  where id = ?;";
+            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
             pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
             pstmt.setString(2, frigorifico.getStatus().name());
-            pstmt.setInt(3, frigorifico.getQuantidade());
-            pstmt.setInt(4, frigorifico.getEndereco().getIdEndereco());
-            pstmt.setString(5, frigorifico.getTipo());
-            pstmt.setInt(6, frigorifico.getIdFrigorifico());
+            pstmt.setInt(3, frigorifico.getEndereco().getIdEndereco());
+            pstmt.setString(4, frigorifico.getTipo());
+            pstmt.setInt(5, frigorifico.getIdFrigorifico());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -139,7 +137,6 @@ public class FrigorificosDAO {
                         rset.getInt("id"),
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
-                        rset.getInt("quantidade"),
                         endereco,
                         rset.getString("tipo")
                 );

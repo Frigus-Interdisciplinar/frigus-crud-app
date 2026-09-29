@@ -16,7 +16,7 @@ public class Conexao {
 
     public Conexao() {
 
-        dotenv = Dotenv.load();
+        dotenv = Dotenv.configure().directory("C:\\Users\\20260224-ieg\\OneDrive - Instituto J&F\\Desktop\\Frigus\\Frigus_BackEnd\\.env").ignoreIfMalformed().ignoreIfMissing().load();
 
         url = dotenv.get("DB_URL");
         usuario = dotenv.get("DB_USER");

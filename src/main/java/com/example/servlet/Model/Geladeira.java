@@ -6,7 +6,6 @@ import com.example.servlet.Util.Enum.StatusArmazenamento;
 public class Geladeira {
     private int idGeladeira;
     private Usuario usuario;
-    private int quantidade;
     private StatusArmazenamento status;
     private String tipo;
 
@@ -14,27 +13,24 @@ public class Geladeira {
     public Geladeira() {
     }
 
-    // Construtor sem id
-    public Geladeira(Usuario usuario, int quantidade, StatusArmazenamento status, String tipo) {
+    // Construtor sem id e status
+    public Geladeira(Usuario usuario, String tipo) {
         this.usuario = usuario;
-        this.quantidade = quantidade;
-        this.status = status;
+        this.status = StatusArmazenamento.VAZIO;
         this.tipo = tipo;
     }
 
-    // construtor sem tipo
-    public Geladeira(int idGeladeira, Usuario usuario, int quantidade, StatusArmazenamento status) {
-        this.idGeladeira = idGeladeira;
+    // Construtor sem id e status e tipo
+    public Geladeira(Usuario usuario) {
         this.usuario = usuario;
-        this.quantidade = quantidade;
-        this.status = status;
+        this.status = StatusArmazenamento.VAZIO;
     }
 
-    // Construtor com id
-    public Geladeira(int idGeladeira, Usuario usuario, int quantidade, StatusArmazenamento status, String tipo) {
+
+    // Construtor para o banco
+    public Geladeira(int idGeladeira, Usuario usuario, StatusArmazenamento status, String tipo) {
         this.idGeladeira = idGeladeira;
         this.usuario = usuario;
-        this.quantidade = quantidade;
         this.status = status;
         this.tipo = tipo;
     }
@@ -56,13 +52,6 @@ public class Geladeira {
         this.idGeladeira = idGeladeira;
     }
 
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
-    }
 
     public StatusArmazenamento getStatus() {
         return status;
@@ -85,7 +74,6 @@ public class Geladeira {
         return "Geladeira{" +
                 "Id da Geladeira: " + idGeladeira + "\n" +
                 "Usuario: \t" + usuario.toString() + "\n" +
-                "Quantidade: " + quantidade + "\n" +
                 "Status: " + status.name() + "\n" +
                 "Tipo: " + tipo + "\n" +
                 '}';

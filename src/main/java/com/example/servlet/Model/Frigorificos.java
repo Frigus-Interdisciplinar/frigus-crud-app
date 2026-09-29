@@ -7,7 +7,6 @@ public class Frigorificos {
     private int idFrigorifico;
     private Empresa empresa;
     private StatusArmazenamento status;
-    private int quantidade;
     private Endereco endereco;
     private String tipo;
 
@@ -16,20 +15,18 @@ public class Frigorificos {
     }
 
     // Construtor sem id
-    public Frigorificos(Empresa empresa, int quantidade, Endereco endereco, String tipo) {
+    public Frigorificos(Empresa empresa, Endereco endereco, String tipo) {
         this.empresa = empresa;
-        this.quantidade = quantidade;
         this.endereco = endereco;
         this.tipo = tipo;
     }
 
 
     // Construtor com id
-    public Frigorificos(int idFrigorifico, Empresa empresa, StatusArmazenamento status, int quantidade, Endereco endereco, String tipo) {
+    public Frigorificos(int idFrigorifico, Empresa empresa, StatusArmazenamento status, Endereco endereco, String tipo) {
         this.idFrigorifico = idFrigorifico;
         this.empresa = empresa;
         this.status = status;
-        this.quantidade = quantidade;
         this.endereco = endereco;
         this.tipo = tipo;
     }
@@ -79,21 +76,12 @@ public class Frigorificos {
         this.status = status;
     }
 
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
-    }
-
     @Override
     public String toString() {
         return "Frigorificos{" + "\n" +
                 "Id do Frigorifico: " + idFrigorifico + "\n" +
                 "Empresa: \t" + empresa.toString() + "\n" +
                 "Status: " + status.name() + "\n" +
-                "Quantidade: " + quantidade + "\n" +
                 "Endereço: \t" + endereco.toString() + "\n" +
                 "Tipo: " + tipo + "\n" +
                 '}';

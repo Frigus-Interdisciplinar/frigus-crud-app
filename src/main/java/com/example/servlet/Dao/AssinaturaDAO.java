@@ -48,7 +48,7 @@ public class AssinaturaDAO {
 
 
     // ============ ALTERAR ASSINATURA PARA O USUARIO ============
-    public int alterarAssinUsuario(Assinatura assinatura){
+    public int alterarAssinUsuario(Assinatura assinaturaAntiga, Assinatura assinaturaNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -56,11 +56,11 @@ public class AssinaturaDAO {
             String comandoSql = "update assinatura set idUsuario = ?, tipoAssinatura = ?, valor = ?, descricao = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valor para a operação
-            pstmt.setString(1, assinatura.getUsuario().getCpf());
-            pstmt.setString(2, assinatura.getTipoAssinatura().name());
-            pstmt.setDouble(3, assinatura.getValor());
-            pstmt.setString(4, assinatura.getDescricao());
-            pstmt.setInt(5, assinatura.getIdAssinatura());
+            pstmt.setString(1, assinaturaNova.getUsuario().getCpf());
+            pstmt.setString(2, assinaturaNova.getTipoAssinatura().name());
+            pstmt.setDouble(3, assinaturaNova.getValor());
+            pstmt.setString(4, assinaturaNova.getDescricao());
+            pstmt.setInt(5, assinaturaAntiga.getIdAssinatura());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// deu certo
@@ -192,7 +192,7 @@ public class AssinaturaDAO {
 
 
     // ============ ALTERAR ASSINATURA PARA A EMPRESA ============
-    public int alterarAssinEmpresa(Assinatura assinatura){
+    public int alterarAssinEmpresa(Assinatura assinaturaAntiga, Assinatura assinaturaNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -200,11 +200,11 @@ public class AssinaturaDAO {
             String comandoSql = "update assinatura set idEmpresa = ?, tipoAssinatura = ?, valor = ?, descricao = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valor para a operação
-            pstmt.setString(1, assinatura.getEmpresa().getCnpj());
-            pstmt.setString(2, assinatura.getTipoAssinatura().name());
-            pstmt.setDouble(3, assinatura.getValor());
-            pstmt.setString(4, assinatura.getDescricao());
-            pstmt.setInt(5, assinatura.getIdAssinatura());
+            pstmt.setString(1, assinaturaNova.getEmpresa().getCnpj());
+            pstmt.setString(2, assinaturaNova.getTipoAssinatura().name());
+            pstmt.setDouble(3, assinaturaNova.getValor());
+            pstmt.setString(4, assinaturaNova.getDescricao());
+            pstmt.setInt(5, assinaturaAntiga.getIdAssinatura());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// deu certo

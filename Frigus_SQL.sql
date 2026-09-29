@@ -1,5 +1,10 @@
 /*
 
+
+-- apagar o banco quando necessario
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
 --Criação das tabelas
 CREATE TABLE Usuario(
     cpf         varchar(11)  primary key,
@@ -50,7 +55,7 @@ CREATE TABLE Receita(
     id            serial      primary key,
     idEmpresa     varchar(14)     null,    
     idUsuario     varchar(11)     null,
-    nome          varchar(20) not null,
+    nome          varchar(50) not null,
     descricao     text            null,
     modoPreparo   text        not null,
     dtReceita     date        not null default current_date,
@@ -92,7 +97,6 @@ CREATE TABLE Frigorificos(
     id              serial      primary key,
     idEndereco      int         not null,
     idEmpresa       varchar(14) not null,
-    quantidade      int         not null,
     status          varchar(20) not null default 'OCUPACAO_MODERADA',
     tipo            varchar(20) not null default 'Freezer'
 );
@@ -121,7 +125,6 @@ CREATE TABLE Geladeira(
     id             serial      primary key,
     idUsuario      varchar(11) not null,
     status         varchar(20) not null default 'OCUPACAO_MODERADA',
-    quantidade     int         not null default 0,
     tipo           varchar(20)     null default 'Geladeira'
 );
 
@@ -323,15 +326,6 @@ alter table Empresa
     check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
 
-alter table Geladeira
-    add constraint chk_quantidade_geladeira
-    check (quantidade >= 0);
-
-
-alter table Frigorificos
-    add constraint chk_quantidade_frigorificos
-    check (quantidade >= 0);
-
 
 alter table Ingredientes
     add constraint chk_quantidade_ingredientes
@@ -357,7 +351,7 @@ alter table Usuario
 alter table Endereco
 	add constraint chk_cep_formato
     check (cep ~ '^\d{5}-?\d{3}$');
-
+    
 
 
 
@@ -533,59 +527,57 @@ INSERT INTO Funcionario (cpf, idEmpresa, nome, Sobrenome, cargo, email, senha, t
 
 
 -- Produtos
-
 INSERT INTO Produtos (nome, descricao, preco, categoria, marca, unidadeMedida) VALUES
-('Leite Integral', 'Leite de vaca integral pasteurizado, rico em calcio e proteinas', 6.49, 'LATICIONIOS', 'Itambe', 'litro'),
-('Peito de Frango', 'Peito de frango resfriado, sem osso e sem pele', 22.9, 'CARNES', 'Sadia', 'kg'),
-('Alface Crespa', 'Alface crespa fresca, colhida diariamente', 3.49, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Queijo Mussarela', 'Queijo mussarela fatiado, ideal para lanches e pizzas', 34.9, 'LATICIONIOS', 'Tirolez', 'kg'),
-('Iogurte Natural', 'Iogurte natural integral sem adicao de acucar', 5.29, 'LATICIONIOS', 'Perdigao', 'unidade'),
-('Carne Moida', 'Carne bovina moida na hora, patinho', 28.9, 'CARNES', 'Seara', 'kg'),
-('Tomate Salada', 'Tomate salada maduro, ideal para saladas e molhos', 7.99, 'HORTALICAS', 'Vigor', 'kg'),
-('Requeijao Cremoso', 'Requeijao cremoso tradicional em pote', 9.79, 'LATICIONIOS', 'Danone', 'unidade'),
-('File de Tilapia', 'File de tilapia fresco, sem espinhas', 32.9, 'PESCADOS', 'Piracanjuba', 'kg'),
-('Cenoura', 'Cenoura fresca lavada, rica em vitamina A', 4.59, 'HORTALICAS', 'Friboi', 'kg'),
-('Manteiga com Sal', 'Manteiga com sal em tablete de 200g', 12.49, 'LATICIONIOS', 'Itambe', 'unidade'),
-('Linguica Toscana', 'Linguica toscana resfriada para churrasco', 19.9, 'EMBUTIDOS', 'Sadia', 'kg'),
-('Batata Inglesa', 'Batata inglesa lavada, tamanho medio', 5.99, 'HORTALICAS', 'FazendaVerde', 'kg'),
-('Presunto Fatiado', 'Presunto cozido fatiado, embalagem a vacuo', 24.9, 'EMBUTIDOS', 'Tirolez', 'kg'),
-('Brocolis', 'Brocolis ninja fresco, rico em fibras', 6.99, 'HORTALICAS', 'Perdigao', 'unidade'),
+('Leite Integral', 'Leite de vaca integral pasteurizado, rico em calcio e proteinas', 6.49, 'LATICIONIOS', 'Seara', 'litro'),
+('Peito de Frango', 'Peito de frango resfriado, sem osso e sem pele', 22.9, 'CARNES', 'Seara', 'kg'),
+('Alface Crespa', 'Alface crespa fresca, colhida diariamente', 3.49, 'HORTALICAS', 'Seara', 'unidade'),
+('Queijo Mussarela', 'Queijo mussarela fatiado, ideal para lanches e pizzas', 34.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Iogurte Natural', 'Iogurte natural integral sem adicao de acucar', 5.29, 'LATICIONIOS', 'Seara', 'unidade'),
+('Carne Moida', 'Carne bovina moida na hora, patinho', 28.9, 'CARNES', 'Friboi', 'kg'),
+('Tomate Salada', 'Tomate salada maduro, ideal para saladas e molhos', 7.99, 'HORTALICAS', 'Seara', 'kg'),
+('Requeijao Cremoso', 'Requeijao cremoso tradicional em pote', 9.79, 'LATICIONIOS', 'Doriana', 'unidade'),
+('File de Tilapia', 'File de tilapia fresco, sem espinhas', 32.9, 'PESCADOS', 'Seara', 'kg'),
+('Cenoura', 'Cenoura fresca lavada, rica em vitamina A', 4.59, 'HORTALICAS', 'Seara', 'kg'),
+('Manteiga com Sal', 'Manteiga com sal em tablete de 200g', 12.49, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Linguica Toscana', 'Linguica toscana resfriada para churrasco', 19.9, 'EMBUTIDOS', 'Seara', 'kg'),
+('Batata Inglesa', 'Batata inglesa lavada, tamanho medio', 5.99, 'HORTALICAS', 'Seara', 'kg'),
+('Presunto Fatiado', 'Presunto cozido fatiado, embalagem a vacuo', 24.9, 'EMBUTIDOS', 'Seara', 'kg'),
+('Brocolis', 'Brocolis ninja fresco, rico em fibras', 6.99, 'HORTALICAS', 'Seara', 'unidade'),
 ('Leite Desnatado', 'Leite desnatado UHT, baixo teor de gordura', 6.79, 'LATICIONIOS', 'Seara', 'litro'),
-('Costela Bovina', 'Costela bovina resfriada, ideal para churrasco', 39.9, 'CARNES', 'Vigor', 'kg'),
-('Cebola Roxa', 'Cebola roxa fresca, sabor suave e adocicado', 8.49, 'HORTALICAS', 'Danone', 'kg'),
-('Cream Cheese', 'Cream cheese tradicional em pote de 150g', 14.9, 'LATICIONIOS', 'Piracanjuba', 'unidade'),
-('Salmao Fresco', 'File de salmao fresco, corte porcionado', 69.9, 'PESCADOS', 'Friboi', 'kg'),
-('Abobrinha', 'Abobrinha italiana fresca', 5.49, 'HORTALICAS', 'Itambe', 'kg'),
-('Bacon em Cubos', 'Bacon defumado cortado em cubos', 27.9, 'EMBUTIDOS', 'Sadia', 'pacote'),
-('Pepino Japones', 'Pepino japones fresco, casca fina', 4.99, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Ricota Fresca', 'Ricota fresca artesanal em pote', 11.9, 'LATICIONIOS', 'Tirolez', 'unidade'),
-('Coxa de Frango', 'Coxa de frango resfriada com sobrecoxa', 15.9, 'CARNES', 'Perdigao', 'kg'),
+('Costela Bovina', 'Costela bovina resfriada, ideal para churrasco', 39.9, 'CARNES', 'Friboi', 'kg'),
+('Cebola Roxa', 'Cebola roxa fresca, sabor suave e adocicado', 8.49, 'HORTALICAS', 'Seara', 'kg'),
+('Cream Cheese', 'Cream cheese tradicional em pote de 150g', 14.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Salmao Fresco', 'File de salmao fresco, corte porcionado', 69.9, 'PESCADOS', 'Seara', 'kg'),
+('Abobrinha', 'Abobrinha italiana fresca', 5.49, 'HORTALICAS', 'Seara', 'kg'),
+('Bacon em Cubos', 'Bacon defumado cortado em cubos', 27.9, 'EMBUTIDOS', 'Seara', 'pacote'),
+('Pepino Japones', 'Pepino japones fresco, casca fina', 4.99, 'HORTALICAS', 'Seara', 'unidade'),
+('Ricota Fresca', 'Ricota fresca artesanal em pote', 11.9, 'LATICIONIOS', 'Seara', 'unidade'),
+('Coxa de Frango', 'Coxa de frango resfriada com sobrecoxa', 15.9, 'CARNES', 'Big Frango', 'kg'),
 ('Couve Manteiga', 'Couve manteiga fresca, folhas selecionadas', 3.99, 'HORTALICAS', 'Seara', 'unidade'),
-('Iogurte Grego', 'Iogurte grego cremoso, alto teor proteico', 8.49, 'LATICIONIOS', 'Vigor', 'unidade'),
-('Pernil Suino', 'Pernil suino resfriado, ideal para assados', 21.9, 'CARNES', 'Danone', 'kg'),
-('Pimentao Verde', 'Pimentao verde fresco, crocante', 9.99, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Queijo Prato', 'Queijo prato fatiado, sabor suave', 36.9, 'LATICIONIOS', 'Friboi', 'kg'),
-('Ovos Brancos', 'Ovos brancos tipo grande, caixa com 12 unidades', 14.9, 'OVOS', 'Itambe', 'caixa'),
-('File Mignon', 'File mignon bovino, corte nobre', 79.9, 'CARNES', 'Sadia', 'kg'),
-('Repolho Roxo', 'Repolho roxo fresco, ideal para saladas', 5.29, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Leite Semidesnatado', 'Leite semidesnatado UHT longa vida', 6.59, 'LATICIONIOS', 'Tirolez', 'litro'),
-('Camarao Limpo', 'Camarao limpo e congelado, medio', 54.9, 'PESCADOS', 'Perdigao', 'kg'),
+('Iogurte Grego', 'Iogurte grego cremoso, alto teor proteico', 8.49, 'LATICIONIOS', 'Seara', 'unidade'),
+('Pernil Suino', 'Pernil suino resfriado, ideal para assados', 21.9, 'CARNES', 'Seara', 'kg'),
+('Pimentao Verde', 'Pimentao verde fresco, crocante', 9.99, 'HORTALICAS', 'Seara', 'kg'),
+('Queijo Prato', 'Queijo prato fatiado, sabor suave', 36.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Ovos Brancos', 'Ovos brancos tipo grande, caixa com 12 unidades', 14.9, 'OVOS', 'Seara', 'caixa'),
+('File Mignon', 'File mignon bovino, corte nobre', 79.9, 'CARNES', 'Swift', 'kg'),
+('Repolho Roxo', 'Repolho roxo fresco, ideal para saladas', 5.29, 'HORTALICAS', 'Seara', 'unidade'),
+('Leite Semidesnatado', 'Leite semidesnatado UHT longa vida', 6.59, 'LATICIONIOS', 'Seara', 'litro'),
+('Camarao Limpo', 'Camarao limpo e congelado, medio', 54.9, 'PESCADOS', 'Seara', 'kg'),
 ('Espinafre', 'Espinafre fresco em maco', 4.49, 'HORTALICAS', 'Seara', 'unidade'),
-('Nata Fresca', 'Nata fresca pasteurizada em pote', 13.9, 'LATICIONIOS', 'Vigor', 'unidade'),
-('Bisteca Suina', 'Bisteca suina resfriada com osso', 18.9, 'CARNES', 'Danone', 'kg'),
-('Vagem', 'Vagem fresca selecionada', 7.49, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Queijo Coalho', 'Queijo coalho para espetinho', 32.9, 'LATICIONIOS', 'Friboi', 'kg'),
-('Whey Protein', 'Suplemento em po sabor baunilha, pote 900g', 149.9, 'BEBIDAS', 'Itambe', 'pacote'),
-('Almondegas', 'Almondegas bovinas temperadas, congeladas', 24.9, 'ALIMENTOS_PREPARADOS', 'Sadia', 'pacote'),
-('Berinjela', 'Berinjela fresca, casca brilhante', 6.29, 'HORTALICAS', 'FazendaVerde', 'kg'),
-('Manteiga sem Sal', 'Manteiga sem sal em tablete de 200g', 12.9, 'LATICIONIOS', 'Tirolez', 'unidade'),
-('Frango a Passarinho', 'Frango a passarinho temperado, congelado', 22.9, 'CONGELADOS', 'Perdigao', 'pacote'),
+('Nata Fresca', 'Nata fresca pasteurizada em pote', 13.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Bisteca Suina', 'Bisteca suina resfriada com osso', 18.9, 'CARNES', 'Seara', 'kg'),
+('Vagem', 'Vagem fresca selecionada', 7.49, 'HORTALICAS', 'Seara', 'kg'),
+('Queijo Coalho', 'Queijo coalho para espetinho', 32.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Whey Protein', 'Suplemento em po sabor baunilha, pote 900g', 149.9, 'BEBIDAS', 'Seara', 'pacote'),
+('Almondegas', 'Almondegas bovinas temperadas, congeladas', 24.9, 'ALIMENTOS_PREPARADOS', 'Seara', 'pacote'),
+('Berinjela', 'Berinjela fresca, casca brilhante', 6.29, 'HORTALICAS', 'Seara', 'kg'),
+('Manteiga sem Sal', 'Manteiga sem sal em tablete de 200g', 12.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Frango a Passarinho', 'Frango a passarinho temperado, congelado', 22.9, 'CONGELADOS', 'Frangosul', 'pacote'),
 ('Rucula', 'Rucula fresca em maco', 3.79, 'HORTALICAS', 'Seara', 'unidade'),
-('Queijo Parmesao', 'Queijo parmesao ralado fino', 44.9, 'LATICIONIOS', 'Vigor', 'kg'),
-('Salsicha', 'Salsicha tipo hot dog, pacote com 10 unidades', 13.9, 'EMBUTIDOS', 'Danone', 'pacote'),
-('Chuchu', 'Chuchu fresco, textura macia', 4.79, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Iogurte de Morango', 'Iogurte sabor morango, copo de 170g', 4.49, 'LATICIONIOS', 'Friboi', 'unidade');
-
+('Queijo Parmesao', 'Queijo parmesao ralado fino', 44.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Salsicha', 'Salsicha tipo hot dog, pacote com 10 unidades', 13.9, 'EMBUTIDOS', 'Seara', 'pacote'),
+('Chuchu', 'Chuchu fresco, textura macia', 4.79, 'HORTALICAS', 'Seara', 'kg'),
+('Iogurte de Morango', 'Iogurte sabor morango, copo de 170g', 4.49, 'LATICIONIOS', 'Seara', 'unidade');
 
 -- Notificacao
 
@@ -644,57 +636,57 @@ INSERT INTO Notificacao (diasAviso, horarioAviso) VALUES
 
 -- Geladeira
 
-INSERT INTO Geladeira (idUsuario, status, quantidade, tipo) VALUES
-('61651728658', 'VAZIO', 0, 'Domestica'),
-('03186265940', 'OCUPACAO_BAIXA', 8, 'Frost Free'),
-('89632247248', 'OCUPACAO_MODERADA', 36, 'Duplex'),
-('78537787671', 'OCUPACAO_ALTA', 8, 'Inox'),
-('61988335000', 'CHEIA', 10, 'Compacta'),
-('76869458200', 'ILIMITADO', 27, 'Domestica'),
-('50370395093', 'VAZIO', 0, 'Frost Free'),
-('09242380385', 'OCUPACAO_BAIXA', 39, 'Duplex'),
-('87511029191', 'OCUPACAO_MODERADA', 18, 'Inox'),
-('20718728351', 'OCUPACAO_ALTA', 21, 'Compacta'),
-('93816662293', 'CHEIA', 7, 'Domestica'),
-('54062767864', 'ILIMITADO', 23, 'Frost Free'),
-('52263905480', 'VAZIO', 0, 'Duplex'),
-('74299060601', 'OCUPACAO_BAIXA', 3, 'Inox'),
-('80340669900', 'OCUPACAO_MODERADA', 4, 'Compacta'),
-('14786469424', 'OCUPACAO_ALTA', 16, 'Domestica'),
-('56858215735', 'CHEIA', 8, 'Frost Free'),
-('76315414427', 'ILIMITADO', 31, 'Duplex'),
-('66139532884', 'VAZIO', 0, 'Inox'),
-('05313798332', 'OCUPACAO_BAIXA', 8, 'Compacta'),
-('10769242987', 'OCUPACAO_MODERADA', 5, 'Domestica'),
-('88293486945', 'OCUPACAO_ALTA', 29, 'Frost Free'),
-('26951681520', 'CHEIA', 4, 'Duplex'),
-('77726406500', 'ILIMITADO', 19, 'Inox'),
-('07658178535', 'VAZIO', 0, 'Compacta'),
-('30035336579', 'OCUPACAO_BAIXA', 40, 'Domestica'),
-('07464396790', 'OCUPACAO_MODERADA', 22, 'Frost Free'),
-('01187309672', 'OCUPACAO_ALTA', 26, 'Duplex'),
-('79643758656', 'CHEIA', 28, 'Inox'),
-('94982888604', 'ILIMITADO', 19, 'Compacta'),
-('06923786185', 'VAZIO', 0, 'Domestica'),
-('98005505426', 'OCUPACAO_BAIXA', 21, 'Frost Free'),
-('68625374310', 'OCUPACAO_MODERADA', 17, 'Duplex'),
-('34711306676', 'OCUPACAO_ALTA', 9, 'Inox'),
-('01116136392', 'CHEIA', 39, 'Compacta'),
-('72421060877', 'ILIMITADO', 39, 'Domestica'),
-('61101572019', 'VAZIO', 0, 'Frost Free'),
-('17710054919', 'OCUPACAO_BAIXA', 3, 'Duplex'),
-('11421570750', 'OCUPACAO_MODERADA', 18, 'Inox'),
-('23103612249', 'OCUPACAO_ALTA', 4, 'Compacta'),
-('42935404904', 'CHEIA', 1, 'Domestica'),
-('72760313140', 'ILIMITADO', 29, 'Frost Free'),
-('32505476462', 'VAZIO', 0, 'Duplex'),
-('95573305468', 'OCUPACAO_BAIXA', 7, 'Inox'),
-('35779032289', 'OCUPACAO_MODERADA', 23, 'Compacta'),
-('06771725758', 'OCUPACAO_ALTA', 5, 'Domestica'),
-('79715532004', 'CHEIA', 19, 'Frost Free'),
-('14647672549', 'ILIMITADO', 8, 'Duplex'),
-('44230143605', 'VAZIO', 0, 'Inox'),
-('97037584959', 'OCUPACAO_BAIXA', 10, 'Compacta');
+INSERT INTO Geladeira (idUsuario, status, tipo) VALUES
+('61651728658', 'VAZIO', 'Domestica'),
+('03186265940', 'OCUPACAO_BAIXA', 'Frost Free'),
+('89632247248', 'OCUPACAO_MODERADA', 'Duplex'),
+('78537787671', 'OCUPACAO_ALTA', 'Inox'),
+('61988335000', 'CHEIA', 'Compacta'),
+('76869458200', 'ILIMITADO', 'Domestica'),
+('50370395093', 'VAZIO', 'Frost Free'),
+('09242380385', 'OCUPACAO_BAIXA',  'Duplex'),
+('87511029191', 'OCUPACAO_MODERADA',  'Inox'),
+('20718728351', 'OCUPACAO_ALTA',  'Compacta'),
+('93816662293', 'CHEIA', 'Domestica'),
+('54062767864', 'ILIMITADO',  'Frost Free'),
+('52263905480', 'VAZIO', 'Duplex'),
+('74299060601', 'OCUPACAO_BAIXA',  'Inox'),
+('80340669900', 'OCUPACAO_MODERADA',  'Compacta'),
+('14786469424', 'OCUPACAO_ALTA',  'Domestica'),
+('56858215735', 'CHEIA', 'Frost Free'),
+('76315414427', 'ILIMITADO', 'Duplex'),
+('66139532884', 'VAZIO',  'Inox'),
+('05313798332', 'OCUPACAO_BAIXA',  'Compacta'),
+('10769242987', 'OCUPACAO_MODERADA',  'Domestica'),
+('88293486945', 'OCUPACAO_ALTA',  'Frost Free'),
+('26951681520', 'CHEIA', 'Duplex'),
+('77726406500', 'ILIMITADO',  'Inox'),
+('07658178535', 'VAZIO',  'Compacta'),
+('30035336579', 'OCUPACAO_BAIXA',  'Domestica'),
+('07464396790', 'OCUPACAO_MODERADA',  'Frost Free'),
+('01187309672', 'OCUPACAO_ALTA',  'Duplex'),
+('79643758656', 'CHEIA',  'Inox'),
+('94982888604', 'ILIMITADO',  'Compacta'),
+('06923786185', 'VAZIO',  'Domestica'),
+('98005505426', 'OCUPACAO_BAIXA', 'Frost Free'),
+('68625374310', 'OCUPACAO_MODERADA',  'Duplex'),
+('34711306676', 'OCUPACAO_ALTA',  'Inox'),
+('01116136392', 'CHEIA',  'Compacta'),
+('72421060877', 'ILIMITADO',  'Domestica'),
+('61101572019', 'VAZIO',  'Frost Free'),
+('17710054919', 'OCUPACAO_BAIXA',  'Duplex'),
+('11421570750', 'OCUPACAO_MODERADA',  'Inox'),
+('23103612249', 'OCUPACAO_ALTA',  'Compacta'),
+('42935404904', 'CHEIA',  'Domestica'),
+('72760313140', 'ILIMITADO',  'Frost Free'),
+('32505476462', 'VAZIO',  'Duplex'),
+('95573305468', 'OCUPACAO_BAIXA',  'Inox'),
+('35779032289', 'OCUPACAO_MODERADA',  'Compacta'),
+('06771725758', 'OCUPACAO_ALTA',  'Domestica'),
+('79715532004', 'CHEIA',  'Frost Free'),
+('14647672549', 'ILIMITADO',  'Duplex'),
+('44230143605', 'VAZIO', 'Inox'),
+('97037584959', 'OCUPACAO_BAIXA',  'Compacta');
 
 
 -- Endereco
@@ -754,57 +746,57 @@ INSERT INTO Endereco (rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade) V
 
 -- Frigorificos
 
-INSERT INTO Frigorificos (idEndereco, idEmpresa, quantidade, status, tipo) VALUES
-(1, '24144297000127', 362, 'OCUPACAO_ALTA', 'Congelador'),
-(2, '47253455000182', 47, 'CHEIA', 'Refrigerador'),
-(3, '36006970000141', 292, 'ILIMITADO', 'Congelador'),
-(4, '87349005000102', 0, 'VAZIO', 'Refrigerador'),
-(5, '77310109000150', 476, 'OCUPACAO_BAIXA', 'Congelador'),
-(6, '06573130000108', 368, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(7, '81948539000179', 82, 'OCUPACAO_ALTA', 'Congelador'),
-(8, '56876315000151', 352, 'CHEIA', 'Refrigerador'),
-(9, '47026119000105', 628, 'ILIMITADO', 'Congelador'),
-(10, '79516470000162', 0, 'VAZIO', 'Refrigerador'),
-(11, '85589026000170', 125, 'OCUPACAO_BAIXA', 'Congelador'),
-(12, '39829214000100', 556, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(13, '43734144000184', 388, 'OCUPACAO_ALTA', 'Congelador'),
-(14, '70022229000102', 862, 'CHEIA', 'Refrigerador'),
-(15, '18315670000162', 338, 'ILIMITADO', 'Congelador'),
-(16, '94007678000140', 0, 'VAZIO', 'Refrigerador'),
-(17, '40613964000120', 457, 'OCUPACAO_BAIXA', 'Congelador'),
-(18, '60898058000126', 544, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(19, '62402210000163', 281, 'OCUPACAO_ALTA', 'Congelador'),
-(20, '56281715000114', 428, 'CHEIA', 'Refrigerador'),
-(21, '67436371000191', 574, 'ILIMITADO', 'Congelador'),
-(22, '91004404000109', 0, 'VAZIO', 'Refrigerador'),
-(23, '72264236000146', 143, 'OCUPACAO_BAIXA', 'Congelador'),
-(24, '96706343000145', 571, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(25, '21473877000170', 29, 'OCUPACAO_ALTA', 'Congelador'),
-(26, '08438764000175', 219, 'CHEIA', 'Refrigerador'),
-(27, '82635120000120', 278, 'ILIMITADO', 'Congelador'),
-(28, '26012776000115', 0, 'VAZIO', 'Refrigerador'),
-(29, '33665954000172', 412, 'OCUPACAO_BAIXA', 'Congelador'),
-(30, '82242871000186', 445, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(31, '34910575000163', 316, 'OCUPACAO_ALTA', 'Congelador'),
-(32, '66304631000102', 765, 'CHEIA', 'Refrigerador'),
-(33, '22514034000137', 770, 'ILIMITADO', 'Congelador'),
-(34, '96116540000104', 0, 'VAZIO', 'Refrigerador'),
-(35, '95405520000190', 152, 'OCUPACAO_BAIXA', 'Congelador'),
-(36, '85416602000187', 268, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(37, '41182220000160', 798, 'OCUPACAO_ALTA', 'Congelador'),
-(38, '61134330000164', 591, 'CHEIA', 'Refrigerador'),
-(39, '21805824000109', 34, 'ILIMITADO', 'Congelador'),
-(40, '03853857000142', 0, 'VAZIO', 'Refrigerador'),
-(41, '93034110000155', 390, 'OCUPACAO_BAIXA', 'Congelador'),
-(42, '00691117000169', 787, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(43, '73758788000173', 268, 'OCUPACAO_ALTA', 'Congelador'),
-(44, '86598366000120', 270, 'CHEIA', 'Refrigerador'),
-(45, '69366710000136', 674, 'ILIMITADO', 'Congelador'),
-(46, '42839744000144', 0, 'VAZIO', 'Refrigerador'),
-(47, '05122832000102', 562, 'OCUPACAO_BAIXA', 'Congelador'),
-(48, '59649891000154', 499, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(49, '23628639000111', 291, 'OCUPACAO_ALTA', 'Congelador'),
-(50, '78859395000170', 662, 'CHEIA', 'Refrigerador');
+INSERT INTO Frigorificos (idEndereco, idEmpresa, status, tipo) VALUES
+(1, '24144297000127', 'OCUPACAO_ALTA', 'Congelador'),
+(2, '47253455000182', 'CHEIA', 'Refrigerador'),
+(3, '36006970000141',  'ILIMITADO', 'Congelador'),
+(4, '87349005000102', 'VAZIO', 'Refrigerador'),
+(5, '77310109000150', 'OCUPACAO_BAIXA', 'Congelador'),
+(6, '06573130000108', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(7, '81948539000179', 'OCUPACAO_ALTA', 'Congelador'),
+(8, '56876315000151', 'CHEIA', 'Refrigerador'),
+(9, '47026119000105', 'ILIMITADO', 'Congelador'),
+(10, '79516470000162', 'VAZIO', 'Refrigerador'),
+(11, '85589026000170', 'OCUPACAO_BAIXA', 'Congelador'),
+(12, '39829214000100', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(13, '43734144000184', 'OCUPACAO_ALTA', 'Congelador'),
+(14, '70022229000102', 'CHEIA', 'Refrigerador'),
+(15, '18315670000162', 'ILIMITADO', 'Congelador'),
+(16, '94007678000140', 'VAZIO', 'Refrigerador'),
+(17, '40613964000120', 'OCUPACAO_BAIXA', 'Congelador'),
+(18, '60898058000126', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(19, '62402210000163', 'OCUPACAO_ALTA', 'Congelador'),
+(20, '56281715000114', 'CHEIA', 'Refrigerador'),
+(21, '67436371000191', 'ILIMITADO', 'Congelador'),
+(22, '91004404000109', 'VAZIO', 'Refrigerador'),
+(23, '72264236000146', 'OCUPACAO_BAIXA', 'Congelador'),
+(24, '96706343000145', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(25, '21473877000170', 'OCUPACAO_ALTA', 'Congelador'),
+(26, '08438764000175', 'CHEIA', 'Refrigerador'),
+(27, '82635120000120', 'ILIMITADO', 'Congelador'),
+(28, '26012776000115', 'VAZIO', 'Refrigerador'),
+(29, '33665954000172', 'OCUPACAO_BAIXA', 'Congelador'),
+(30, '82242871000186', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(31, '34910575000163', 'OCUPACAO_ALTA', 'Congelador'),
+(32, '66304631000102', 'CHEIA', 'Refrigerador'),
+(33, '22514034000137', 'ILIMITADO', 'Congelador'),
+(34, '96116540000104', 'VAZIO', 'Refrigerador'),
+(35, '95405520000190', 'OCUPACAO_BAIXA', 'Congelador'),
+(36, '85416602000187', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(37, '41182220000160', 'OCUPACAO_ALTA', 'Congelador'),
+(38, '61134330000164', 'CHEIA', 'Refrigerador'),
+(39, '21805824000109', 'ILIMITADO', 'Congelador'),
+(40, '03853857000142', 'VAZIO', 'Refrigerador'),
+(41, '93034110000155', 'OCUPACAO_BAIXA', 'Congelador'),
+(42, '00691117000169', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(43, '73758788000173', 'OCUPACAO_ALTA', 'Congelador'),
+(44, '86598366000120', 'CHEIA', 'Refrigerador'),
+(45, '69366710000136', 'ILIMITADO', 'Congelador'),
+(46, '42839744000144', 'VAZIO', 'Refrigerador'),
+(47, '05122832000102', 'OCUPACAO_BAIXA', 'Congelador'),
+(48, '59649891000154', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(49, '23628639000111', 'OCUPACAO_ALTA', 'Congelador'),
+(50, '78859395000170', 'CHEIA', 'Refrigerador');
 
 
 -- ProdutosGeladeira
@@ -1306,9 +1298,15 @@ INSERT INTO MarcasParceiras (idEmpresa, idProdutos, observacoes) VALUES
 
 
 
-
 set timezone = 'America/Sao_Paulo';
 show timezone;
 SET datestyle = 'ISO, DMY';
-show datastyle;
+show datestyle;
+
+
 */
+
+
+select * from geladeira 
+
+SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosGeladeira WHERE idGeladeira =52

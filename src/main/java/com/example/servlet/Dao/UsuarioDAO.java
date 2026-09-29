@@ -44,7 +44,7 @@ public class UsuarioDAO {
 
 
     // ================ ALTERAR ================
-    public int alterarUsuario(Usuario usuario){
+    public int alterarUsuario(Usuario usuarioAntigo, Usuario usuarioNovo){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -52,12 +52,12 @@ public class UsuarioDAO {
             String comandoSql = "update usuario set nome = ?, sobrenome = ?, email = ?, senha = ?, telefone = ? where cpf = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, usuario.getNome());
-            pstmt.setString(2, usuario.getSobrenome());
-            pstmt.setString(3, usuario.getEmail());
-            pstmt.setString(4, usuario.getSenha());
-            pstmt.setString(5, usuario.getTelefone());
-            pstmt.setString(6, usuario.getCpf());
+            pstmt.setString(1, usuarioNovo.getNome());
+            pstmt.setString(2, usuarioNovo.getSobrenome());
+            pstmt.setString(3, usuarioNovo.getEmail());
+            pstmt.setString(4, usuarioNovo.getSenha());
+            pstmt.setString(5, usuarioNovo.getTelefone());
+            pstmt.setString(6, usuarioAntigo.getCpf());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // inseriu as informações no banco
@@ -77,7 +77,7 @@ public class UsuarioDAO {
 
 
     // ================ ALTERAR E-MAIL ================
-    public int alterarEmailUsuario(Usuario usuario){
+    public int alterarEmailUsuario(Usuario usuario, String email){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -85,7 +85,7 @@ public class UsuarioDAO {
             String comandoSql = "update usuario set email = ? where cpf = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, usuario.getEmail());
+            pstmt.setString(1, email);
             pstmt.setString(2, usuario.getCpf());
 
             if (pstmt.executeUpdate() > 0){
