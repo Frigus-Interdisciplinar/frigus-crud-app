@@ -16,13 +16,12 @@ public class GeladeiraDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into geladeira(idUsuario, status, quantidade, tipo) values (?,?,?,?);";
+            String comandoSql = "insert into geladeira(idUsuario, status, tipo) values (?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando valores para o comando
             pstmt.setString(1, geladeira.getUsuario().getCpf());
             pstmt.setString(2, geladeira.getStatus().name());
-            pstmt.setInt(3, geladeira.getQuantidade());
-            pstmt.setString(4, geladeira.getTipo());
+            pstmt.setString(3, geladeira.getTipo());
 
             if (pstmt.executeUpdate() > 0){
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
@@ -43,37 +42,6 @@ public class GeladeiraDAO {
     }//===========INSERIR===========
 
 
-
-
-    //==============ALTERAR=============
-    public int alterarGeradeira(Geladeira geladeira){
-        Conexao conexao = new Conexao(); // abrindo a conexão
-        Connection conn = conexao.conectar();
-
-        try{
-            String comandoSql = "update geladeira set idUsuario = ?, status = ?, quantidade = ?, tipo = ?  where id = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para o comando
-            pstmt.setString(1, geladeira.getUsuario().getCpf());
-            pstmt.setString(2, geladeira.getStatus().name());
-            pstmt.setInt(3, geladeira.getQuantidade());
-            pstmt.setString(4, geladeira.getTipo());
-            pstmt.setInt(5, geladeira.getIdGeladeira());
-            if (pstmt.executeUpdate() > 0){
-                return 1;// verifica se deu certo
-            }
-            else{
-                return 0;// não deu certo
-            }
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexão
-        }
-    }// ==============ALTERAR===============
 
 
     // ================ ALTERAR STATUS ================
@@ -103,8 +71,11 @@ public class GeladeiraDAO {
         }
     }// ================ ALTERAR STATUS ================
 
-    // ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
-    public List<Geladeira> buscarGeladeiraUsuario(String cpf){
+
+
+
+    // ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
+    public List<Geladeira> buscarTodasGeladeira(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
 
@@ -126,7 +97,6 @@ public class GeladeiraDAO {
                 Geladeira geladeira = new Geladeira(
                     rset.getInt("id"),
                     usuario,
-                    rset.getInt("quantidade"),
                     StatusArmazenamento.valueOf(rset.getString("status")),
                     rset.getString("tipo")
                 );
@@ -138,5 +108,46 @@ public class GeladeiraDAO {
             conexao.desconectar(conn);// fechando a conexao
         }
         return listaGeladeira;
-    }// ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
+    }// ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
+
+
+
+
+
+    // ==============BUSCAR UMA GELADEIRA PELO ID DO USUARIO E PELO ID DA GELADEIRA ===============
+    public Geladeira buscarUnicaGeladeira(String cpf, int idGeladeira){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao
+
+        ResultSet rset = null;
+        Geladeira geladeira = null;
+
+        try{
+            String comandoSql = "select * from geladeira where idUsuario = ? and id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o valor do id da empresa
+            pstmt.setString(1, cpf);
+            pstmt.setInt(2, idGeladeira);
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                // criando o objeto usuario
+                Usuario usuario = new Usuario();
+                usuario.setCpf(rset.getString("idUsuario"));
+
+                // criando o objeto geladeira
+                 geladeira = new Geladeira(
+                        rset.getInt("id"),
+                        usuario,
+                        StatusArmazenamento.valueOf(rset.getString("status")),
+                        rset.getString("tipo")
+                );
+
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao
+        }
+        return geladeira;
+    }// ==============BUSCAR UMA GELADEIRA PELO ID DO USUARIO E PELO ID DA GELADEIRA ===============
 }

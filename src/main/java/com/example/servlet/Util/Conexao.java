@@ -16,7 +16,7 @@ public class Conexao {
 
     public Conexao() {
 
-        dotenv = Dotenv.load();
+        dotenv = Dotenv.configure().directory("C:\\Users\\20260224-ieg\\OneDrive - Instituto J&F\\Desktop\\Frigus\\Frigus_BackEnd\\.env").ignoreIfMalformed().ignoreIfMissing().load();
 
         url = dotenv.get("DB_URL");
         usuario = dotenv.get("DB_USER");
@@ -34,6 +34,10 @@ public class Conexao {
     public Connection conectar() {
 
         try {
+            Class.forName("org.postgresql.Driver");
+            System.out.println(
+                    java.sql.DriverManager.getDrivers().hasMoreElements()
+            );
 
             return DriverManager.getConnection(
                     url,
@@ -41,12 +45,16 @@ public class Conexao {
                     senha
             );
 
+
+
         } catch (SQLException e) {
 
             throw new RuntimeException(
                     "Erro ao conectar com o banco de dados.",
                     e
             );
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
     }

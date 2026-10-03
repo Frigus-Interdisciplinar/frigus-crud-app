@@ -1,4 +1,8 @@
-/*
+
+
+-- apagar o banco quando necessario
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
 
 --Criação das tabelas
 CREATE TABLE Usuario(
@@ -6,8 +10,7 @@ CREATE TABLE Usuario(
     nome        varchar(20)  not null,
     Sobrenome   varchar(60)  not null,
     email       varchar(320) not null,
-    senha       varchar(16)  not null,
-    telefone    varchar(14)      null
+    senha       varchar(16)  not null
 );
 
 CREATE TABLE Empresa(
@@ -18,16 +21,7 @@ CREATE TABLE Empresa(
     descricao   text             null
 );
 
-CREATE TABLE Funcionario(
-    cpf         varchar(11)  primary key,
-    idEmpresa   varchar(14)  not null,
-    nome        varchar(20)  not null,
-    Sobrenome   varchar(60)  not null,
-    cargo       varchar(50)  not null,
-    email       varchar(320) not null,
-    senha       varchar(16)  not null,
-    telefone    varchar(14)
-);
+
 
 CREATE TABLE MarcasParceiras(
     id              serial      primary key,
@@ -42,7 +36,7 @@ CREATE TABLE Assinatura(
     idEmpresa       varchar(14)         null,
     tipoAssinatura  varchar(50)     not null,
     valor           numeric(10,2)   not null default 0,
-    descricao       text                null
+    descricao       text            not null
 );
 
 
@@ -50,7 +44,7 @@ CREATE TABLE Receita(
     id            serial      primary key,
     idEmpresa     varchar(14)     null,    
     idUsuario     varchar(11)     null,
-    nome          varchar(20) not null,
+    nome          varchar(50) not null,
     descricao     text            null,
     modoPreparo   text        not null,
     dtReceita     date        not null default current_date,
@@ -92,7 +86,6 @@ CREATE TABLE Frigorificos(
     id              serial      primary key,
     idEndereco      int         not null,
     idEmpresa       varchar(14) not null,
-    quantidade      int         not null,
     status          varchar(20) not null default 'OCUPACAO_MODERADA',
     tipo            varchar(20) not null default 'Freezer'
 );
@@ -121,7 +114,6 @@ CREATE TABLE Geladeira(
     id             serial      primary key,
     idUsuario      varchar(11) not null,
     status         varchar(20) not null default 'OCUPACAO_MODERADA',
-    quantidade     int         not null default 0,
     tipo           varchar(20)     null default 'Geladeira'
 );
 
@@ -323,15 +315,6 @@ alter table Empresa
     check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
 
-alter table Geladeira
-    add constraint chk_quantidade_geladeira
-    check (quantidade >= 0);
-
-
-alter table Frigorificos
-    add constraint chk_quantidade_frigorificos
-    check (quantidade >= 0);
-
 
 alter table Ingredientes
     add constraint chk_quantidade_ingredientes
@@ -350,14 +333,10 @@ alter table ProdutosFrigorifico
     add constraint chk_quantidade_produtolista
     check (quantidade >= 0);
 
-alter table Usuario
-	add constraint chk_telefone_formato
-    check (telefone ~ '^\(?[1-9]{2}\)?\s?(?:9[0-9]{4}|[2-8][0-9]{3})\-?[0-9]{4}$');
-
 alter table Endereco
 	add constraint chk_cep_formato
     check (cep ~ '^\d{5}-?\d{3}$');
-
+    
 
 
 
@@ -369,57 +348,57 @@ alter table Endereco
 
 -- Usuario
 
-INSERT INTO Usuario (cpf, nome, Sobrenome, email, senha, telefone) VALUES
-('61651728658', 'Ana', 'Rodrigues', 'ana.rodrigues@gmail.com', 'Senha@100', '81907429263'),
-('03186265940', 'Bruno', 'Gomes', 'bruno.gomes@gmail.com', 'Senha@101', '48905019909'),
-('89632247248', 'Carla', 'Barbosa', 'carla.barbosa@gmail.com', 'Senha@102', '62908591449'),
-('78537787671', 'Diego', 'Nascimento', 'diego.nascimento@gmail.com', 'Senha@103', '21983446125'),
-('61988335000', 'Elaine', 'Cardoso', 'elaine.cardoso@gmail.com', 'Senha@104', '85909351989'),
-('76869458200', 'Fabio', 'Cavalcanti', 'fabio.cavalcanti@gmail.com', 'Senha@105', '81901737613'),
-('50370395093', 'Gabriela', 'Nunes', 'gabriela.nunes@gmail.com', 'Senha@106', '85961058133'),
-('09242380385', 'Heitor', 'Freitas', 'heitor.freitas@gmail.com', 'Senha@107', '41916952821'),
-('87511029191', 'Isabela', 'Vieira', 'isabela.vieira@gmail.com', 'Senha@108', '92928610665'),
-('20718728351', 'Joao', 'Batista', 'joao.batista@gmail.com', 'Senha@109', '51992605249'),
-('93816662293', 'Karina', 'Xavier', 'karina.xavier@gmail.com', 'Senha@110', '31977387743'),
-('54062767864', 'Lucas', 'Guimaraes', 'lucas.guimaraes@gmail.com', 'Senha@111', '85983424050'),
-('52263905480', 'Marina', 'Peixoto', 'marina.peixoto@gmail.com', 'Senha@112', '21975359089'),
-('74299060601', 'Nicolas', 'Brito', 'nicolas.brito@gmail.com', 'Senha@113', '71906569876'),
-('80340669900', 'Otavio', 'Braga', 'otavio.braga@gmail.com', 'Senha@114', '61996353667'),
-('14786469424', 'Patricia', 'Costa', 'patricia.costa@gmail.com', 'Senha@115', '62910218629'),
-('56858215735', 'Rafael', 'Pereira', 'rafael.pereira@gmail.com', 'Senha@116', '62978414217'),
-('76315414427', 'Sofia', 'Almeida', 'sofia.almeida@gmail.com', 'Senha@117', '41975583187'),
-('66139532884', 'Thiago', 'Ribeiro', 'thiago.ribeiro@gmail.com', 'Senha@118', '85920684168'),
-('05313798332', 'Vanessa', 'Rocha', 'vanessa.rocha@gmail.com', 'Senha@119', '91923723359'),
-('10769242987', 'Aline', 'Araujo', 'aline.araujo@gmail.com', 'Senha@120', '48992777568'),
-('88293486945', 'Bernardo', 'Teixeira', 'bernardo.teixeira@gmail.com', 'Senha@121', '91968430779'),
-('26951681520', 'Camila', 'Monteiro', 'camila.monteiro@gmail.com', 'Senha@122', '85947849086'),
-('77726406500', 'Daniel', 'Marques', 'daniel.marques@gmail.com', 'Senha@123', '71976599511'),
-('07658178535', 'Eduarda', 'Pinto', 'eduarda.pinto@gmail.com', 'Senha@124', '81929436483'),
-('30035336579', 'Felipe', 'Tavares', 'felipe.tavares@gmail.com', 'Senha@125', '85917280569'),
-('07464396790', 'Gustavo', 'Cunha', 'gustavo.cunha@gmail.com', 'Senha@126', '21958813998'),
-('01187309672', 'Helena', 'Sales', 'helena.sales@gmail.com', 'Senha@127', '21971056262'),
-('79643758656', 'Igor', 'Neves', 'igor.neves@gmail.com', 'Senha@128', '61920554203'),
-('94982888604', 'Julia', 'Bezerra', 'julia.bezerra@gmail.com', 'Senha@129', '62977226882'),
-('06923786185', 'Kevin', 'Coelho', 'kevin.coelho@gmail.com', 'Senha@130', '51965807766'),
-('98005505426', 'Laura', 'Silva', 'laura.silva@gmail.com', 'Senha@131', '47925547793'),
-('68625374310', 'Marcelo', 'Santos', 'marcelo.santos@gmail.com', 'Senha@132', '91909717322'),
-('34711306676', 'Natalia', 'Ferreira', 'natalia.ferreira@gmail.com', 'Senha@133', '71921698365'),
-('01116136392', 'Osvaldo', 'Lima', 'osvaldo.lima@gmail.com', 'Senha@134', '21955890814'),
-('72421060877', 'Priscila', 'Carvalho', 'priscila.carvalho@gmail.com', 'Senha@135', '91942107499'),
-('61101572019', 'Ricardo', 'Dias', 'ricardo.dias@gmail.com', 'Senha@136', '92909996028'),
-('17710054919', 'Sabrina', 'Melo', 'sabrina.melo@gmail.com', 'Senha@137', '51980472061'),
-('11421570750', 'Tiago', 'Correia', 'tiago.correia@gmail.com', 'Senha@138', '21971188903'),
-('23103612249', 'Ursula', 'Moreira', 'ursula.moreira@gmail.com', 'Senha@139', '47988608449'),
-('42935404904', 'Vitor', 'Machado', 'vitor.machado@gmail.com', 'Senha@140', '71985977685'),
-('72760313140', 'Wagner', 'Ramos', 'wagner.ramos@gmail.com', 'Senha@141', '11979427318'),
-('32505476462', 'Ximena', 'Fonseca', 'ximena.fonseca@gmail.com', 'Senha@142', '65959382416'),
-('95573305468', 'Yara', 'Farias', 'yara.farias@gmail.com', 'Senha@143', '81993988627'),
-('35779032289', 'Zeca', 'Duarte', 'zeca.duarte@gmail.com', 'Senha@144', '92915184780'),
-('06771725758', 'Amanda', 'Pacheco', 'amanda.pacheco@gmail.com', 'Senha@145', '92926093146'),
-('79715532004', 'Breno', 'Amaral', 'breno.amaral@gmail.com', 'Senha@146', '85965643172'),
-('14647672549', 'Cintia', 'Assis', 'cintia.assis@gmail.com', 'Senha@147', '47937260670'),
-('44230143605', 'Douglas', 'Souza', 'douglas.souza@gmail.com', 'Senha@148', '51978685350'),
-('97037584959', 'Estela', 'Oliveira', 'estela.oliveira@gmail.com', 'Senha@149', '85941969690');
+INSERT INTO Usuario (cpf, nome, Sobrenome, email, senha) VALUES
+('61651728658', 'Ana', 'Rodrigues', 'ana.rodrigues@gmail.com', 'Senha@100'),
+('03186265940', 'Bruno', 'Gomes', 'bruno.gomes@gmail.com', 'Senha@101'),
+('89632247248', 'Carla', 'Barbosa', 'carla.barbosa@gmail.com', 'Senha@102'),
+('78537787671', 'Diego', 'Nascimento', 'diego.nascimento@gmail.com', 'Senha@103'),
+('61988335000', 'Elaine', 'Cardoso', 'elaine.cardoso@gmail.com', 'Senha@104'),
+('76869458200', 'Fabio', 'Cavalcanti', 'fabio.cavalcanti@gmail.com', 'Senha@105'),
+('50370395093', 'Gabriela', 'Nunes', 'gabriela.nunes@gmail.com', 'Senha@106'),
+('09242380385', 'Heitor', 'Freitas', 'heitor.freitas@gmail.com', 'Senha@107'),
+('87511029191', 'Isabela', 'Vieira', 'isabela.vieira@gmail.com', 'Senha@108'),
+('20718728351', 'Joao', 'Batista', 'joao.batista@gmail.com', 'Senha@109'),
+('93816662293', 'Karina', 'Xavier', 'karina.xavier@gmail.com', 'Senha@110'),
+('54062767864', 'Lucas', 'Guimaraes', 'lucas.guimaraes@gmail.com', 'Senha@111'),
+('52263905480', 'Marina', 'Peixoto', 'marina.peixoto@gmail.com', 'Senha@112'),
+('74299060601', 'Nicolas', 'Brito', 'nicolas.brito@gmail.com', 'Senha@113'),
+('80340669900', 'Otavio', 'Braga', 'otavio.braga@gmail.com', 'Senha@114'),
+('14786469424', 'Patricia', 'Costa', 'patricia.costa@gmail.com', 'Senha@115'),
+('56858215735', 'Rafael', 'Pereira', 'rafael.pereira@gmail.com', 'Senha@116'),
+('76315414427', 'Sofia', 'Almeida', 'sofia.almeida@gmail.com', 'Senha@117'),
+('66139532884', 'Thiago', 'Ribeiro', 'thiago.ribeiro@gmail.com', 'Senha@118'),
+('05313798332', 'Vanessa', 'Rocha', 'vanessa.rocha@gmail.com', 'Senha@119'),
+('10769242987', 'Aline', 'Araujo', 'aline.araujo@gmail.com', 'Senha@120'),
+('88293486945', 'Bernardo', 'Teixeira', 'bernardo.teixeira@gmail.com', 'Senha@121'),
+('26951681520', 'Camila', 'Monteiro', 'camila.monteiro@gmail.com', 'Senha@122'),
+('77726406500', 'Daniel', 'Marques', 'daniel.marques@gmail.com', 'Senha@123'),
+('07658178535', 'Eduarda', 'Pinto', 'eduarda.pinto@gmail.com', 'Senha@124'),
+('30035336579', 'Felipe', 'Tavares', 'felipe.tavares@gmail.com', 'Senha@125'),
+('07464396790', 'Gustavo', 'Cunha', 'gustavo.cunha@gmail.com', 'Senha@126'),
+('01187309672', 'Helena', 'Sales', 'helena.sales@gmail.com', 'Senha@127'),
+('79643758656', 'Igor', 'Neves', 'igor.neves@gmail.com', 'Senha@128'),
+('94982888604', 'Julia', 'Bezerra', 'julia.bezerra@gmail.com', 'Senha@129'),
+('06923786185', 'Kevin', 'Coelho', 'kevin.coelho@gmail.com', 'Senha@130'),
+('98005505426', 'Laura', 'Silva', 'laura.silva@gmail.com', 'Senha@131'),
+('68625374310', 'Marcelo', 'Santos', 'marcelo.santos@gmail.com', 'Senha@132'),
+('34711306676', 'Natalia', 'Ferreira', 'natalia.ferreira@gmail.com', 'Senha@133'),
+('01116136392', 'Osvaldo', 'Lima', 'osvaldo.lima@gmail.com', 'Senha@134'),
+('72421060877', 'Priscila', 'Carvalho', 'priscila.carvalho@gmail.com', 'Senha@135'),
+('61101572019', 'Ricardo', 'Dias', 'ricardo.dias@gmail.com', 'Senha@136'),
+('17710054919', 'Sabrina', 'Melo', 'sabrina.melo@gmail.com', 'Senha@137'),
+('11421570750', 'Tiago', 'Correia', 'tiago.correia@gmail.com', 'Senha@138'),
+('23103612249', 'Ursula', 'Moreira', 'ursula.moreira@gmail.com', 'Senha@139'),
+('42935404904', 'Vitor', 'Machado', 'vitor.machado@gmail.com', 'Senha@140'),
+('72760313140', 'Wagner', 'Ramos', 'wagner.ramos@gmail.com', 'Senha@141'),
+('32505476462', 'Ximena', 'Fonseca', 'ximena.fonseca@gmail.com', 'Senha@142'),
+('95573305468', 'Yara', 'Farias', 'yara.farias@gmail.com', 'Senha@143'),
+('35779032289', 'Zeca', 'Duarte', 'zeca.duarte@gmail.com', 'Senha@144'),
+('06771725758', 'Amanda', 'Pacheco', 'amanda.pacheco@gmail.com', 'Senha@145'),
+('79715532004', 'Breno', 'Amaral', 'breno.amaral@gmail.com', 'Senha@146'),
+('14647672549', 'Cintia', 'Assis', 'cintia.assis@gmail.com', 'Senha@147'),
+('44230143605', 'Douglas', 'Souza', 'douglas.souza@gmail.com', 'Senha@148'),
+('97037584959', 'Estela', 'Oliveira', 'estela.oliveira@gmail.com', 'Senha@149');
 
 
 -- Empresa
@@ -477,115 +456,58 @@ INSERT INTO Empresa (cnpj, nome, email, senha, descricao) VALUES
 ('78859395000170', 'Atacado Sol Nascente EIRELI', 'contato@solnascente.com.br', 'Emp@149', 'Empresa do ramo alimenticio especializada em atacado, atuante desde 2001');
 
 
--- Funcionario
-
-INSERT INTO Funcionario (cpf, idEmpresa, nome, Sobrenome, cargo, email, senha, telefone) VALUES
-('66738756151', '24144297000127', 'Heitor', 'Brito', 'Gerente de Estoque', 'heitor.brito@laticinios.com.br', 'Func@100', '11956718608'),
-('62637779314', '47253455000182', 'Isabela', 'Braga', 'Atendente', 'isabela.braga@frigorifico.com.br', 'Func@101', '11969810293'),
-('67103901449', '36006970000141', 'Joao', 'Costa', 'Motorista', 'joao.costa@distribuidora.com.br', 'Func@102', '11900967419'),
-('33201894680', '87349005000102', 'Karina', 'Pereira', 'Comprador', 'karina.pereira@empório.com.br', 'Func@103', '11964869978'),
-('75780607087', '77310109000150', 'Lucas', 'Almeida', 'Analista de Qualidade', 'lucas.almeida@atacado.com.br', 'Func@104', '11945992740'),
-('39912409981', '06573130000108', 'Marina', 'Ribeiro', 'Supervisor', 'marina.ribeiro@mercado.com.br', 'Func@105', '11930377542'),
-('83521906280', '81948539000179', 'Nicolas', 'Rocha', 'Auxiliar de Deposito', 'nicolas.rocha@fazenda.com.br', 'Func@106', '11921822589'),
-('24226069382', '56876315000151', 'Otavio', 'Araujo', 'Nutricionista', 'otavio.araujo@agro.com.br', 'Func@107', '11959856183'),
-('81451076797', '47026119000105', 'Patricia', 'Teixeira', 'Vendedor', 'patricia.teixeira@nutri.com.br', 'Func@108', '11992435096'),
-('70041964292', '79516470000162', 'Rafael', 'Monteiro', 'Coordenador', 'rafael.monteiro@rede.com.br', 'Func@109', '11938853451'),
-('24840662959', '85589026000170', 'Sofia', 'Marques', 'Gerente de Estoque', 'sofia.marques@comercial.com.br', 'Func@110', '11907393571'),
-('06237315250', '39829214000100', 'Thiago', 'Pinto', 'Atendente', 'thiago.pinto@granja.com.br', 'Func@111', '11982811730'),
-('29430110888', '43734144000184', 'Vanessa', 'Tavares', 'Motorista', 'vanessa.tavares@casa.com.br', 'Func@112', '11915899901'),
-('05754758383', '70022229000102', 'Aline', 'Cunha', 'Comprador', 'aline.cunha@ponto.com.br', 'Func@113', '11987967857'),
-('96999226059', '18315670000162', 'Bernardo', 'Sales', 'Analista de Qualidade', 'bernardo.sales@central.com.br', 'Func@114', '11936488379'),
-('97402560236', '94007678000140', 'Camila', 'Neves', 'Supervisor', 'camila.neves@laticinios.com.br', 'Func@115', '11970610175'),
-('35293610627', '40613964000120', 'Daniel', 'Bezerra', 'Auxiliar de Deposito', 'daniel.bezerra@frigorifico.com.br', 'Func@116', '11984560185'),
-('55631414546', '60898058000126', 'Eduarda', 'Coelho', 'Nutricionista', 'eduarda.coelho@distribuidora.com.br', 'Func@117', '11931650204'),
-('61868718867', '62402210000163', 'Felipe', 'Silva', 'Vendedor', 'felipe.silva@empório.com.br', 'Func@118', '11934802026'),
-('47513786941', '56281715000114', 'Gustavo', 'Santos', 'Coordenador', 'gustavo.santos@atacado.com.br', 'Func@119', '11980769880'),
-('33648781375', '67436371000191', 'Helena', 'Ferreira', 'Gerente de Estoque', 'helena.ferreira@mercado.com.br', 'Func@120', '11998949109'),
-('05400110886', '91004404000109', 'Igor', 'Lima', 'Atendente', 'igor.lima@fazenda.com.br', 'Func@121', '11908343596'),
-('51463473524', '72264236000146', 'Julia', 'Carvalho', 'Motorista', 'julia.carvalho@agro.com.br', 'Func@122', '11950408531'),
-('77019159664', '96706343000145', 'Kevin', 'Dias', 'Comprador', 'kevin.dias@nutri.com.br', 'Func@123', '11958645784'),
-('50641767919', '21473877000170', 'Laura', 'Melo', 'Analista de Qualidade', 'laura.melo@rede.com.br', 'Func@124', '11966104827'),
-('24978734371', '08438764000175', 'Marcelo', 'Correia', 'Supervisor', 'marcelo.correia@comercial.com.br', 'Func@125', '11917305599'),
-('06522153602', '82635120000120', 'Natalia', 'Moreira', 'Auxiliar de Deposito', 'natalia.moreira@granja.com.br', 'Func@126', '11988565816'),
-('08296306352', '26012776000115', 'Osvaldo', 'Machado', 'Nutricionista', 'osvaldo.machado@casa.com.br', 'Func@127', '11954082670'),
-('47679042500', '33665954000172', 'Priscila', 'Ramos', 'Vendedor', 'priscila.ramos@ponto.com.br', 'Func@128', '11953122886'),
-('68537480002', '82242871000186', 'Ricardo', 'Fonseca', 'Coordenador', 'ricardo.fonseca@central.com.br', 'Func@129', '11977473294'),
-('78123449089', '34910575000163', 'Sabrina', 'Farias', 'Gerente de Estoque', 'sabrina.farias@laticinios.com.br', 'Func@130', '11998361614'),
-('87999827304', '66304631000102', 'Tiago', 'Duarte', 'Atendente', 'tiago.duarte@frigorifico.com.br', 'Func@131', '11905753199'),
-('98263203406', '22514034000137', 'Ursula', 'Pacheco', 'Motorista', 'ursula.pacheco@distribuidora.com.br', 'Func@132', '11968599109'),
-('95160465685', '96116540000104', 'Vitor', 'Amaral', 'Comprador', 'vitor.amaral@empório.com.br', 'Func@133', '11949982488'),
-('50100940374', '95405520000190', 'Wagner', 'Assis', 'Analista de Qualidade', 'wagner.assis@atacado.com.br', 'Func@134', '11907441820'),
-('42060103231', '85416602000187', 'Ximena', 'Souza', 'Supervisor', 'ximena.souza@mercado.com.br', 'Func@135', '11940635768'),
-('09015542198', '41182220000160', 'Yara', 'Oliveira', 'Auxiliar de Deposito', 'yara.oliveira@fazenda.com.br', 'Func@136', '11921308492'),
-('97790969064', '61134330000164', 'Zeca', 'Rodrigues', 'Nutricionista', 'zeca.rodrigues@agro.com.br', 'Func@137', '11963979677'),
-('45232329707', '21805824000109', 'Amanda', 'Gomes', 'Vendedor', 'amanda.gomes@nutri.com.br', 'Func@138', '11976247399'),
-('35642131125', '03853857000142', 'Breno', 'Barbosa', 'Coordenador', 'breno.barbosa@rede.com.br', 'Func@139', '11901542908'),
-('15889956663', '93034110000155', 'Cintia', 'Nascimento', 'Gerente de Estoque', 'cintia.nascimento@comercial.com.br', 'Func@140', '11961583991'),
-('88525364932', '00691117000169', 'Douglas', 'Cardoso', 'Atendente', 'douglas.cardoso@granja.com.br', 'Func@141', '11968943427'),
-('90892209682', '73758788000173', 'Estela', 'Cavalcanti', 'Motorista', 'estela.cavalcanti@casa.com.br', 'Func@142', '11980217054'),
-('68975161471', '86598366000120', 'Ana', 'Nunes', 'Comprador', 'ana.nunes@ponto.com.br', 'Func@143', '11979031604'),
-('97553956953', '69366710000136', 'Bruno', 'Freitas', 'Analista de Qualidade', 'bruno.freitas@central.com.br', 'Func@144', '11965382184'),
-('80406019088', '42839744000144', 'Carla', 'Vieira', 'Supervisor', 'carla.vieira@laticinios.com.br', 'Func@145', '11902717832'),
-('98280909109', '05122832000102', 'Diego', 'Batista', 'Auxiliar de Deposito', 'diego.batista@frigorifico.com.br', 'Func@146', '11936368062'),
-('78292465057', '59649891000154', 'Elaine', 'Xavier', 'Nutricionista', 'elaine.xavier@distribuidora.com.br', 'Func@147', '11995557182'),
-('97989008475', '23628639000111', 'Fabio', 'Guimaraes', 'Vendedor', 'fabio.guimaraes@empório.com.br', 'Func@148', '11990947124'),
-('77313275668', '78859395000170', 'Gabriela', 'Peixoto', 'Coordenador', 'gabriela.peixoto@atacado.com.br', 'Func@149', '11946321206');
-
-
 -- Produtos
-
 INSERT INTO Produtos (nome, descricao, preco, categoria, marca, unidadeMedida) VALUES
-('Leite Integral', 'Leite de vaca integral pasteurizado, rico em calcio e proteinas', 6.49, 'LATICIONIOS', 'Itambe', 'litro'),
-('Peito de Frango', 'Peito de frango resfriado, sem osso e sem pele', 22.9, 'CARNES', 'Sadia', 'kg'),
-('Alface Crespa', 'Alface crespa fresca, colhida diariamente', 3.49, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Queijo Mussarela', 'Queijo mussarela fatiado, ideal para lanches e pizzas', 34.9, 'LATICIONIOS', 'Tirolez', 'kg'),
-('Iogurte Natural', 'Iogurte natural integral sem adicao de acucar', 5.29, 'LATICIONIOS', 'Perdigao', 'unidade'),
-('Carne Moida', 'Carne bovina moida na hora, patinho', 28.9, 'CARNES', 'Seara', 'kg'),
-('Tomate Salada', 'Tomate salada maduro, ideal para saladas e molhos', 7.99, 'HORTALICAS', 'Vigor', 'kg'),
-('Requeijao Cremoso', 'Requeijao cremoso tradicional em pote', 9.79, 'LATICIONIOS', 'Danone', 'unidade'),
-('File de Tilapia', 'File de tilapia fresco, sem espinhas', 32.9, 'PESCADOS', 'Piracanjuba', 'kg'),
-('Cenoura', 'Cenoura fresca lavada, rica em vitamina A', 4.59, 'HORTALICAS', 'Friboi', 'kg'),
-('Manteiga com Sal', 'Manteiga com sal em tablete de 200g', 12.49, 'LATICIONIOS', 'Itambe', 'unidade'),
-('Linguica Toscana', 'Linguica toscana resfriada para churrasco', 19.9, 'EMBUTIDOS', 'Sadia', 'kg'),
-('Batata Inglesa', 'Batata inglesa lavada, tamanho medio', 5.99, 'HORTALICAS', 'FazendaVerde', 'kg'),
-('Presunto Fatiado', 'Presunto cozido fatiado, embalagem a vacuo', 24.9, 'EMBUTIDOS', 'Tirolez', 'kg'),
-('Brocolis', 'Brocolis ninja fresco, rico em fibras', 6.99, 'HORTALICAS', 'Perdigao', 'unidade'),
+('Leite Integral', 'Leite de vaca integral pasteurizado, rico em calcio e proteinas', 6.49, 'LATICIONIOS', 'Seara', 'litro'),
+('Peito de Frango', 'Peito de frango resfriado, sem osso e sem pele', 22.9, 'CARNES', 'Seara', 'kg'),
+('Alface Crespa', 'Alface crespa fresca, colhida diariamente', 3.49, 'HORTALICAS', 'Seara', 'unidade'),
+('Queijo Mussarela', 'Queijo mussarela fatiado, ideal para lanches e pizzas', 34.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Iogurte Natural', 'Iogurte natural integral sem adicao de acucar', 5.29, 'LATICIONIOS', 'Seara', 'unidade'),
+('Carne Moida', 'Carne bovina moida na hora, patinho', 28.9, 'CARNES', 'Friboi', 'kg'),
+('Tomate Salada', 'Tomate salada maduro, ideal para saladas e molhos', 7.99, 'HORTALICAS', 'Seara', 'kg'),
+('Requeijao Cremoso', 'Requeijao cremoso tradicional em pote', 9.79, 'LATICIONIOS', 'Doriana', 'unidade'),
+('File de Tilapia', 'File de tilapia fresco, sem espinhas', 32.9, 'PESCADOS', 'Seara', 'kg'),
+('Cenoura', 'Cenoura fresca lavada, rica em vitamina A', 4.59, 'HORTALICAS', 'Seara', 'kg'),
+('Manteiga com Sal', 'Manteiga com sal em tablete de 200g', 12.49, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Linguica Toscana', 'Linguica toscana resfriada para churrasco', 19.9, 'EMBUTIDOS', 'Seara', 'kg'),
+('Batata Inglesa', 'Batata inglesa lavada, tamanho medio', 5.99, 'HORTALICAS', 'Seara', 'kg'),
+('Presunto Fatiado', 'Presunto cozido fatiado, embalagem a vacuo', 24.9, 'EMBUTIDOS', 'Seara', 'kg'),
+('Brocolis', 'Brocolis ninja fresco, rico em fibras', 6.99, 'HORTALICAS', 'Seara', 'unidade'),
 ('Leite Desnatado', 'Leite desnatado UHT, baixo teor de gordura', 6.79, 'LATICIONIOS', 'Seara', 'litro'),
-('Costela Bovina', 'Costela bovina resfriada, ideal para churrasco', 39.9, 'CARNES', 'Vigor', 'kg'),
-('Cebola Roxa', 'Cebola roxa fresca, sabor suave e adocicado', 8.49, 'HORTALICAS', 'Danone', 'kg'),
-('Cream Cheese', 'Cream cheese tradicional em pote de 150g', 14.9, 'LATICIONIOS', 'Piracanjuba', 'unidade'),
-('Salmao Fresco', 'File de salmao fresco, corte porcionado', 69.9, 'PESCADOS', 'Friboi', 'kg'),
-('Abobrinha', 'Abobrinha italiana fresca', 5.49, 'HORTALICAS', 'Itambe', 'kg'),
-('Bacon em Cubos', 'Bacon defumado cortado em cubos', 27.9, 'EMBUTIDOS', 'Sadia', 'pacote'),
-('Pepino Japones', 'Pepino japones fresco, casca fina', 4.99, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Ricota Fresca', 'Ricota fresca artesanal em pote', 11.9, 'LATICIONIOS', 'Tirolez', 'unidade'),
-('Coxa de Frango', 'Coxa de frango resfriada com sobrecoxa', 15.9, 'CARNES', 'Perdigao', 'kg'),
+('Costela Bovina', 'Costela bovina resfriada, ideal para churrasco', 39.9, 'CARNES', 'Friboi', 'kg'),
+('Cebola Roxa', 'Cebola roxa fresca, sabor suave e adocicado', 8.49, 'HORTALICAS', 'Seara', 'kg'),
+('Cream Cheese', 'Cream cheese tradicional em pote de 150g', 14.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Salmao Fresco', 'File de salmao fresco, corte porcionado', 69.9, 'PESCADOS', 'Seara', 'kg'),
+('Abobrinha', 'Abobrinha italiana fresca', 5.49, 'HORTALICAS', 'Seara', 'kg'),
+('Bacon em Cubos', 'Bacon defumado cortado em cubos', 27.9, 'EMBUTIDOS', 'Seara', 'pacote'),
+('Pepino Japones', 'Pepino japones fresco, casca fina', 4.99, 'HORTALICAS', 'Seara', 'unidade'),
+('Ricota Fresca', 'Ricota fresca artesanal em pote', 11.9, 'LATICIONIOS', 'Seara', 'unidade'),
+('Coxa de Frango', 'Coxa de frango resfriada com sobrecoxa', 15.9, 'CARNES', 'Big Frango', 'kg'),
 ('Couve Manteiga', 'Couve manteiga fresca, folhas selecionadas', 3.99, 'HORTALICAS', 'Seara', 'unidade'),
-('Iogurte Grego', 'Iogurte grego cremoso, alto teor proteico', 8.49, 'LATICIONIOS', 'Vigor', 'unidade'),
-('Pernil Suino', 'Pernil suino resfriado, ideal para assados', 21.9, 'CARNES', 'Danone', 'kg'),
-('Pimentao Verde', 'Pimentao verde fresco, crocante', 9.99, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Queijo Prato', 'Queijo prato fatiado, sabor suave', 36.9, 'LATICIONIOS', 'Friboi', 'kg'),
-('Ovos Brancos', 'Ovos brancos tipo grande, caixa com 12 unidades', 14.9, 'OVOS', 'Itambe', 'caixa'),
-('File Mignon', 'File mignon bovino, corte nobre', 79.9, 'CARNES', 'Sadia', 'kg'),
-('Repolho Roxo', 'Repolho roxo fresco, ideal para saladas', 5.29, 'HORTALICAS', 'FazendaVerde', 'unidade'),
-('Leite Semidesnatado', 'Leite semidesnatado UHT longa vida', 6.59, 'LATICIONIOS', 'Tirolez', 'litro'),
-('Camarao Limpo', 'Camarao limpo e congelado, medio', 54.9, 'PESCADOS', 'Perdigao', 'kg'),
+('Iogurte Grego', 'Iogurte grego cremoso, alto teor proteico', 8.49, 'LATICIONIOS', 'Seara', 'unidade'),
+('Pernil Suino', 'Pernil suino resfriado, ideal para assados', 21.9, 'CARNES', 'Seara', 'kg'),
+('Pimentao Verde', 'Pimentao verde fresco, crocante', 9.99, 'HORTALICAS', 'Seara', 'kg'),
+('Queijo Prato', 'Queijo prato fatiado, sabor suave', 36.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Ovos Brancos', 'Ovos brancos tipo grande, caixa com 12 unidades', 14.9, 'OVOS', 'Seara', 'caixa'),
+('File Mignon', 'File mignon bovino, corte nobre', 79.9, 'CARNES', 'Swift', 'kg'),
+('Repolho Roxo', 'Repolho roxo fresco, ideal para saladas', 5.29, 'HORTALICAS', 'Seara', 'unidade'),
+('Leite Semidesnatado', 'Leite semidesnatado UHT longa vida', 6.59, 'LATICIONIOS', 'Seara', 'litro'),
+('Camarao Limpo', 'Camarao limpo e congelado, medio', 54.9, 'PESCADOS', 'Seara', 'kg'),
 ('Espinafre', 'Espinafre fresco em maco', 4.49, 'HORTALICAS', 'Seara', 'unidade'),
-('Nata Fresca', 'Nata fresca pasteurizada em pote', 13.9, 'LATICIONIOS', 'Vigor', 'unidade'),
-('Bisteca Suina', 'Bisteca suina resfriada com osso', 18.9, 'CARNES', 'Danone', 'kg'),
-('Vagem', 'Vagem fresca selecionada', 7.49, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Queijo Coalho', 'Queijo coalho para espetinho', 32.9, 'LATICIONIOS', 'Friboi', 'kg'),
-('Whey Protein', 'Suplemento em po sabor baunilha, pote 900g', 149.9, 'BEBIDAS', 'Itambe', 'pacote'),
-('Almondegas', 'Almondegas bovinas temperadas, congeladas', 24.9, 'ALIMENTOS_PREPARADOS', 'Sadia', 'pacote'),
-('Berinjela', 'Berinjela fresca, casca brilhante', 6.29, 'HORTALICAS', 'FazendaVerde', 'kg'),
-('Manteiga sem Sal', 'Manteiga sem sal em tablete de 200g', 12.9, 'LATICIONIOS', 'Tirolez', 'unidade'),
-('Frango a Passarinho', 'Frango a passarinho temperado, congelado', 22.9, 'CONGELADOS', 'Perdigao', 'pacote'),
+('Nata Fresca', 'Nata fresca pasteurizada em pote', 13.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Bisteca Suina', 'Bisteca suina resfriada com osso', 18.9, 'CARNES', 'Seara', 'kg'),
+('Vagem', 'Vagem fresca selecionada', 7.49, 'HORTALICAS', 'Seara', 'kg'),
+('Queijo Coalho', 'Queijo coalho para espetinho', 32.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Whey Protein', 'Suplemento em po sabor baunilha, pote 900g', 149.9, 'BEBIDAS', 'Seara', 'pacote'),
+('Almondegas', 'Almondegas bovinas temperadas, congeladas', 24.9, 'ALIMENTOS_PREPARADOS', 'Seara', 'pacote'),
+('Berinjela', 'Berinjela fresca, casca brilhante', 6.29, 'HORTALICAS', 'Seara', 'kg'),
+('Manteiga sem Sal', 'Manteiga sem sal em tablete de 200g', 12.9, 'LATICIONIOS', 'Doriana', 'unidade'),
+('Frango a Passarinho', 'Frango a passarinho temperado, congelado', 22.9, 'CONGELADOS', 'Frangosul', 'pacote'),
 ('Rucula', 'Rucula fresca em maco', 3.79, 'HORTALICAS', 'Seara', 'unidade'),
-('Queijo Parmesao', 'Queijo parmesao ralado fino', 44.9, 'LATICIONIOS', 'Vigor', 'kg'),
-('Salsicha', 'Salsicha tipo hot dog, pacote com 10 unidades', 13.9, 'EMBUTIDOS', 'Danone', 'pacote'),
-('Chuchu', 'Chuchu fresco, textura macia', 4.79, 'HORTALICAS', 'Piracanjuba', 'kg'),
-('Iogurte de Morango', 'Iogurte sabor morango, copo de 170g', 4.49, 'LATICIONIOS', 'Friboi', 'unidade');
-
+('Queijo Parmesao', 'Queijo parmesao ralado fino', 44.9, 'LATICIONIOS', 'Seara', 'kg'),
+('Salsicha', 'Salsicha tipo hot dog, pacote com 10 unidades', 13.9, 'EMBUTIDOS', 'Seara', 'pacote'),
+('Chuchu', 'Chuchu fresco, textura macia', 4.79, 'HORTALICAS', 'Seara', 'kg'),
+('Iogurte de Morango', 'Iogurte sabor morango, copo de 170g', 4.49, 'LATICIONIOS', 'Seara', 'unidade');
 
 -- Notificacao
 
@@ -644,57 +566,57 @@ INSERT INTO Notificacao (diasAviso, horarioAviso) VALUES
 
 -- Geladeira
 
-INSERT INTO Geladeira (idUsuario, status, quantidade, tipo) VALUES
-('61651728658', 'VAZIO', 0, 'Domestica'),
-('03186265940', 'OCUPACAO_BAIXA', 8, 'Frost Free'),
-('89632247248', 'OCUPACAO_MODERADA', 36, 'Duplex'),
-('78537787671', 'OCUPACAO_ALTA', 8, 'Inox'),
-('61988335000', 'CHEIA', 10, 'Compacta'),
-('76869458200', 'ILIMITADO', 27, 'Domestica'),
-('50370395093', 'VAZIO', 0, 'Frost Free'),
-('09242380385', 'OCUPACAO_BAIXA', 39, 'Duplex'),
-('87511029191', 'OCUPACAO_MODERADA', 18, 'Inox'),
-('20718728351', 'OCUPACAO_ALTA', 21, 'Compacta'),
-('93816662293', 'CHEIA', 7, 'Domestica'),
-('54062767864', 'ILIMITADO', 23, 'Frost Free'),
-('52263905480', 'VAZIO', 0, 'Duplex'),
-('74299060601', 'OCUPACAO_BAIXA', 3, 'Inox'),
-('80340669900', 'OCUPACAO_MODERADA', 4, 'Compacta'),
-('14786469424', 'OCUPACAO_ALTA', 16, 'Domestica'),
-('56858215735', 'CHEIA', 8, 'Frost Free'),
-('76315414427', 'ILIMITADO', 31, 'Duplex'),
-('66139532884', 'VAZIO', 0, 'Inox'),
-('05313798332', 'OCUPACAO_BAIXA', 8, 'Compacta'),
-('10769242987', 'OCUPACAO_MODERADA', 5, 'Domestica'),
-('88293486945', 'OCUPACAO_ALTA', 29, 'Frost Free'),
-('26951681520', 'CHEIA', 4, 'Duplex'),
-('77726406500', 'ILIMITADO', 19, 'Inox'),
-('07658178535', 'VAZIO', 0, 'Compacta'),
-('30035336579', 'OCUPACAO_BAIXA', 40, 'Domestica'),
-('07464396790', 'OCUPACAO_MODERADA', 22, 'Frost Free'),
-('01187309672', 'OCUPACAO_ALTA', 26, 'Duplex'),
-('79643758656', 'CHEIA', 28, 'Inox'),
-('94982888604', 'ILIMITADO', 19, 'Compacta'),
-('06923786185', 'VAZIO', 0, 'Domestica'),
-('98005505426', 'OCUPACAO_BAIXA', 21, 'Frost Free'),
-('68625374310', 'OCUPACAO_MODERADA', 17, 'Duplex'),
-('34711306676', 'OCUPACAO_ALTA', 9, 'Inox'),
-('01116136392', 'CHEIA', 39, 'Compacta'),
-('72421060877', 'ILIMITADO', 39, 'Domestica'),
-('61101572019', 'VAZIO', 0, 'Frost Free'),
-('17710054919', 'OCUPACAO_BAIXA', 3, 'Duplex'),
-('11421570750', 'OCUPACAO_MODERADA', 18, 'Inox'),
-('23103612249', 'OCUPACAO_ALTA', 4, 'Compacta'),
-('42935404904', 'CHEIA', 1, 'Domestica'),
-('72760313140', 'ILIMITADO', 29, 'Frost Free'),
-('32505476462', 'VAZIO', 0, 'Duplex'),
-('95573305468', 'OCUPACAO_BAIXA', 7, 'Inox'),
-('35779032289', 'OCUPACAO_MODERADA', 23, 'Compacta'),
-('06771725758', 'OCUPACAO_ALTA', 5, 'Domestica'),
-('79715532004', 'CHEIA', 19, 'Frost Free'),
-('14647672549', 'ILIMITADO', 8, 'Duplex'),
-('44230143605', 'VAZIO', 0, 'Inox'),
-('97037584959', 'OCUPACAO_BAIXA', 10, 'Compacta');
+INSERT INTO Geladeira (idUsuario, status, tipo) VALUES
+('61651728658', 'VAZIO', 'Domestica'),
+('03186265940', 'OCUPACAO_BAIXA', 'Frost Free'),
+('89632247248', 'OCUPACAO_MODERADA', 'Duplex'),
+('78537787671', 'OCUPACAO_ALTA', 'Inox'),
+('61988335000', 'CHEIA', 'Compacta'),
+('76869458200', 'ILIMITADO', 'Domestica'),
+('50370395093', 'VAZIO', 'Frost Free'),
+('09242380385', 'OCUPACAO_BAIXA',  'Duplex'),
+('87511029191', 'OCUPACAO_MODERADA',  'Inox'),
+('20718728351', 'OCUPACAO_ALTA',  'Compacta'),
+('93816662293', 'CHEIA', 'Domestica'),
+('54062767864', 'ILIMITADO',  'Frost Free'),
+('52263905480', 'VAZIO', 'Duplex'),
+('74299060601', 'OCUPACAO_BAIXA',  'Inox'),
+('80340669900', 'OCUPACAO_MODERADA',  'Compacta'),
+('14786469424', 'OCUPACAO_ALTA',  'Domestica'),
+('56858215735', 'CHEIA', 'Frost Free'),
+('76315414427', 'ILIMITADO', 'Duplex'),
+('66139532884', 'VAZIO',  'Inox'),
+('05313798332', 'OCUPACAO_BAIXA',  'Compacta'),
+('10769242987', 'OCUPACAO_MODERADA',  'Domestica'),
+('88293486945', 'OCUPACAO_ALTA',  'Frost Free'),
+('26951681520', 'CHEIA', 'Duplex'),
+('77726406500', 'ILIMITADO',  'Inox'),
+('07658178535', 'VAZIO',  'Compacta'),
+('30035336579', 'OCUPACAO_BAIXA',  'Domestica'),
+('07464396790', 'OCUPACAO_MODERADA',  'Frost Free'),
+('01187309672', 'OCUPACAO_ALTA',  'Duplex'),
+('79643758656', 'CHEIA',  'Inox'),
+('94982888604', 'ILIMITADO',  'Compacta'),
+('06923786185', 'VAZIO',  'Domestica'),
+('98005505426', 'OCUPACAO_BAIXA', 'Frost Free'),
+('68625374310', 'OCUPACAO_MODERADA',  'Duplex'),
+('34711306676', 'OCUPACAO_ALTA',  'Inox'),
+('01116136392', 'CHEIA',  'Compacta'),
+('72421060877', 'ILIMITADO',  'Domestica'),
+('61101572019', 'VAZIO',  'Frost Free'),
+('17710054919', 'OCUPACAO_BAIXA',  'Duplex'),
+('11421570750', 'OCUPACAO_MODERADA',  'Inox'),
+('23103612249', 'OCUPACAO_ALTA',  'Compacta'),
+('42935404904', 'CHEIA',  'Domestica'),
+('72760313140', 'ILIMITADO',  'Frost Free'),
+('32505476462', 'VAZIO',  'Duplex'),
+('95573305468', 'OCUPACAO_BAIXA',  'Inox'),
+('35779032289', 'OCUPACAO_MODERADA',  'Compacta'),
+('06771725758', 'OCUPACAO_ALTA',  'Domestica'),
+('79715532004', 'CHEIA',  'Frost Free'),
+('14647672549', 'ILIMITADO',  'Duplex'),
+('44230143605', 'VAZIO', 'Inox'),
+('97037584959', 'OCUPACAO_BAIXA',  'Compacta');
 
 
 -- Endereco
@@ -754,57 +676,57 @@ INSERT INTO Endereco (rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade) V
 
 -- Frigorificos
 
-INSERT INTO Frigorificos (idEndereco, idEmpresa, quantidade, status, tipo) VALUES
-(1, '24144297000127', 362, 'OCUPACAO_ALTA', 'Congelador'),
-(2, '47253455000182', 47, 'CHEIA', 'Refrigerador'),
-(3, '36006970000141', 292, 'ILIMITADO', 'Congelador'),
-(4, '87349005000102', 0, 'VAZIO', 'Refrigerador'),
-(5, '77310109000150', 476, 'OCUPACAO_BAIXA', 'Congelador'),
-(6, '06573130000108', 368, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(7, '81948539000179', 82, 'OCUPACAO_ALTA', 'Congelador'),
-(8, '56876315000151', 352, 'CHEIA', 'Refrigerador'),
-(9, '47026119000105', 628, 'ILIMITADO', 'Congelador'),
-(10, '79516470000162', 0, 'VAZIO', 'Refrigerador'),
-(11, '85589026000170', 125, 'OCUPACAO_BAIXA', 'Congelador'),
-(12, '39829214000100', 556, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(13, '43734144000184', 388, 'OCUPACAO_ALTA', 'Congelador'),
-(14, '70022229000102', 862, 'CHEIA', 'Refrigerador'),
-(15, '18315670000162', 338, 'ILIMITADO', 'Congelador'),
-(16, '94007678000140', 0, 'VAZIO', 'Refrigerador'),
-(17, '40613964000120', 457, 'OCUPACAO_BAIXA', 'Congelador'),
-(18, '60898058000126', 544, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(19, '62402210000163', 281, 'OCUPACAO_ALTA', 'Congelador'),
-(20, '56281715000114', 428, 'CHEIA', 'Refrigerador'),
-(21, '67436371000191', 574, 'ILIMITADO', 'Congelador'),
-(22, '91004404000109', 0, 'VAZIO', 'Refrigerador'),
-(23, '72264236000146', 143, 'OCUPACAO_BAIXA', 'Congelador'),
-(24, '96706343000145', 571, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(25, '21473877000170', 29, 'OCUPACAO_ALTA', 'Congelador'),
-(26, '08438764000175', 219, 'CHEIA', 'Refrigerador'),
-(27, '82635120000120', 278, 'ILIMITADO', 'Congelador'),
-(28, '26012776000115', 0, 'VAZIO', 'Refrigerador'),
-(29, '33665954000172', 412, 'OCUPACAO_BAIXA', 'Congelador'),
-(30, '82242871000186', 445, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(31, '34910575000163', 316, 'OCUPACAO_ALTA', 'Congelador'),
-(32, '66304631000102', 765, 'CHEIA', 'Refrigerador'),
-(33, '22514034000137', 770, 'ILIMITADO', 'Congelador'),
-(34, '96116540000104', 0, 'VAZIO', 'Refrigerador'),
-(35, '95405520000190', 152, 'OCUPACAO_BAIXA', 'Congelador'),
-(36, '85416602000187', 268, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(37, '41182220000160', 798, 'OCUPACAO_ALTA', 'Congelador'),
-(38, '61134330000164', 591, 'CHEIA', 'Refrigerador'),
-(39, '21805824000109', 34, 'ILIMITADO', 'Congelador'),
-(40, '03853857000142', 0, 'VAZIO', 'Refrigerador'),
-(41, '93034110000155', 390, 'OCUPACAO_BAIXA', 'Congelador'),
-(42, '00691117000169', 787, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(43, '73758788000173', 268, 'OCUPACAO_ALTA', 'Congelador'),
-(44, '86598366000120', 270, 'CHEIA', 'Refrigerador'),
-(45, '69366710000136', 674, 'ILIMITADO', 'Congelador'),
-(46, '42839744000144', 0, 'VAZIO', 'Refrigerador'),
-(47, '05122832000102', 562, 'OCUPACAO_BAIXA', 'Congelador'),
-(48, '59649891000154', 499, 'OCUPACAO_MODERADA', 'Refrigerador'),
-(49, '23628639000111', 291, 'OCUPACAO_ALTA', 'Congelador'),
-(50, '78859395000170', 662, 'CHEIA', 'Refrigerador');
+INSERT INTO Frigorificos (idEndereco, idEmpresa, status, tipo) VALUES
+(1, '24144297000127', 'OCUPACAO_ALTA', 'Congelador'),
+(2, '47253455000182', 'CHEIA', 'Refrigerador'),
+(3, '36006970000141',  'ILIMITADO', 'Congelador'),
+(4, '87349005000102', 'VAZIO', 'Refrigerador'),
+(5, '77310109000150', 'OCUPACAO_BAIXA', 'Congelador'),
+(6, '06573130000108', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(7, '81948539000179', 'OCUPACAO_ALTA', 'Congelador'),
+(8, '56876315000151', 'CHEIA', 'Refrigerador'),
+(9, '47026119000105', 'ILIMITADO', 'Congelador'),
+(10, '79516470000162', 'VAZIO', 'Refrigerador'),
+(11, '85589026000170', 'OCUPACAO_BAIXA', 'Congelador'),
+(12, '39829214000100', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(13, '43734144000184', 'OCUPACAO_ALTA', 'Congelador'),
+(14, '70022229000102', 'CHEIA', 'Refrigerador'),
+(15, '18315670000162', 'ILIMITADO', 'Congelador'),
+(16, '94007678000140', 'VAZIO', 'Refrigerador'),
+(17, '40613964000120', 'OCUPACAO_BAIXA', 'Congelador'),
+(18, '60898058000126', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(19, '62402210000163', 'OCUPACAO_ALTA', 'Congelador'),
+(20, '56281715000114', 'CHEIA', 'Refrigerador'),
+(21, '67436371000191', 'ILIMITADO', 'Congelador'),
+(22, '91004404000109', 'VAZIO', 'Refrigerador'),
+(23, '72264236000146', 'OCUPACAO_BAIXA', 'Congelador'),
+(24, '96706343000145', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(25, '21473877000170', 'OCUPACAO_ALTA', 'Congelador'),
+(26, '08438764000175', 'CHEIA', 'Refrigerador'),
+(27, '82635120000120', 'ILIMITADO', 'Congelador'),
+(28, '26012776000115', 'VAZIO', 'Refrigerador'),
+(29, '33665954000172', 'OCUPACAO_BAIXA', 'Congelador'),
+(30, '82242871000186', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(31, '34910575000163', 'OCUPACAO_ALTA', 'Congelador'),
+(32, '66304631000102', 'CHEIA', 'Refrigerador'),
+(33, '22514034000137', 'ILIMITADO', 'Congelador'),
+(34, '96116540000104', 'VAZIO', 'Refrigerador'),
+(35, '95405520000190', 'OCUPACAO_BAIXA', 'Congelador'),
+(36, '85416602000187', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(37, '41182220000160', 'OCUPACAO_ALTA', 'Congelador'),
+(38, '61134330000164', 'CHEIA', 'Refrigerador'),
+(39, '21805824000109', 'ILIMITADO', 'Congelador'),
+(40, '03853857000142', 'VAZIO', 'Refrigerador'),
+(41, '93034110000155', 'OCUPACAO_BAIXA', 'Congelador'),
+(42, '00691117000169', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(43, '73758788000173', 'OCUPACAO_ALTA', 'Congelador'),
+(44, '86598366000120', 'CHEIA', 'Refrigerador'),
+(45, '69366710000136', 'ILIMITADO', 'Congelador'),
+(46, '42839744000144', 'VAZIO', 'Refrigerador'),
+(47, '05122832000102', 'OCUPACAO_BAIXA', 'Congelador'),
+(48, '59649891000154', 'OCUPACAO_MODERADA', 'Refrigerador'),
+(49, '23628639000111', 'OCUPACAO_ALTA', 'Congelador'),
+(50, '78859395000170', 'CHEIA', 'Refrigerador');
 
 
 -- ProdutosGeladeira
@@ -1306,9 +1228,21 @@ INSERT INTO MarcasParceiras (idEmpresa, idProdutos, observacoes) VALUES
 
 
 
-
 set timezone = 'America/Sao_Paulo';
 show timezone;
 SET datestyle = 'ISO, DMY';
-show datastyle;
-*/
+show datestyle;
+
+
+
+
+select * from usuario
+
+
+select * from geladeira
+
+select * from produtos
+
+select * from produtosGeladeira
+
+SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosGeladeira WHERE idGeladeira =52

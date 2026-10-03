@@ -38,6 +38,7 @@ public class ArmazenamentoService {
 
     // ATUALIZAR O STATUS DA GELADEIRA
     public static void calcularStatusGeladeira(Geladeira geladeira, Assinatura assinatura){
+        StatusArmazenamento statusAntigo = geladeira.getStatus();
         // buscar a quantidade total de produtos na geladeira
         int quantidadeProd = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
         // buscar pelo tipo de plano para pegar a quantidade maxima dele
@@ -46,6 +47,7 @@ public class ArmazenamentoService {
         StatusArmazenamento novoStatus = StatusArmazenamento.DefinirStatus(quantidadeProd,capacidade);
         // aplicando no objeto geladeira
         geladeira.setStatus(novoStatus);
+
     }// ATUALIZAR O STATUS DA GELADEIRA
 
 

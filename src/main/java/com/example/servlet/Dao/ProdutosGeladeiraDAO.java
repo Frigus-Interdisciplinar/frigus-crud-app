@@ -140,7 +140,7 @@ public class ProdutosGeladeiraDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
-                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira;";
@@ -165,8 +165,8 @@ public class ProdutosGeladeiraDAO {
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
+                        rset.getInt("idGeladeira"),
                         usuario,
-                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -208,7 +208,7 @@ public class ProdutosGeladeiraDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
-                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira " +
@@ -234,8 +234,8 @@ public class ProdutosGeladeiraDAO {
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
+                        rset.getInt("idGeladeira"),
                         usuario,
-                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -274,7 +274,7 @@ public class ProdutosGeladeiraDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
-                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira " +
@@ -301,8 +301,8 @@ public class ProdutosGeladeiraDAO {
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
+                        rset.getInt("idGeladeira"),
                         usuario,
-                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -343,7 +343,7 @@ public class ProdutosGeladeiraDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
-                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira " +
@@ -368,8 +368,8 @@ public class ProdutosGeladeiraDAO {
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
+                        rset.getInt("idGeladeira"),
                         usuario,
-                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );
@@ -409,7 +409,7 @@ public class ProdutosGeladeiraDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
-                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo, g.quantidade as quantidadeGeladeira " +
+                    "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira " +
@@ -434,8 +434,8 @@ public class ProdutosGeladeiraDAO {
 
                 // Criando o objeto geladeira com o ID vindo do ResultSet
                 Geladeira geladeira = new Geladeira(
+                        rset.getInt("idGeladeira"),
                         usuario,
-                        rset.getInt("QuantidadeGeladeira"),
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         rset.getString("Tipo")
                 );

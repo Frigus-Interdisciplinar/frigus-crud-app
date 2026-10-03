@@ -45,7 +45,7 @@ public class EmpresaDAO {
 
 
     //==============ALTERAR=============
-    public int alterarEmpresa(Empresa empresa){
+    public int alterarEmpresa(Empresa empresaAntiga, Empresa empresaNova){
         Conexao conexao = new Conexao(); // abrindo a conexão
         Connection conn = conexao.conectar();
 
@@ -53,11 +53,11 @@ public class EmpresaDAO {
             String comandoSql = "update empresa set nome = ?, email = ?, senha = ?, descricao = ? where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
-            pstmt.setString(1, empresa.getNome());
-            pstmt.setString(2, empresa.getEmail());
-            pstmt.setString(3, empresa.getSenha());
-            pstmt.setString(4, empresa.getDescricao());
-            pstmt.setString(5, empresa.getCnpj());
+            pstmt.setString(1, empresaNova.getNome());
+            pstmt.setString(2, empresaNova.getEmail());
+            pstmt.setString(3, empresaNova.getSenha());
+            pstmt.setString(4, empresaNova.getDescricao());
+            pstmt.setString(5, empresaAntiga.getCnpj());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -77,7 +77,7 @@ public class EmpresaDAO {
 
 
     //============== ALTERAR E-MAIL =============
-    public int alterarEmailEmpresa(Empresa empresa){
+    public int alterarEmailEmpresa(Empresa empresa, String email){
         Conexao conexao = new Conexao(); // abrindo a conexão
         Connection conn = conexao.conectar();
 
@@ -85,11 +85,11 @@ public class EmpresaDAO {
             String comandoSql = "update empresa set email = ? where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
-            pstmt.setString(1, empresa.getEmail());
+            pstmt.setString(1, email);
             pstmt.setString(2, empresa.getCnpj());
 
             if (pstmt.executeUpdate() > 0){
-                return 1;// verifica se deu certo
+                 return 1;// verifica se deu certo
             }
             else{
                 return 0;// não deu certo
@@ -136,7 +136,7 @@ public class EmpresaDAO {
 
 
     // ================ BUSCAR ================
-    public Empresa buscarEmpresa(String cnpj){
+    public Empresa buscarEmpresa(String email){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -147,7 +147,7 @@ public class EmpresaDAO {
             String comandoSql = "select * from empresa where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, cnpj);
+            pstmt.setString(1, email);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
