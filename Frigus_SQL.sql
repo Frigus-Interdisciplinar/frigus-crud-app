@@ -1,4 +1,3 @@
-/*
 
 
 -- apagar o banco quando necessario
@@ -11,8 +10,7 @@ CREATE TABLE Usuario(
     nome        varchar(20)  not null,
     Sobrenome   varchar(60)  not null,
     email       varchar(320) not null,
-    senha       varchar(16)  not null,
-    telefone    varchar(14)      null
+    senha       varchar(16)  not null
 );
 
 CREATE TABLE Empresa(
@@ -23,16 +21,7 @@ CREATE TABLE Empresa(
     descricao   text             null
 );
 
-CREATE TABLE Funcionario(
-    cpf         varchar(11)  primary key,
-    idEmpresa   varchar(14)  not null,
-    nome        varchar(20)  not null,
-    Sobrenome   varchar(60)  not null,
-    cargo       varchar(50)  not null,
-    email       varchar(320) not null,
-    senha       varchar(16)  not null,
-    telefone    varchar(14)
-);
+
 
 CREATE TABLE MarcasParceiras(
     id              serial      primary key,
@@ -47,7 +36,7 @@ CREATE TABLE Assinatura(
     idEmpresa       varchar(14)         null,
     tipoAssinatura  varchar(50)     not null,
     valor           numeric(10,2)   not null default 0,
-    descricao       text                null
+    descricao       text            not null
 );
 
 
@@ -344,10 +333,6 @@ alter table ProdutosFrigorifico
     add constraint chk_quantidade_produtolista
     check (quantidade >= 0);
 
-alter table Usuario
-	add constraint chk_telefone_formato
-    check (telefone ~ '^\(?[1-9]{2}\)?\s?(?:9[0-9]{4}|[2-8][0-9]{3})\-?[0-9]{4}$');
-
 alter table Endereco
 	add constraint chk_cep_formato
     check (cep ~ '^\d{5}-?\d{3}$');
@@ -363,57 +348,57 @@ alter table Endereco
 
 -- Usuario
 
-INSERT INTO Usuario (cpf, nome, Sobrenome, email, senha, telefone) VALUES
-('61651728658', 'Ana', 'Rodrigues', 'ana.rodrigues@gmail.com', 'Senha@100', '81907429263'),
-('03186265940', 'Bruno', 'Gomes', 'bruno.gomes@gmail.com', 'Senha@101', '48905019909'),
-('89632247248', 'Carla', 'Barbosa', 'carla.barbosa@gmail.com', 'Senha@102', '62908591449'),
-('78537787671', 'Diego', 'Nascimento', 'diego.nascimento@gmail.com', 'Senha@103', '21983446125'),
-('61988335000', 'Elaine', 'Cardoso', 'elaine.cardoso@gmail.com', 'Senha@104', '85909351989'),
-('76869458200', 'Fabio', 'Cavalcanti', 'fabio.cavalcanti@gmail.com', 'Senha@105', '81901737613'),
-('50370395093', 'Gabriela', 'Nunes', 'gabriela.nunes@gmail.com', 'Senha@106', '85961058133'),
-('09242380385', 'Heitor', 'Freitas', 'heitor.freitas@gmail.com', 'Senha@107', '41916952821'),
-('87511029191', 'Isabela', 'Vieira', 'isabela.vieira@gmail.com', 'Senha@108', '92928610665'),
-('20718728351', 'Joao', 'Batista', 'joao.batista@gmail.com', 'Senha@109', '51992605249'),
-('93816662293', 'Karina', 'Xavier', 'karina.xavier@gmail.com', 'Senha@110', '31977387743'),
-('54062767864', 'Lucas', 'Guimaraes', 'lucas.guimaraes@gmail.com', 'Senha@111', '85983424050'),
-('52263905480', 'Marina', 'Peixoto', 'marina.peixoto@gmail.com', 'Senha@112', '21975359089'),
-('74299060601', 'Nicolas', 'Brito', 'nicolas.brito@gmail.com', 'Senha@113', '71906569876'),
-('80340669900', 'Otavio', 'Braga', 'otavio.braga@gmail.com', 'Senha@114', '61996353667'),
-('14786469424', 'Patricia', 'Costa', 'patricia.costa@gmail.com', 'Senha@115', '62910218629'),
-('56858215735', 'Rafael', 'Pereira', 'rafael.pereira@gmail.com', 'Senha@116', '62978414217'),
-('76315414427', 'Sofia', 'Almeida', 'sofia.almeida@gmail.com', 'Senha@117', '41975583187'),
-('66139532884', 'Thiago', 'Ribeiro', 'thiago.ribeiro@gmail.com', 'Senha@118', '85920684168'),
-('05313798332', 'Vanessa', 'Rocha', 'vanessa.rocha@gmail.com', 'Senha@119', '91923723359'),
-('10769242987', 'Aline', 'Araujo', 'aline.araujo@gmail.com', 'Senha@120', '48992777568'),
-('88293486945', 'Bernardo', 'Teixeira', 'bernardo.teixeira@gmail.com', 'Senha@121', '91968430779'),
-('26951681520', 'Camila', 'Monteiro', 'camila.monteiro@gmail.com', 'Senha@122', '85947849086'),
-('77726406500', 'Daniel', 'Marques', 'daniel.marques@gmail.com', 'Senha@123', '71976599511'),
-('07658178535', 'Eduarda', 'Pinto', 'eduarda.pinto@gmail.com', 'Senha@124', '81929436483'),
-('30035336579', 'Felipe', 'Tavares', 'felipe.tavares@gmail.com', 'Senha@125', '85917280569'),
-('07464396790', 'Gustavo', 'Cunha', 'gustavo.cunha@gmail.com', 'Senha@126', '21958813998'),
-('01187309672', 'Helena', 'Sales', 'helena.sales@gmail.com', 'Senha@127', '21971056262'),
-('79643758656', 'Igor', 'Neves', 'igor.neves@gmail.com', 'Senha@128', '61920554203'),
-('94982888604', 'Julia', 'Bezerra', 'julia.bezerra@gmail.com', 'Senha@129', '62977226882'),
-('06923786185', 'Kevin', 'Coelho', 'kevin.coelho@gmail.com', 'Senha@130', '51965807766'),
-('98005505426', 'Laura', 'Silva', 'laura.silva@gmail.com', 'Senha@131', '47925547793'),
-('68625374310', 'Marcelo', 'Santos', 'marcelo.santos@gmail.com', 'Senha@132', '91909717322'),
-('34711306676', 'Natalia', 'Ferreira', 'natalia.ferreira@gmail.com', 'Senha@133', '71921698365'),
-('01116136392', 'Osvaldo', 'Lima', 'osvaldo.lima@gmail.com', 'Senha@134', '21955890814'),
-('72421060877', 'Priscila', 'Carvalho', 'priscila.carvalho@gmail.com', 'Senha@135', '91942107499'),
-('61101572019', 'Ricardo', 'Dias', 'ricardo.dias@gmail.com', 'Senha@136', '92909996028'),
-('17710054919', 'Sabrina', 'Melo', 'sabrina.melo@gmail.com', 'Senha@137', '51980472061'),
-('11421570750', 'Tiago', 'Correia', 'tiago.correia@gmail.com', 'Senha@138', '21971188903'),
-('23103612249', 'Ursula', 'Moreira', 'ursula.moreira@gmail.com', 'Senha@139', '47988608449'),
-('42935404904', 'Vitor', 'Machado', 'vitor.machado@gmail.com', 'Senha@140', '71985977685'),
-('72760313140', 'Wagner', 'Ramos', 'wagner.ramos@gmail.com', 'Senha@141', '11979427318'),
-('32505476462', 'Ximena', 'Fonseca', 'ximena.fonseca@gmail.com', 'Senha@142', '65959382416'),
-('95573305468', 'Yara', 'Farias', 'yara.farias@gmail.com', 'Senha@143', '81993988627'),
-('35779032289', 'Zeca', 'Duarte', 'zeca.duarte@gmail.com', 'Senha@144', '92915184780'),
-('06771725758', 'Amanda', 'Pacheco', 'amanda.pacheco@gmail.com', 'Senha@145', '92926093146'),
-('79715532004', 'Breno', 'Amaral', 'breno.amaral@gmail.com', 'Senha@146', '85965643172'),
-('14647672549', 'Cintia', 'Assis', 'cintia.assis@gmail.com', 'Senha@147', '47937260670'),
-('44230143605', 'Douglas', 'Souza', 'douglas.souza@gmail.com', 'Senha@148', '51978685350'),
-('97037584959', 'Estela', 'Oliveira', 'estela.oliveira@gmail.com', 'Senha@149', '85941969690');
+INSERT INTO Usuario (cpf, nome, Sobrenome, email, senha) VALUES
+('61651728658', 'Ana', 'Rodrigues', 'ana.rodrigues@gmail.com', 'Senha@100'),
+('03186265940', 'Bruno', 'Gomes', 'bruno.gomes@gmail.com', 'Senha@101'),
+('89632247248', 'Carla', 'Barbosa', 'carla.barbosa@gmail.com', 'Senha@102'),
+('78537787671', 'Diego', 'Nascimento', 'diego.nascimento@gmail.com', 'Senha@103'),
+('61988335000', 'Elaine', 'Cardoso', 'elaine.cardoso@gmail.com', 'Senha@104'),
+('76869458200', 'Fabio', 'Cavalcanti', 'fabio.cavalcanti@gmail.com', 'Senha@105'),
+('50370395093', 'Gabriela', 'Nunes', 'gabriela.nunes@gmail.com', 'Senha@106'),
+('09242380385', 'Heitor', 'Freitas', 'heitor.freitas@gmail.com', 'Senha@107'),
+('87511029191', 'Isabela', 'Vieira', 'isabela.vieira@gmail.com', 'Senha@108'),
+('20718728351', 'Joao', 'Batista', 'joao.batista@gmail.com', 'Senha@109'),
+('93816662293', 'Karina', 'Xavier', 'karina.xavier@gmail.com', 'Senha@110'),
+('54062767864', 'Lucas', 'Guimaraes', 'lucas.guimaraes@gmail.com', 'Senha@111'),
+('52263905480', 'Marina', 'Peixoto', 'marina.peixoto@gmail.com', 'Senha@112'),
+('74299060601', 'Nicolas', 'Brito', 'nicolas.brito@gmail.com', 'Senha@113'),
+('80340669900', 'Otavio', 'Braga', 'otavio.braga@gmail.com', 'Senha@114'),
+('14786469424', 'Patricia', 'Costa', 'patricia.costa@gmail.com', 'Senha@115'),
+('56858215735', 'Rafael', 'Pereira', 'rafael.pereira@gmail.com', 'Senha@116'),
+('76315414427', 'Sofia', 'Almeida', 'sofia.almeida@gmail.com', 'Senha@117'),
+('66139532884', 'Thiago', 'Ribeiro', 'thiago.ribeiro@gmail.com', 'Senha@118'),
+('05313798332', 'Vanessa', 'Rocha', 'vanessa.rocha@gmail.com', 'Senha@119'),
+('10769242987', 'Aline', 'Araujo', 'aline.araujo@gmail.com', 'Senha@120'),
+('88293486945', 'Bernardo', 'Teixeira', 'bernardo.teixeira@gmail.com', 'Senha@121'),
+('26951681520', 'Camila', 'Monteiro', 'camila.monteiro@gmail.com', 'Senha@122'),
+('77726406500', 'Daniel', 'Marques', 'daniel.marques@gmail.com', 'Senha@123'),
+('07658178535', 'Eduarda', 'Pinto', 'eduarda.pinto@gmail.com', 'Senha@124'),
+('30035336579', 'Felipe', 'Tavares', 'felipe.tavares@gmail.com', 'Senha@125'),
+('07464396790', 'Gustavo', 'Cunha', 'gustavo.cunha@gmail.com', 'Senha@126'),
+('01187309672', 'Helena', 'Sales', 'helena.sales@gmail.com', 'Senha@127'),
+('79643758656', 'Igor', 'Neves', 'igor.neves@gmail.com', 'Senha@128'),
+('94982888604', 'Julia', 'Bezerra', 'julia.bezerra@gmail.com', 'Senha@129'),
+('06923786185', 'Kevin', 'Coelho', 'kevin.coelho@gmail.com', 'Senha@130'),
+('98005505426', 'Laura', 'Silva', 'laura.silva@gmail.com', 'Senha@131'),
+('68625374310', 'Marcelo', 'Santos', 'marcelo.santos@gmail.com', 'Senha@132'),
+('34711306676', 'Natalia', 'Ferreira', 'natalia.ferreira@gmail.com', 'Senha@133'),
+('01116136392', 'Osvaldo', 'Lima', 'osvaldo.lima@gmail.com', 'Senha@134'),
+('72421060877', 'Priscila', 'Carvalho', 'priscila.carvalho@gmail.com', 'Senha@135'),
+('61101572019', 'Ricardo', 'Dias', 'ricardo.dias@gmail.com', 'Senha@136'),
+('17710054919', 'Sabrina', 'Melo', 'sabrina.melo@gmail.com', 'Senha@137'),
+('11421570750', 'Tiago', 'Correia', 'tiago.correia@gmail.com', 'Senha@138'),
+('23103612249', 'Ursula', 'Moreira', 'ursula.moreira@gmail.com', 'Senha@139'),
+('42935404904', 'Vitor', 'Machado', 'vitor.machado@gmail.com', 'Senha@140'),
+('72760313140', 'Wagner', 'Ramos', 'wagner.ramos@gmail.com', 'Senha@141'),
+('32505476462', 'Ximena', 'Fonseca', 'ximena.fonseca@gmail.com', 'Senha@142'),
+('95573305468', 'Yara', 'Farias', 'yara.farias@gmail.com', 'Senha@143'),
+('35779032289', 'Zeca', 'Duarte', 'zeca.duarte@gmail.com', 'Senha@144'),
+('06771725758', 'Amanda', 'Pacheco', 'amanda.pacheco@gmail.com', 'Senha@145'),
+('79715532004', 'Breno', 'Amaral', 'breno.amaral@gmail.com', 'Senha@146'),
+('14647672549', 'Cintia', 'Assis', 'cintia.assis@gmail.com', 'Senha@147'),
+('44230143605', 'Douglas', 'Souza', 'douglas.souza@gmail.com', 'Senha@148'),
+('97037584959', 'Estela', 'Oliveira', 'estela.oliveira@gmail.com', 'Senha@149');
 
 
 -- Empresa
@@ -469,61 +454,6 @@ INSERT INTO Empresa (cnpj, nome, email, senha, descricao) VALUES
 ('59649891000154', 'Distribuidora Raiz Forte S.A.', 'contato@raizforte.com.br', 'Emp@147', 'Empresa do ramo alimenticio especializada em distribuidora, atuante desde 2023'),
 ('23628639000111', 'Empório Novo Rumo LTDA', 'contato@novorumo.com.br', 'Emp@148', 'Empresa do ramo alimenticio especializada em empório, atuante desde 2000'),
 ('78859395000170', 'Atacado Sol Nascente EIRELI', 'contato@solnascente.com.br', 'Emp@149', 'Empresa do ramo alimenticio especializada em atacado, atuante desde 2001');
-
-
--- Funcionario
-
-INSERT INTO Funcionario (cpf, idEmpresa, nome, Sobrenome, cargo, email, senha, telefone) VALUES
-('66738756151', '24144297000127', 'Heitor', 'Brito', 'Gerente de Estoque', 'heitor.brito@laticinios.com.br', 'Func@100', '11956718608'),
-('62637779314', '47253455000182', 'Isabela', 'Braga', 'Atendente', 'isabela.braga@frigorifico.com.br', 'Func@101', '11969810293'),
-('67103901449', '36006970000141', 'Joao', 'Costa', 'Motorista', 'joao.costa@distribuidora.com.br', 'Func@102', '11900967419'),
-('33201894680', '87349005000102', 'Karina', 'Pereira', 'Comprador', 'karina.pereira@empório.com.br', 'Func@103', '11964869978'),
-('75780607087', '77310109000150', 'Lucas', 'Almeida', 'Analista de Qualidade', 'lucas.almeida@atacado.com.br', 'Func@104', '11945992740'),
-('39912409981', '06573130000108', 'Marina', 'Ribeiro', 'Supervisor', 'marina.ribeiro@mercado.com.br', 'Func@105', '11930377542'),
-('83521906280', '81948539000179', 'Nicolas', 'Rocha', 'Auxiliar de Deposito', 'nicolas.rocha@fazenda.com.br', 'Func@106', '11921822589'),
-('24226069382', '56876315000151', 'Otavio', 'Araujo', 'Nutricionista', 'otavio.araujo@agro.com.br', 'Func@107', '11959856183'),
-('81451076797', '47026119000105', 'Patricia', 'Teixeira', 'Vendedor', 'patricia.teixeira@nutri.com.br', 'Func@108', '11992435096'),
-('70041964292', '79516470000162', 'Rafael', 'Monteiro', 'Coordenador', 'rafael.monteiro@rede.com.br', 'Func@109', '11938853451'),
-('24840662959', '85589026000170', 'Sofia', 'Marques', 'Gerente de Estoque', 'sofia.marques@comercial.com.br', 'Func@110', '11907393571'),
-('06237315250', '39829214000100', 'Thiago', 'Pinto', 'Atendente', 'thiago.pinto@granja.com.br', 'Func@111', '11982811730'),
-('29430110888', '43734144000184', 'Vanessa', 'Tavares', 'Motorista', 'vanessa.tavares@casa.com.br', 'Func@112', '11915899901'),
-('05754758383', '70022229000102', 'Aline', 'Cunha', 'Comprador', 'aline.cunha@ponto.com.br', 'Func@113', '11987967857'),
-('96999226059', '18315670000162', 'Bernardo', 'Sales', 'Analista de Qualidade', 'bernardo.sales@central.com.br', 'Func@114', '11936488379'),
-('97402560236', '94007678000140', 'Camila', 'Neves', 'Supervisor', 'camila.neves@laticinios.com.br', 'Func@115', '11970610175'),
-('35293610627', '40613964000120', 'Daniel', 'Bezerra', 'Auxiliar de Deposito', 'daniel.bezerra@frigorifico.com.br', 'Func@116', '11984560185'),
-('55631414546', '60898058000126', 'Eduarda', 'Coelho', 'Nutricionista', 'eduarda.coelho@distribuidora.com.br', 'Func@117', '11931650204'),
-('61868718867', '62402210000163', 'Felipe', 'Silva', 'Vendedor', 'felipe.silva@empório.com.br', 'Func@118', '11934802026'),
-('47513786941', '56281715000114', 'Gustavo', 'Santos', 'Coordenador', 'gustavo.santos@atacado.com.br', 'Func@119', '11980769880'),
-('33648781375', '67436371000191', 'Helena', 'Ferreira', 'Gerente de Estoque', 'helena.ferreira@mercado.com.br', 'Func@120', '11998949109'),
-('05400110886', '91004404000109', 'Igor', 'Lima', 'Atendente', 'igor.lima@fazenda.com.br', 'Func@121', '11908343596'),
-('51463473524', '72264236000146', 'Julia', 'Carvalho', 'Motorista', 'julia.carvalho@agro.com.br', 'Func@122', '11950408531'),
-('77019159664', '96706343000145', 'Kevin', 'Dias', 'Comprador', 'kevin.dias@nutri.com.br', 'Func@123', '11958645784'),
-('50641767919', '21473877000170', 'Laura', 'Melo', 'Analista de Qualidade', 'laura.melo@rede.com.br', 'Func@124', '11966104827'),
-('24978734371', '08438764000175', 'Marcelo', 'Correia', 'Supervisor', 'marcelo.correia@comercial.com.br', 'Func@125', '11917305599'),
-('06522153602', '82635120000120', 'Natalia', 'Moreira', 'Auxiliar de Deposito', 'natalia.moreira@granja.com.br', 'Func@126', '11988565816'),
-('08296306352', '26012776000115', 'Osvaldo', 'Machado', 'Nutricionista', 'osvaldo.machado@casa.com.br', 'Func@127', '11954082670'),
-('47679042500', '33665954000172', 'Priscila', 'Ramos', 'Vendedor', 'priscila.ramos@ponto.com.br', 'Func@128', '11953122886'),
-('68537480002', '82242871000186', 'Ricardo', 'Fonseca', 'Coordenador', 'ricardo.fonseca@central.com.br', 'Func@129', '11977473294'),
-('78123449089', '34910575000163', 'Sabrina', 'Farias', 'Gerente de Estoque', 'sabrina.farias@laticinios.com.br', 'Func@130', '11998361614'),
-('87999827304', '66304631000102', 'Tiago', 'Duarte', 'Atendente', 'tiago.duarte@frigorifico.com.br', 'Func@131', '11905753199'),
-('98263203406', '22514034000137', 'Ursula', 'Pacheco', 'Motorista', 'ursula.pacheco@distribuidora.com.br', 'Func@132', '11968599109'),
-('95160465685', '96116540000104', 'Vitor', 'Amaral', 'Comprador', 'vitor.amaral@empório.com.br', 'Func@133', '11949982488'),
-('50100940374', '95405520000190', 'Wagner', 'Assis', 'Analista de Qualidade', 'wagner.assis@atacado.com.br', 'Func@134', '11907441820'),
-('42060103231', '85416602000187', 'Ximena', 'Souza', 'Supervisor', 'ximena.souza@mercado.com.br', 'Func@135', '11940635768'),
-('09015542198', '41182220000160', 'Yara', 'Oliveira', 'Auxiliar de Deposito', 'yara.oliveira@fazenda.com.br', 'Func@136', '11921308492'),
-('97790969064', '61134330000164', 'Zeca', 'Rodrigues', 'Nutricionista', 'zeca.rodrigues@agro.com.br', 'Func@137', '11963979677'),
-('45232329707', '21805824000109', 'Amanda', 'Gomes', 'Vendedor', 'amanda.gomes@nutri.com.br', 'Func@138', '11976247399'),
-('35642131125', '03853857000142', 'Breno', 'Barbosa', 'Coordenador', 'breno.barbosa@rede.com.br', 'Func@139', '11901542908'),
-('15889956663', '93034110000155', 'Cintia', 'Nascimento', 'Gerente de Estoque', 'cintia.nascimento@comercial.com.br', 'Func@140', '11961583991'),
-('88525364932', '00691117000169', 'Douglas', 'Cardoso', 'Atendente', 'douglas.cardoso@granja.com.br', 'Func@141', '11968943427'),
-('90892209682', '73758788000173', 'Estela', 'Cavalcanti', 'Motorista', 'estela.cavalcanti@casa.com.br', 'Func@142', '11980217054'),
-('68975161471', '86598366000120', 'Ana', 'Nunes', 'Comprador', 'ana.nunes@ponto.com.br', 'Func@143', '11979031604'),
-('97553956953', '69366710000136', 'Bruno', 'Freitas', 'Analista de Qualidade', 'bruno.freitas@central.com.br', 'Func@144', '11965382184'),
-('80406019088', '42839744000144', 'Carla', 'Vieira', 'Supervisor', 'carla.vieira@laticinios.com.br', 'Func@145', '11902717832'),
-('98280909109', '05122832000102', 'Diego', 'Batista', 'Auxiliar de Deposito', 'diego.batista@frigorifico.com.br', 'Func@146', '11936368062'),
-('78292465057', '59649891000154', 'Elaine', 'Xavier', 'Nutricionista', 'elaine.xavier@distribuidora.com.br', 'Func@147', '11995557182'),
-('97989008475', '23628639000111', 'Fabio', 'Guimaraes', 'Vendedor', 'fabio.guimaraes@empório.com.br', 'Func@148', '11990947124'),
-('77313275668', '78859395000170', 'Gabriela', 'Peixoto', 'Coordenador', 'gabriela.peixoto@atacado.com.br', 'Func@149', '11946321206');
 
 
 -- Produtos
@@ -1304,9 +1234,15 @@ SET datestyle = 'ISO, DMY';
 show datestyle;
 
 
-*/
 
 
-select * from geladeira 
+select * from usuario
+
+
+select * from geladeira
+
+select * from produtos
+
+select * from produtosGeladeira
 
 SELECT COALESCE(SUM(quantidade), 0) AS total FROM produtosGeladeira WHERE idGeladeira =52

@@ -89,7 +89,7 @@ public class EmpresaDAO {
             pstmt.setString(2, empresa.getCnpj());
 
             if (pstmt.executeUpdate() > 0){
-                return 1;// verifica se deu certo
+                 return 1;// verifica se deu certo
             }
             else{
                 return 0;// não deu certo
@@ -136,7 +136,7 @@ public class EmpresaDAO {
 
 
     // ================ BUSCAR ================
-    public Empresa buscarEmpresa(String cnpj){
+    public Empresa buscarEmpresa(String email){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -147,7 +147,7 @@ public class EmpresaDAO {
             String comandoSql = "select * from empresa where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, cnpj);
+            pstmt.setString(1, email);
             rset = pstmt.executeQuery();
 
             if (rset.next()){

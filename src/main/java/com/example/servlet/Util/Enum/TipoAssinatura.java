@@ -36,6 +36,22 @@ public enum TipoAssinatura {
                 return 0;
         }
     }
+
+    // definir a descrição da assinatura
+    public static String descricaoPlano(TipoAssinatura plano){
+        switch (plano){
+            case FREE:
+                return "Para quem quer começar a organizar seus produtos e acompanhar suas validades de forma simples.";
+            case PLUS:
+                return "Mais recursos para manter sua geladeira organizada e ter maior controle sobre seus produtos.";
+            case FAMILIA:
+                return "Ideal para famílias que querem organizar seus produtos em conjunto e reduzir desperdícios no dia a dia.";
+            case COMERCIAL:
+                return "Feito para pequenos e médios comércios que precisam de mais controle sobre estoque, validade e perdas.";
+            default:
+                return "";
+        }
+    }
 }
 
 

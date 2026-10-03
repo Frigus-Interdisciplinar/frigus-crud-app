@@ -40,13 +40,13 @@ public class Main {
 
 //
 //        // criando o objeto produto
-//        Produto prod = new Produto(
-//                "Batata inglesa",
-//                "tuberculo",
-//                6.99,
-//                Categoria.TUBERCULOS,
-//                "in natura",
-//                "KG");
+        Produto prod = new Produto(
+                "Batata inglesa",
+                "tuberculo",
+                6.99,
+                Categoria.TUBERCULOS,
+                "in natura",
+                "KG");
 //
 //        // criando o objeto para atualizar o produto
 //        Produto prodAlterado = new Produto(
@@ -58,7 +58,7 @@ public class Main {
 //                "KG");
 //
 //        // instanciando o objeto produto dao para fazer as operações do crud
-//        ProdutoDAO produtoDAO = new ProdutoDAO();
+            ProdutoDAO produtoDAO = new ProdutoDAO();
 //
 //        // criar o objeto para realizar os metodos de alterar e deletar
 //        Produto produtoSelecionado = produtoDAO.buscarprodutoPorId(29);
@@ -92,8 +92,7 @@ public class Main {
                 "Mauro",
                 "silvestre Cavaliere",
                 "mauro.silvestre@hotmail.com",
-                "123456",
-                "11987654321"
+                "123456"
                 );
 //        // usuario sem telefone
         Usuario usuarioStelefone = new Usuario(
@@ -225,8 +224,7 @@ public class Main {
 //
         Assinatura assiUsuario = new Assinatura(
                 usuario,
-                TipoAssinatura.PLUS,
-                "Assinatura plus para o melhor do seu lar"
+                TipoAssinatura.PLUS
         );
 //
 //        Assinatura assiUsuarioSdescricao = new Assinatura(
@@ -282,24 +280,53 @@ public class Main {
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         //System.out.println(usuarioDAO.adicionarUsuario(usuario));
-        Geladeira geladeira = new Geladeira(
-                usuario,
-                "ice Frozen"
-        );
-        GeladeiraDAO geladeiraDao = new GeladeiraDAO();
+        Geladeira geladeira2 = new Geladeira(
+                usuario
 
+        );
+        //GeladeiraDAO geladeiraDao = new GeladeiraDAO();
+        //System.out.println(geladeiraDao.inserirGeladeira(geladeira2));
         //System.out.println(geladeiraDao.inserirGeladeira(geladeira));
 
-        Geladeira geladeiraConsulta = geladeiraDao.buscarUnicaGeladeira(usuario.getCpf(), geladeira.getIdGeladeira());
-        ArmazenamentoService service = new ArmazenamentoService();
-        System.out.println(geladeiraConsulta);
-        System.out.println("total prod: " +ArmazenamentoService.totalProdutosGeladeira(geladeiraConsulta.getIdGeladeira()));
-        System.out.println(ArmazenamentoService.calcularStatusGeladeira(geladeira, assiUsuario));
-        System.out.println(geladeira);
+//        Geladeira geladeiraConsulta = geladeiraDao.buscarUnicaGeladeira("12345678910", 52);
+//        ArmazenamentoService service = new ArmazenamentoService();
+//        System.out.println(geladeiraConsulta);
+//        System.out.println("total prod: " +ArmazenamentoService.totalProdutosGeladeira(geladeiraConsulta.getIdGeladeira()));
+//        ArmazenamentoService.calcularStatusGeladeira(geladeiraConsulta, assiUsuario);
+//        System.out.println(geladeiraConsulta);
+//        System.out.println(geladeiraDao.atualizarStatus(geladeiraConsulta));
 
 
-       // System.out.println(geladeiraDao.atualizarStatus(geladeira, ));
+//        Geladeira geladeiraConsulta = geladeiraDao.buscarUnicaGeladeira("12345678910",52);
+//        System.out.println(geladeiraConsulta + "\n" + ArmazenamentoService.totalProdutosGeladeira(geladeiraConsulta.getIdGeladeira()));
+//        ArmazenamentoService.calcularStatusGeladeira(geladeiraConsulta, assiUsuario);
+//        System.out.println(geladeiraDao.atualizarStatus(geladeiraConsulta));
+//        System.out.println(geladeiraConsulta);
 
 
+        //System.out.println(geladeiraDao.buscarTodasGeladeira("12345678910"));
+
+
+        // produto geladeira
+
+        //System.out.println(produtoDAO.inserirProduto(prod));
+
+        GeladeiraDAO gelaDao = new GeladeiraDAO();
+
+
+        Produto prodConsulta = produtoDAO.buscarprodutoPorId(51);
+
+        Geladeira gelaConsulta = gelaDao.buscarUnicaGeladeira("12345678910", 52);
+
+        ProdutosGeladeira pg = new ProdutosGeladeira(
+                1,
+                geladeira2,
+                prod,
+                LocalDate.of(2026,9, 20),
+                5
+        );
+
+        ProdutosGeladeiraDAO pgDao = new ProdutosGeladeiraDAO();
+        System.out.println(pgDao.inserirProdutoGeladeira(pg));
     }
 }

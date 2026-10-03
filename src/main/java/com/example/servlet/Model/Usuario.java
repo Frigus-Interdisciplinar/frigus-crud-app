@@ -7,23 +7,12 @@ public class Usuario {
     private String sobrenome;
     private String email;
     private String senha;
-    private String telefone;
 
     // Construtor vazio
     public Usuario() {
     }
 
     // Construtor
-    public Usuario(String cpf, String nome, String sobrenome, String email, String senha, String telefone) {
-        this.cpf = cpf;
-        this.nome = nome;
-        this.sobrenome = sobrenome;
-        this.email = email;
-        this.senha = senha;
-        this.telefone = telefone;
-    }
-
-    // construtor sem telefone
     public Usuario(String cpf, String nome, String sobrenome, String email, String senha) {
         this.cpf = cpf;
         this.nome = nome;
@@ -31,6 +20,7 @@ public class Usuario {
         this.email = email;
         this.senha = senha;
     }
+
 
     // GETTERS E SETTERS
     public String getCpf() {
@@ -73,14 +63,6 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
     @Override
     public String toString() {
         return "Usuario{" +
@@ -89,7 +71,6 @@ public class Usuario {
                 "Nome: " + nome + "\n" +
                 "Sobrenome: " + sobrenome + "\n" +
                 "E-mail: " + email + "\n" +
-                "Telefone: " + telefone + "\n" +
                 '}';
     }
 

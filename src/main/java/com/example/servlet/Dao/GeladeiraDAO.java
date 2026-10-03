@@ -44,38 +44,8 @@ public class GeladeiraDAO {
 
 
 
-    //==============ALTERAR=============
-    public int alterarGeradeira(Geladeira geladeiraAntiga, Geladeira geladeiraNova){
-        Conexao conexao = new Conexao(); // abrindo a conexão
-        Connection conn = conexao.conectar();
-
-        try{
-            String comandoSql = "update geladeira set idUsuario = ?, status = ?, tipo = ?  where id = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para o comando
-            pstmt.setString(1, geladeiraNova.getUsuario().getCpf());
-            pstmt.setString(2, geladeiraNova.getStatus().name());;
-            pstmt.setString(3, geladeiraNova.getTipo());
-            pstmt.setInt(4, geladeiraAntiga.getIdGeladeira());
-            if (pstmt.executeUpdate() > 0){
-                return 1;// verifica se deu certo
-            }
-            else{
-                return 0;// não deu certo
-            }
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexão
-        }
-    }// ==============ALTERAR===============
-
-
     // ================ ALTERAR STATUS ================
-    public int atualizarStatus(Geladeira geladeira, StatusArmazenamento novoStatus){
+    public int atualizarStatus(Geladeira geladeira){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexão com o banco
 
@@ -83,7 +53,7 @@ public class GeladeiraDAO {
             String comandoSlq = "update geladeira set status = ? where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSlq);
             // setando os valores para a operação
-            pstmt.setString(1, novoStatus.name());
+            pstmt.setString(1, geladeira.getStatus().name());
             pstmt.setInt(2, geladeira.getIdGeladeira());
             // verifica se foi possivel alterar o banco
             if (pstmt.executeUpdate() > 0){
@@ -101,7 +71,10 @@ public class GeladeiraDAO {
         }
     }// ================ ALTERAR STATUS ================
 
-    // ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
+
+
+
+    // ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
     public List<Geladeira> buscarTodasGeladeira(String cpf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
@@ -135,7 +108,7 @@ public class GeladeiraDAO {
             conexao.desconectar(conn);// fechando a conexao
         }
         return listaGeladeira;
-    }// ==============BUSCAR TODOS AS GELADEIRAS PELO ID DO USUARIO ===============
+    }// ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
 
 
 

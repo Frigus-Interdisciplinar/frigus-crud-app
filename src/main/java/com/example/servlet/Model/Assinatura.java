@@ -17,18 +17,11 @@ public class Assinatura {
     }
 
     // construtor para planos dos usuarios sem id
-    public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura, String descricao) {
-        this.usuario = usuario;
-        this.tipoAssinatura = tipoAssinatura;
-        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
-        this.descricao = descricao;
-    }
-
-    // contrutor para planos dos usuarios sem descricao
     public Assinatura(Usuario usuario, TipoAssinatura tipoAssinatura) {
         this.usuario = usuario;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
+        this.descricao = TipoAssinatura.descricaoPlano(tipoAssinatura);
     }
 
     // construtor para constuir o objeto vindo do banco com foco no usuario
@@ -41,18 +34,11 @@ public class Assinatura {
     }
 
     // construtor para planos das empresas sem id
-    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura, String descricao) {
+    public Assinatura(Empresa empresa, TipoAssinatura tipoAssinatura) {
         this.empresa = empresa;
         this.tipoAssinatura = tipoAssinatura;
         this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
-        this.descricao = descricao;
-    }
-
-    // construtor para planos das empresas sem descrição
-    public Assinatura( Empresa empresa, TipoAssinatura tipoAssinatura) {
-        this.empresa = empresa;
-        this.tipoAssinatura = tipoAssinatura;
-        this.valor = TipoAssinatura.definirValorPlano(tipoAssinatura);
+        this.descricao = TipoAssinatura.descricaoPlano(tipoAssinatura);
     }
 
     // construtor para ver o objeto no banco com foco na empresa

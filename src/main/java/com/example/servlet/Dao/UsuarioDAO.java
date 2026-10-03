@@ -16,7 +16,7 @@ public class UsuarioDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "Insert into usuario (cpf, nome, sobrenome, email, senha, telefone) values (?,?,?,?,?,?);";
+            String comandoSql = "Insert into usuario (cpf, nome, sobrenome, email, senha) values (?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setString(1, usuario.getCpf());
@@ -24,7 +24,6 @@ public class UsuarioDAO {
             pstmt.setString(3, usuario.getSobrenome());
             pstmt.setString(4, usuario.getEmail());
             pstmt.setString(5, usuario.getSenha());
-            pstmt.setString(6, usuario.getTelefone());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // inseriu as informações no banco
@@ -49,15 +48,14 @@ public class UsuarioDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "update usuario set nome = ?, sobrenome = ?, email = ?, senha = ?, telefone = ? where cpf = ?;";
+            String comandoSql = "update usuario set nome = ?, sobrenome = ?, email = ?, senha = ? where cpf = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setString(1, usuarioNovo.getNome());
             pstmt.setString(2, usuarioNovo.getSobrenome());
             pstmt.setString(3, usuarioNovo.getEmail());
             pstmt.setString(4, usuarioNovo.getSenha());
-            pstmt.setString(5, usuarioNovo.getTelefone());
-            pstmt.setString(6, usuarioAntigo.getCpf());
+            pstmt.setString(5, usuarioAntigo.getCpf());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // inseriu as informações no banco
@@ -136,7 +134,7 @@ public class UsuarioDAO {
 
 
     // ================ BUSCAR ================
-    public Usuario buscarUsuario(String cpf){
+    public Usuario buscarUsuario(String email){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -144,10 +142,10 @@ public class UsuarioDAO {
         Usuario usuario = null;
 
         try{
-            String comandoSql = "select * from usuario where cpf = ?;";
+            String comandoSql = "select * from usuario where email = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, cpf);
+            pstmt.setString(1, email);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
@@ -156,12 +154,9 @@ public class UsuarioDAO {
                         rset.getString("nome"),
                         rset.getString("sobrenome"),
                         rset.getString("email"),
-                        rset.getString("senha"),
-                        rset.getString("telefone")
+                        rset.getString("senha")
                 );
             }
-
-
         }catch (SQLException sqle){
             sqle.printStackTrace();
         }

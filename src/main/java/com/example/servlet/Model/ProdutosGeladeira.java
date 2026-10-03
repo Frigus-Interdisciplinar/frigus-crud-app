@@ -30,6 +30,16 @@ public class ProdutosGeladeira {
         this.quantidade = quantidade;
     }
 
+    // construtor sem id e lote
+    public ProdutosGeladeira( int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int quantidade) {
+        this.idNotificacao = idNotificacao;
+        this.geladeira = geladeira;
+        this.produto = produto;
+        this.dtValidade = dtValidade;
+        this.status = StatusProduto.calcularStatus(dtValidade);
+        this.quantidade = quantidade;
+    }
+
     // Construtor com id
     public ProdutosGeladeira(int idProdutosGeladeira, int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int lote, StatusProduto status,  int quantidade) {
         this.idProdutosGeladeira = idProdutosGeladeira;
@@ -42,16 +52,6 @@ public class ProdutosGeladeira {
         this.quantidade = quantidade;
     }
 
-    // construtor sem lote
-    public ProdutosGeladeira(int idProdutosGeladeira, int idNotificacao, Geladeira geladeira, Produto produto, LocalDate dtValidade, int quantidade) {
-        this.idProdutosGeladeira = idProdutosGeladeira;
-        this.idNotificacao = idNotificacao;
-        this.geladeira = geladeira;
-        this.produto = produto;
-        this.dtValidade = dtValidade;
-        this.status = StatusProduto.calcularStatus(dtValidade);
-        this.quantidade = quantidade;
-    }
 
     // GETTERS E SETTERS
     public int getIdProdutosGeladeira() {
