@@ -18,6 +18,6 @@
 </form>
 <a href="hello-servlet">Hello Servlet</a>
 <br>
-<a href="assets/pages/Login.jsp">Cadastrar usuario</a>
+<a href="${pageContext.request.contextPath}/assets/Pages/Login.jsp">Cadastrar usuario</a>
 </body>
 </html>

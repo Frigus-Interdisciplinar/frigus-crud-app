@@ -12,23 +12,23 @@
     <img src="assets/images/onda 1.png" alt="onda para estilizar a pagina" id="onda1">
     <img src="assets/images/onda 2.png" alt="onda para estilizar a pagina" id="onda2">
     
-    <div class="conteinerVidro">
-        <div class="conteinerPreto">
+    <div class="Vidro">
+        <div class="Preto">
             <h2>Crie uma senha</h2>
             <p>Mantenha a sua conta segura criando uma senha</p>
             <br>
-            <form action="cadastrar">
+            <form action="/SenhaUsuario">
                 <label for="senha">Senha</label>
                 <br>
-                <input type="password" id="senha" name="senha" placeholder="Crie uma senha">
+                <input type="password" name="senha" placeholder="Crie uma senha">
                 <br>
                 <label for="confirmarSenha">Confirmar senha</label>
                 <br>
-                <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Confirme sua senha">
+                <input type="password"  name="confirmarSenha" placeholder="Confirme sua senha">
                 <br>
             </form>
-            <button type="submit">Contiuar</button>
-            <p id="conta">Já tem conta? &emsp;<a href="#">Entrar</a></p>
+            <a href="PlanoUsuario.jsp">Continuar</a>
+            <p id="conta">Já tem conta? &emsp;<a href="Login.jsp">Entrar</a></p>
         </div>
     </div>
     <br>

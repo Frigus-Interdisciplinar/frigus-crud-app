@@ -28,53 +28,42 @@
                 </p>
 
 
-                <form action="">
-
+                <form action="/CriarUsuario">
+                    <br>
                     <label for="nome">
                         Nome completo
                     </label>
-
+                    <br>
                     <input
-                        id="nome"
                         type="text"
-                        name="nomeCompleto"
+                        name="nome"
                         placeholder="Digite seu nome"
                     >
-
+                    <br>
 
                     <label for="email">
                         E-mail
                     </label>
 
+                    <br>
                     <input
-                        id="email"
                         type="email"
                         name="email"
                         placeholder="Digite seu email"
                     >
 
-
+                    <br>
                     <label for="cpf">
                         CPF
                     </label>
+                    <br>
+                    <input
+                        type="text"
+                        name="cpf"
+                        placeholder="Digite seu cpf"
+                    >
 
-
-                    <div class="input-senha">
-
-                        <input
-                            id="cpf"
-                            type="text"
-                            name="cpf"
-                            placeholder="Digite seu CPF"
-                        >
-
-                        <span class="olho">
-                            ◉
-                        </span>
-
-                    </div>
-
-
+                    <br>
                     <div class="termos">
 
                         <input
@@ -97,7 +86,7 @@
 
 
                     <a
-                        href="../SenhaUsuario/SenhaUsuario.jsp"
+                        href="SenhaUsuario.jsp"
                         class="botao"
                     >
 
@@ -112,7 +101,7 @@
 
                     Já tem uma conta?
 
-                    <a href="#">
+                    <a href="Login.jsp">
                         Entrar
                     </a>
 

@@ -59,6 +59,7 @@ public class Main {
 //
 //        // instanciando o objeto produto dao para fazer as operações do crud
             ProdutoDAO produtoDAO = new ProdutoDAO();
+        //System.out.println(produtoDAO.inserirProduto(prod));
 //
 //        // criar o objeto para realizar os metodos de alterar e deletar
 //        Produto produtoSelecionado = produtoDAO.buscarprodutoPorId(29);
@@ -94,14 +95,6 @@ public class Main {
                 "mauro.silvestre@hotmail.com",
                 "123456"
                 );
-//        // usuario sem telefone
-        Usuario usuarioStelefone = new Usuario(
-                "34566778910",
-                "Clara",
-                "Torreto rima de lima",
-                "torreto.clara@hotmail.com",
-                "78556"
-        );
 
         // instanciando o objeto dao
         //UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -219,6 +212,9 @@ public class Main {
 
 
 
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+        //System.out.println(usuarioDAO.adicionarUsuario(usuario));
 
 //        // assinatura
 //
@@ -226,6 +222,8 @@ public class Main {
                 usuario,
                 TipoAssinatura.PLUS
         );
+        AssinaturaDAO assinaturaDAO = new AssinaturaDAO();
+       // System.out.println(assinaturaDAO.inserirAssinaturaUsuario(assiUsuario));
 //
 //        Assinatura assiUsuarioSdescricao = new Assinatura(
 //                usuarioStelefone,
@@ -277,10 +275,8 @@ public class Main {
 //        System.out.println("alterar\n" + assinaturaDAO.alterarAssinEmpresa(assinaturaEmpreConsulta,assiEmpresaALterada));
 //
 //        System.out.println(assinaturaDAO.deletarAssinaturaEmpresa(assinaturaEmpreConsulta));
-
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
         //System.out.println(usuarioDAO.adicionarUsuario(usuario));
-        Geladeira geladeira2 = new Geladeira(
+        Geladeira geladeira = new Geladeira(
                 usuario
 
         );
@@ -313,20 +309,41 @@ public class Main {
 
         GeladeiraDAO gelaDao = new GeladeiraDAO();
 
+        //System.out.println(gelaDao.inserirGeladeira(geladeira));
 
         Produto prodConsulta = produtoDAO.buscarprodutoPorId(51);
 
-        Geladeira gelaConsulta = gelaDao.buscarUnicaGeladeira("12345678910", 52);
+        Geladeira gelaConsulta = gelaDao.buscarUnicaGeladeira("12345678910", 51);
+        //System.out.println(gelaConsulta);
 
         ProdutosGeladeira pg = new ProdutosGeladeira(
                 1,
-                geladeira2,
-                prod,
+                gelaConsulta,
+                prodConsulta,
                 LocalDate.of(2026,9, 20),
+                12,
                 5
         );
-
         ProdutosGeladeiraDAO pgDao = new ProdutosGeladeiraDAO();
-        System.out.println(pgDao.inserirProdutoGeladeira(pg));
+        String coxa = "Coxa de ";
+        ProdutosGeladeira pgConsulta = pgDao.buscarProdutoGeladeiraPorId(77);
+        //System.out.println(pgConsulta);
+//        for (ProdutosGeladeira pgn : pgConsulta){
+//
+//            System.out.println(pgConsulta);
+//        }
+
+        Geladeira gelaNova = gelaDao.buscarUnicaGeladeira("78537787671", 4);
+        Produto prodNova = produtoDAO.buscarprodutoPorId(4);
+        ProdutosGeladeira pgNova = new ProdutosGeladeira(
+                4,
+                gelaNova,
+                prodNova,
+                LocalDate.of(2026,9, 20),
+                12,
+                5
+        );
+        System.out.println(pgDao.alterarProdutoGeladeira(pgConsulta, pgNova));
+        //System.out.println(pgDao.inserirProdutoGeladeira(pg));
     }
 }

@@ -104,6 +104,37 @@ public class UsuarioDAO {
 
 
 
+    // ================ ALTERAR SENHA ================
+    public int alterarSenhaUsuario(Usuario usuario, String senha){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        try{
+            String comandoSql = "update usuario set senha = ? where cpf = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a execução
+            pstmt.setString(1, senha);
+            pstmt.setString(2, usuario.getCpf());
+
+            if (pstmt.executeUpdate() > 0){
+                return 1; // inseriu as informações no banco
+            }
+            else{
+                return 0; // não foi possível adicionar
+            }
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+    }// ================ ALTERAR SENHA ================
+
+
+
+
 
     // ================ DELETAR ================
     public int deletarUsuario(Usuario usuario){
