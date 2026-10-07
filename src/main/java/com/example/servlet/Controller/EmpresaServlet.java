@@ -13,7 +13,15 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/criar-empresa", "/senha-empresa", "tela-padrao-empresa", "/alterar-empresa", "/alterar-email-empresa", "/alterar-senha-empresa", "/deletar-empresa"}, name = "/criar-empresa")
+@WebServlet(urlPatterns = {
+        "/tela-padrao-empresa",
+        "/criar-empresa",
+        "/senha-empresa",
+        "/alterar-empresa",
+        "/alterar-email-empresa",
+        "/alterar-senha-empresa",
+        "/deletar-empresa"},
+        name = "/criar-empresa")
 public class EmpresaServlet extends HttpServlet {
     private EmpresaDAO empresaDAO;
     private HttpSession session;
@@ -63,7 +71,7 @@ public class EmpresaServlet extends HttpServlet {
                 session.setAttribute("nomeEmpresa", nome);
                 session.setAttribute("emailEmpresa", email);
                 session.setAttribute("cnpj", cnpj);
-                resp.sendRedirect(req.getContextPath() + "/SenhaEmpresa");
+                resp.sendRedirect(req.getContextPath() + "/senha-empresa.jsp");
                 break;
             }
 
@@ -78,7 +86,7 @@ public class EmpresaServlet extends HttpServlet {
                 String nome = (String) session.getAttribute("nomeEmpresa");
                 String email = (String) session.getAttribute("emailEmpresa");
                 if (!senha.equals(senhaConfirmada)) {
-                    resp.sendRedirect(req.getContextPath() + "/senha-empresa");
+                    resp.sendRedirect(req.getContextPath() + "/senha-empresa.jsp");
                     break;
                 }
 
@@ -128,7 +136,7 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vSenhaAlterado = validar.validarSenha(senhaAlterado);
 
                 if ((vNomeAlterado == false) || (vEmailAlterado == false) || (vSenhaAlterado == false)){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa");
+                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
                     break;
                 }
                 // hasheando a senha
@@ -178,7 +186,7 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vEmailAlterado = validar.validarEmail(emailAlterado);
 
                 if (vEmailAlterado == false){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + "/alterar-email-empresa.jsp");
                     break;
                 }
 
@@ -194,7 +202,7 @@ public class EmpresaServlet extends HttpServlet {
                     resp.sendRedirect(req.getContextPath() + "/tela-padrao-empresa.jsp");
                     break;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + "/alterar-email-empresa.jsp");
                 }
                 break;
             }
@@ -248,7 +256,6 @@ public class EmpresaServlet extends HttpServlet {
                     resp.sendRedirect(req.getContextPath() + "/deletar-empresa.jsp");
                 }
                 break;
-
             }
 
 

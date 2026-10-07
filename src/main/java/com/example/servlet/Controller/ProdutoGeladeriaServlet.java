@@ -1,8 +1,10 @@
 package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.GeladeiraDAO;
+import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ProdutosGeladeiraDAO;
 import com.example.servlet.Model.ProdutosGeladeira;
+import com.example.servlet.Util.Enum.Categoria;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,17 +16,16 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/produtoGeladeriaServlet",
-        "/pg-inserir",
-        "pg-alterar",
-        "pg-deletar",
-        "pg-busca-lote",
-        "pg-busca-validade",
-        "pg-busca-nome"},
-        name = "/produtoGeladeriaServlet")
+@WebServlet(urlPatterns = {"/tela-padrao-pg",
+        "/inserir-pg",
+        "/alterar-pg",
+        "/deletar-pg",
+        "/busca-pg",},
+        name = "/tela-padrao-pg")
 public class ProdutoGeladeriaServlet extends HttpServlet {
     private ProdutosGeladeiraDAO pgDao = new ProdutosGeladeiraDAO();
     private GeladeiraDAO gelaDao;
+    private ProdutoDAO prodDAO;
     private String action;
     private String metodo;
     private String filtro;
@@ -33,6 +34,7 @@ public class ProdutoGeladeriaServlet extends HttpServlet {
 
     @Override
     public void init(){
+        prodDAO = new ProdutoDAO();
         pgDao = new ProdutosGeladeiraDAO();
         gelaDao = new GeladeiraDAO();
     }
@@ -41,12 +43,11 @@ public class ProdutoGeladeriaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // enviando o id da geladeira
-        resp.addCookie("id", geladeira.getId);
+
         // pegando a pagina usando o action
         action = req.getParameter("action");
         switch (action){
-            case "/produtoGeladeriaServlet":{
+            case "/tela-padrao-pg":{
                 List<ProdutosGeladeira> pgTodos = pgDao.buscarTodosProdutosGeladeira()
 
 
@@ -88,6 +89,20 @@ public class ProdutoGeladeriaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // pegando a pagina usando o action
+        action = req.getParameter("action");
+        switch (action){
+            case "/inserir-pg":{
+                // pegando as informações do formulario
+                String nome = req.getParameter("nome");
+                String descricao = req.getParameter("descricao");
+                String preco = req.getParameter("preco");
+                Categoria categoria = Categoria.valueOf(req.getParameter("categoria"));
+                String marca = req.getParameter("marca");
+                String unidadeMedida = req.getParameter("unidadeMedida");
+                String
+            }
+        }
 
     }
 }

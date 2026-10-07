@@ -16,12 +16,14 @@ public class GeladeiraDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into geladeira(idUsuario, status, tipo) values (?,?,?);";
+            String comandoSql = "insert into geladeira(idUsuario, status, tipo, nome) values (?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando valores para o comando
             pstmt.setString(1, geladeira.getUsuario().getCpf());
             pstmt.setString(2, geladeira.getStatus().name());
             pstmt.setString(3, geladeira.getTipo());
+            pstmt.setString(4, geladeira.getNome());
+
 
             if (pstmt.executeUpdate() > 0){
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
@@ -98,7 +100,8 @@ public class GeladeiraDAO {
                     rset.getInt("id"),
                     usuario,
                     StatusArmazenamento.valueOf(rset.getString("status")),
-                    rset.getString("tipo")
+                    rset.getString("tipo"),
+                        rset.getString("nome")
                 );
                 listaGeladeira.add(geladeira);
             }
@@ -139,7 +142,8 @@ public class GeladeiraDAO {
                         rset.getInt("id"),
                         usuario,
                         StatusArmazenamento.valueOf(rset.getString("status")),
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                         rset.getString("nome")
                 );
 
             }
