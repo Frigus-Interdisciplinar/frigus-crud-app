@@ -54,7 +54,7 @@ public class ProdutosGeladeiraDAO {
 
 
     //==============ATUALIZAR===============
-    public int alterarProdutoGeladeira(ProdutosGeladeira pg){
+    public int alterarProdutoGeladeira(ProdutosGeladeira pgAntiga, ProdutosGeladeira pgNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -63,14 +63,14 @@ public class ProdutosGeladeiraDAO {
             String comandoSql = "Update ProdutosGeladeira set idNotificacao = ?, idGeladeira = ?, idProdutos = ?, DtValidade = ?, status = ?, lote = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // definindo parâmetros da instrução
-            pstmt.setInt(1, pg.getIdNotificacao());
-            pstmt.setInt(2, pg.getGeladeira().getIdGeladeira());
-            pstmt.setInt(3, pg.getProduto().getIdProdutos());
-            pstmt.setObject(4, pg.getDtValidade());
-            pstmt.setString(5, pg.getStatus().name());
-            pstmt.setInt(6, pg.getLote());
-            pstmt.setInt(7, pg.getQuantidade());
-            pstmt.setInt(8, pg.getIdProdutosGeladeira());
+            pstmt.setInt(1, pgNova.getIdNotificacao());
+            pstmt.setInt(2, pgNova.getGeladeira().getIdGeladeira());
+            pstmt.setInt(3, pgNova.getProduto().getIdProdutos());
+            pstmt.setObject(4, pgNova.getDtValidade());
+            pstmt.setString(5, pgNova.getStatus().name());
+            pstmt.setInt(6, pgNova.getLote());
+            pstmt.setInt(7, pgNova.getQuantidade());
+            pstmt.setInt(8, pgAntiga.getIdProdutosGeladeira());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -130,7 +130,7 @@ public class ProdutosGeladeiraDAO {
 
 
     // LISTA DE PRODUTOS PARA O DOMÉSTICO - TABELA produtoGeladeira
-    public List<ProdutosGeladeira> buscarProdutoGeladeira(){
+    public List<ProdutosGeladeira> buscarTodosProdutosGeladeira(int idGeladeira){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar(); // abrindo a conexão com o banco
 
@@ -143,8 +143,11 @@ public class ProdutosGeladeiraDAO {
                     "       g.id as idGeladeira, g.idUsuario, g.status, g.tipo " +
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
-                    "join geladeira g on g.id = pg.idGeladeira;";
+                    "join geladeira g on g.id = pg.idGeladeira " +
+                    "where g.id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o valor do id da geladeira
+            pstmt.setInt(1, idGeladeira);
             rset = pstmt.executeQuery(); // executa a consulta SQL
 
             // armazena os valores em um list<>
@@ -333,7 +336,7 @@ public class ProdutosGeladeiraDAO {
 
 
     // BUSCAR 1 PRODUTO DA GELADEIRA POR ID DO PRODUTO
-    public ProdutosGeladeira buscarProdutoGeladeiraPorId(int idProduto){
+    public ProdutosGeladeira buscarProdutoGeladeiraPorId(int idProdutoGeladeira){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -347,9 +350,9 @@ public class ProdutosGeladeiraDAO {
                     "from produtos p " +
                     "join produtosGeladeira pg on p.id = pg.idProdutos " +
                     "join geladeira g on g.id = pg.idGeladeira " +
-                    "where p.id = ?";
+                    "where pg.id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setInt(1, idProduto);// setando os parâmetros da instrução
+            pstmt.setInt(1, idProdutoGeladeira);// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
             if (rset.next()){
                 Produto produto = new Produto(
@@ -399,7 +402,7 @@ public class ProdutosGeladeiraDAO {
 
 
     // BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
-    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(String nomeProduto){
+    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(String nome){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -415,7 +418,7 @@ public class ProdutosGeladeiraDAO {
                     "join geladeira g on g.id = pg.idGeladeira " +
                     "where lower(p.nome) like ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1,  "%" + nomeProduto.toLowerCase() + "%");// setando os parâmetros da instrução
+            pstmt.setString(1,  "%" + nome.toLowerCase() + "%");// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
             if (rset.next()){
                 Produto produto = new Produto(

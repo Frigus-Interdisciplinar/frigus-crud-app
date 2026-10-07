@@ -35,7 +35,7 @@
                 </form>
                 <a href="../pages/#">Continuar</a>
                 <p>Ainda não tem conta?</a></p>
-                <a href="../Pages/Planos.jsp">Cadastrar-se</a>
+                <a href="${pageContext.request.contextPath}/assets/Pages/Planos.jsp">Cadastrar-se</a>
             </div>
         </div>
         <br>

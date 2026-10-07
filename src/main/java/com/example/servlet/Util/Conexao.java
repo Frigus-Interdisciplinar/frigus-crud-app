@@ -35,9 +35,6 @@ public class Conexao {
 
         try {
             Class.forName("org.postgresql.Driver");
-            System.out.println(
-                    java.sql.DriverManager.getDrivers().hasMoreElements()
-            );
 
             return DriverManager.getConnection(
                     url,
