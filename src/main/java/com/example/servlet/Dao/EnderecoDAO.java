@@ -49,7 +49,7 @@ public class EnderecoDAO {
 
 
     // ============== ALTERAR ==============
-    public int alterarEndereco(Endereco endereco){
+    public int alterarEndereco(Endereco enderecoAntigo, Endereco enderecoNovo ){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -57,15 +57,15 @@ public class EnderecoDAO {
             String comandoSql = "update endereco set rua = ?, bairro = ?, cidade = ?, uf = ?, pais = ?, cep = ?, numero = ?, nomeUnidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
-            pstmt.setString(1, endereco.getRua());
-            pstmt.setString(2, endereco.getBairro());
-            pstmt.setString(3, endereco.getCidade());
-            pstmt.setString(4, endereco.getUf());
-            pstmt.setString(5, endereco.getPais());
-            pstmt.setString(6, endereco.getCep());
-            pstmt.setString(7, endereco.getNumero());
-            pstmt.setString(8, endereco.getNomeUnidade());
-            pstmt.setInt(9, endereco.getIdEndereco());
+            pstmt.setString(1, enderecoNovo.getRua());
+            pstmt.setString(2, enderecoNovo.getBairro());
+            pstmt.setString(3, enderecoNovo.getCidade());
+            pstmt.setString(4, enderecoNovo.getUf());
+            pstmt.setString(5, enderecoNovo.getPais());
+            pstmt.setString(6, enderecoNovo.getCep());
+            pstmt.setString(7, enderecoNovo.getNumero());
+            pstmt.setString(8, enderecoNovo.getNomeUnidade());
+            pstmt.setInt(9, enderecoAntigo.getIdEndereco());
             // verifica se conseguiuexecutar o comando
             if(pstmt.executeUpdate() > 0){
                 return 1;// sim

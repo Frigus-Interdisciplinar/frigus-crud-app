@@ -48,7 +48,7 @@ public class IngredienteDAO {
 
 
     // ========== ALTERAR ==========
-    public int alterarIngrediente(Ingredientes ingrediente){
+    public int alterarIngrediente(Ingredientes ingredienteAntigo, Ingredientes ingredienteNovo){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -57,10 +57,10 @@ public class IngredienteDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
-            pstmt.setInt(1, ingrediente.getReceita().getIdReceita());
-            pstmt.setInt(2, ingrediente.getProduto().getIdProdutos());
-            pstmt.setInt(3, ingrediente.getQuantidade());
-            pstmt.setInt(4, ingrediente.getIdIngredientes());
+            pstmt.setInt(1, ingredienteNovo.getReceita().getIdReceita());
+            pstmt.setInt(2, ingredienteNovo.getProduto().getIdProdutos());
+            pstmt.setInt(3, ingredienteNovo.getQuantidade());
+            pstmt.setInt(4, ingredienteAntigo.getIdIngredientes());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // verifica se deu certo

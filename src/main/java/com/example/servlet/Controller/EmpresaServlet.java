@@ -13,11 +13,28 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/criar-empresa", "/senha-empresa", "tela-padrao-empresa", "/alterar-empresa", "/alterar-email-empresa", "/alterar-senha-empresa", "/deletar-empresa"}, name = "/criar-empresa")
+@WebServlet(urlPatterns = {
+        "/perfil-empresa",
+        "/criar-empresa",
+        "/senha-empresa",
+        "/alterar-empresa",
+        "/alterar-email-empresa",
+        "/alterar-senha-empresa",
+        "/deletar-empresa"},
+        name = "/criar-empresa")
 public class EmpresaServlet extends HttpServlet {
     private EmpresaDAO empresaDAO;
-    private HttpSession session;
     private Validacao validar;
+
+    private static final String jsp_tela_perfil = "/assets/pages/perfil-empresa.jsp";
+    private static final String jsp_inserir = "/assets/pages/criar-empresa.jsp";
+    private static final String jsp_senha = "/assets/pages/senha-empresa.jsp";
+    private static final String jsp_alterar = "/assets/pages/alterar-empresa.jsp";
+    private static final String jsp_alterar_email = "/assets/pages/alterar-email-empresa.jsp";
+    private static final String jsp_alterar_senha = "/assets/pages/alterar-senha-empresa.jsp";
+    private static final String jsp_deletar = "/assets/pages/deletar-empresa.jsp";
+    private static final String jsp_visao_geral = "/assets/pages/visao-geral-emp.jsp";
+    private static final String jsp_plano = "/assets/pages/criar-plano-emp.jsp";
 
     @Override
     public void init(){
@@ -25,7 +42,32 @@ public class EmpresaServlet extends HttpServlet {
          validar = new Validacao();
     }
 
-    // precisa ter o doGet
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException{
+        String path = req.getServletPath();
+        HttpSession session = req.getSession(false);
+
+        // verifica se esta logado
+        if (session == null || session.getAttribute("empresaEmail") == null){
+            resp.sendRedirect(req.getContextPath() + jsp_inserir);
+            return;
+        }
+
+        String email = (String) session.getAttribute("empresaEmail");
+
+        switch (path){
+            case "/perfil-empresa":{
+                Empresa empresa = empresaDAO.buscarEmpresa(email);
+                req.setAttribute("empresa", empresa);
+                req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
+                break;
+            }
+            default:
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -35,7 +77,7 @@ public class EmpresaServlet extends HttpServlet {
         String action = req.getParameter("action");
 
         // salvando as informações entre as requisições
-        session = req.getSession();
+        HttpSession session = req.getSession();
 
         switch (action){
 
@@ -56,14 +98,14 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vCnpj = validar.validarCnpj(cnpjPuro);
 
                 if ( (vNome == false) || (vCnpj == false) || (vEmail == false) ){
-                    resp.sendRedirect(req.getContextPath() + "/criar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_inserir);
                     break;
                 }
 
                 session.setAttribute("nomeEmpresa", nome);
                 session.setAttribute("emailEmpresa", email);
                 session.setAttribute("cnpj", cnpj);
-                resp.sendRedirect(req.getContextPath() + "/SenhaEmpresa");
+                resp.sendRedirect(req.getContextPath() + jsp_senha);
                 break;
             }
 
@@ -78,7 +120,7 @@ public class EmpresaServlet extends HttpServlet {
                 String nome = (String) session.getAttribute("nomeEmpresa");
                 String email = (String) session.getAttribute("emailEmpresa");
                 if (!senha.equals(senhaConfirmada)) {
-                    resp.sendRedirect(req.getContextPath() + "/senha-empresa");
+                    resp.sendRedirect(req.getContextPath() + jsp_senha);
                     break;
                 }
 
@@ -105,10 +147,10 @@ public class EmpresaServlet extends HttpServlet {
                     session.removeAttribute("email");
 
                     // redirecionando para a proxima pagina
-                    resp.sendRedirect(req.getContextPath() + "/plano-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_plano);
                     break;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/senha-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_senha);
                 }
                 break;
             }
@@ -128,7 +170,7 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vSenhaAlterado = validar.validarSenha(senhaAlterado);
 
                 if ((vNomeAlterado == false) || (vEmailAlterado == false) || (vSenhaAlterado == false)){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
                     break;
                 }
                 // hasheando a senha
@@ -157,10 +199,10 @@ public class EmpresaServlet extends HttpServlet {
                     session.removeAttribute("email");
 
                     // redirecionando para a proxima pagina
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                     break;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
                 }
                 break;
             }
@@ -178,7 +220,7 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vEmailAlterado = validar.validarEmail(emailAlterado);
 
                 if (vEmailAlterado == false){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_email);
                     break;
                 }
 
@@ -191,10 +233,10 @@ public class EmpresaServlet extends HttpServlet {
                     // salvando o objeto empresa
                     session.setAttribute("empresaEmail", emailAlterado);
                     // redirecionando para a proxima pagina
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                     break;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_email);
                 }
                 break;
             }
@@ -202,7 +244,7 @@ public class EmpresaServlet extends HttpServlet {
 
             case "/alterar-senha-empresa":{
                 // resgatando o email
-                String emailResgatado = (String) session.getAttribute("email");
+                String emailResgatado = (String) session.getAttribute("empresaEmail");
 
                 // pegando a senha do formulario
                 String senha = req.getParameter("senha");
@@ -211,7 +253,7 @@ public class EmpresaServlet extends HttpServlet {
                 boolean vSenha = validar.validarSenha(senha);
 
                 if (vSenha == false){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-senha-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_senha);
                     break;
                 }
                 // hasheando a senha
@@ -222,10 +264,10 @@ public class EmpresaServlet extends HttpServlet {
 
                 int funcionou = empresaDAO.alterarSenhaEmpresa(empresa, senhaHash);
                 if (funcionou == 1){
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-senha-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_senha);
 
                 }
             }
@@ -236,22 +278,19 @@ public class EmpresaServlet extends HttpServlet {
                 // validando
                 boolean vEmail = validar.validarEmail(email);
                 if ( vEmail == false){
-                    resp.sendRedirect(req.getContextPath() + "/deletar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
                 }
 
                 int funcionou = empresaDAO.excluirEmpresa(email);
                 if (funcionou == 1) {
                     // redirecionando para a proxima pagina
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                     break;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/deletar-empresa.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
                 }
                 break;
-
             }
-
-
             default:
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }

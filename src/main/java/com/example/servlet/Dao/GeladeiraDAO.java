@@ -16,12 +16,14 @@ public class GeladeiraDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into geladeira(idUsuario, status, tipo) values (?,?,?);";
+            String comandoSql = "insert into geladeira(idUsuario, status, tipo, nome) values (?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando valores para o comando
             pstmt.setString(1, geladeira.getUsuario().getCpf());
             pstmt.setString(2, geladeira.getStatus().name());
             pstmt.setString(3, geladeira.getTipo());
+            pstmt.setString(4, geladeira.getNome());
+
 
             if (pstmt.executeUpdate() > 0){
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
@@ -40,6 +42,39 @@ public class GeladeiraDAO {
         }
 
     }//===========INSERIR===========
+
+
+
+
+    //==============ALTERAR=============
+    public int alterarGeradeira(Geladeira geladeiraAntiga, Geladeira geladeiraNova){
+        Conexao conexao = new Conexao(); // abrindo a conexão
+        Connection conn = conexao.conectar();
+
+        try{
+            String comandoSql = "update geladeira set idUsuario = ?, status = ?, tipo = ?, nome = ?  where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para o comando
+            pstmt.setString(1, geladeiraNova.getUsuario().getCpf());
+            pstmt.setString(2, geladeiraNova.getStatus().name());;
+            pstmt.setString(3, geladeiraNova.getTipo());
+            pstmt.setString(4, geladeiraNova.getNome());
+            pstmt.setInt(5, geladeiraAntiga.getIdGeladeira());
+            if (pstmt.executeUpdate() > 0){
+                return 1;// verifica se deu certo
+            }
+            else{
+                return 0;// não deu certo
+            }
+        }
+        catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);// fechando a conexão
+        }
+    }// ==============ALTERAR===============
 
 
 
@@ -98,7 +133,8 @@ public class GeladeiraDAO {
                     rset.getInt("id"),
                     usuario,
                     StatusArmazenamento.valueOf(rset.getString("status")),
-                    rset.getString("tipo")
+                    rset.getString("tipo"),
+                        rset.getString("nome")
                 );
                 listaGeladeira.add(geladeira);
             }
@@ -139,7 +175,8 @@ public class GeladeiraDAO {
                         rset.getInt("id"),
                         usuario,
                         StatusArmazenamento.valueOf(rset.getString("status")),
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                         rset.getString("nome")
                 );
 
             }

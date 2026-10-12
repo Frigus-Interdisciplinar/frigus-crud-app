@@ -8,31 +8,35 @@ public class Geladeira {
     private Usuario usuario;
     private StatusArmazenamento status;
     private String tipo;
+    private String nome;
 
     // Construtor vazio
     public Geladeira() {
     }
 
     // Construtor sem id e status
-    public Geladeira(Usuario usuario, String tipo) {
+    public Geladeira(Usuario usuario, String tipo, String nome) {
         this.usuario = usuario;
         this.status = StatusArmazenamento.VAZIO;
         this.tipo = tipo;
+        this.nome = nome;
     }
 
     // Construtor sem id e status e tipo
-    public Geladeira(Usuario usuario) {
+    public Geladeira(Usuario usuario, String nome) {
         this.usuario = usuario;
         this.status = StatusArmazenamento.VAZIO;
+        this.nome = nome;
     }
 
 
     // Construtor para o banco
-    public Geladeira(int idGeladeira, Usuario usuario, StatusArmazenamento status, String tipo) {
+    public Geladeira(int idGeladeira, Usuario usuario, StatusArmazenamento status, String tipo, String nome ) {
         this.idGeladeira = idGeladeira;
         this.usuario = usuario;
         this.status = status;
         this.tipo = tipo;
+        this.nome = nome;
     }
 
     // GETTERS E SETTERS
@@ -67,6 +71,14 @@ public class Geladeira {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     @Override

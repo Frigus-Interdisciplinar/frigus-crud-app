@@ -277,8 +277,8 @@ public class Main {
 //        System.out.println(assinaturaDAO.deletarAssinaturaEmpresa(assinaturaEmpreConsulta));
         //System.out.println(usuarioDAO.adicionarUsuario(usuario));
         Geladeira geladeira = new Geladeira(
-                usuario
-
+                usuario,
+                "geladeira de teste"
         );
         //GeladeiraDAO geladeiraDao = new GeladeiraDAO();
         //System.out.println(geladeiraDao.inserirGeladeira(geladeira2));
