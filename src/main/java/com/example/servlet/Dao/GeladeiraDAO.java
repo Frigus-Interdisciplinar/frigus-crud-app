@@ -46,6 +46,39 @@ public class GeladeiraDAO {
 
 
 
+    //==============ALTERAR=============
+    public int alterarGeradeira(Geladeira geladeiraAntiga, Geladeira geladeiraNova){
+        Conexao conexao = new Conexao(); // abrindo a conexão
+        Connection conn = conexao.conectar();
+
+        try{
+            String comandoSql = "update geladeira set idUsuario = ?, status = ?, tipo = ?, nome = ?  where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para o comando
+            pstmt.setString(1, geladeiraNova.getUsuario().getCpf());
+            pstmt.setString(2, geladeiraNova.getStatus().name());;
+            pstmt.setString(3, geladeiraNova.getTipo());
+            pstmt.setString(4, geladeiraNova.getNome());
+            pstmt.setInt(5, geladeiraAntiga.getIdGeladeira());
+            if (pstmt.executeUpdate() > 0){
+                return 1;// verifica se deu certo
+            }
+            else{
+                return 0;// não deu certo
+            }
+        }
+        catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);// fechando a conexão
+        }
+    }// ==============ALTERAR===============
+
+
+
+
     // ================ ALTERAR STATUS ================
     public int atualizarStatus(Geladeira geladeira){
         Conexao conexao = new Conexao();

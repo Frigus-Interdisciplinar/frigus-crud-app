@@ -43,7 +43,7 @@ public class MarcasParceirasDAO {
 
 
     // ========== ALTERAR ==========
-    public int alterarParceira(MarcasParcerias parcerias){
+    public int alterarParceira(MarcasParcerias parceriasAntiga, MarcasParcerias parceriasNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -51,10 +51,10 @@ public class MarcasParceirasDAO {
             String comandoSql = "update marcasParceiras set idEmpresa = ?, idProdutos = ?, observacoes = ? where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
-            pstmt.setString(1, parcerias.getEmpresa().getCnpj());
-            pstmt.setInt(2, parcerias.getProduto().getIdProdutos());
-            pstmt.setString(3, parcerias.getObservacoes());
-            pstmt.setInt(4, parcerias.getIdMarcasParcerias());
+            pstmt.setString(1, parceriasNova.getEmpresa().getCnpj());
+            pstmt.setInt(2, parceriasNova.getProduto().getIdProdutos());
+            pstmt.setString(3, parceriasNova.getObservacoes());
+            pstmt.setInt(4, parceriasAntiga.getIdMarcasParcerias());
 
             // verifica se deu certo
             if(pstmt.executeUpdate() > 0){

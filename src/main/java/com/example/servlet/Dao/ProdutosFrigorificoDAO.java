@@ -54,7 +54,7 @@ public class ProdutosFrigorificoDAO {
 
 
     // ===========ALTERAR===========
-    public int alterarProdutoFrigorifico(ProdutosFrigorifico pf){
+    public int alterarProdutoFrigorifico(ProdutosFrigorifico pfAntigo, ProdutosFrigorifico pfNovo){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -63,14 +63,14 @@ public class ProdutosFrigorificoDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores pra a instrução
-            pstmt.setInt(1, pf.getIdNotificacao());
-            pstmt.setInt(2, pf.getFrigorificos().getIdFrigorifico());
-            pstmt.setInt(3, pf.getProduto().getIdProdutos());
-            pstmt.setObject(4, pf.getDtValidade());
-            pstmt.setString(5, pf.getStatus().name());
-            pstmt.setInt(6, pf.getLote());
-            pstmt.setInt(7, pf.getQuantidade());
-            pstmt.setInt(8, pf.getIdProdutosFrigorifico());
+            pstmt.setInt(1, pfNovo.getIdNotificacao());
+            pstmt.setInt(2, pfNovo.getFrigorificos().getIdFrigorifico());
+            pstmt.setInt(3, pfNovo.getProduto().getIdProdutos());
+            pstmt.setObject(4, pfNovo.getDtValidade());
+            pstmt.setString(5, pfNovo.getStatus().name());
+            pstmt.setInt(6, pfNovo.getLote());
+            pstmt.setInt(7, pfNovo.getQuantidade());
+            pstmt.setInt(8, pfAntigo.getIdProdutosFrigorifico());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;
@@ -136,7 +136,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorifico pf on p.id = pf.idProdutos " +
@@ -171,7 +171,8 @@ public class ProdutosFrigorificoDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nomeFrigorifico")
                 );
                 // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
                 ProdutosFrigorifico pf = new ProdutosFrigorifico(
@@ -211,7 +212,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorifico pf on p.id = pf.idProdutos " +
@@ -247,7 +248,8 @@ public class ProdutosFrigorificoDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nomeFrigorifico")
                 );
                 // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
                 ProdutosFrigorifico pf = new ProdutosFrigorifico(
@@ -287,7 +289,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorifico pf on p.id = pf.idProdutos " +
@@ -324,7 +326,8 @@ public class ProdutosFrigorificoDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nomeFrigorifico")
                 );
                 // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
                 ProdutosFrigorifico pf = new ProdutosFrigorifico(
@@ -366,7 +369,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorifico pf on p.id = pf.idProdutos " +
@@ -401,7 +404,8 @@ public class ProdutosFrigorificoDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nomeFrigorifico")
                 );
                 // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
                 pf = new ProdutosFrigorifico(
@@ -441,7 +445,7 @@ public class ProdutosFrigorificoDAO {
         try{
             String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        pf.id as idProdutoFrigorifico, pf.idNotificacao, pf.dtValidade, pf.lote, pf.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.status, f.tipo, " +
+                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status, f.tipo, " +
                     "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
                     "from produtos p " +
                     "join produtosFrigorifico pf on p.id = pf.idProdutos " +
@@ -476,7 +480,8 @@ public class ProdutosFrigorificoDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nomeFrigorifico")
                 );
                 // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
                 pf = new ProdutosFrigorifico(

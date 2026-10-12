@@ -193,5 +193,13 @@ public class Validacao {
     public boolean validarEmail(String email){
         return email.matches("[a-z0-9_.]+@[a-z]+\\.[a-z]+");
     }
+
+    // datas de cadastro de produtos
+    public boolean validarDatas1Ano(LocalDate data){
+        LocalDate hoje = LocalDate.now();
+        LocalDate minimo = hoje.minusMonths(6);
+        LocalDate maximo = hoje.plusMonths(6);
+        return !data.isBefore(minimo) && !data.isAfter(maximo);
+    }
     // =========== VALIDAR ===========
 }

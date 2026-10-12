@@ -21,6 +21,12 @@ public class Login extends HttpServlet {
     private EmpresaDAO empresaDAO;
     private Validacao validar;
 
+    // camihos das paginas
+    private static final String jsp_login = "/assets/pages/login.jsp";
+    private static final String jsp_visaoGeralUsu = "/assets/pages/visao-geral-geladeira.jsp";
+    private static final String jsp_visaoGeralEmp = "/assets/pages/visao-geral-frigorifico.jsp";
+
+
 
     @Override
     public void init(){
@@ -55,11 +61,11 @@ public class Login extends HttpServlet {
             // vendo se a senha digitada é a mesma da armazenada no banco
             boolean senhaIgualBanco = Hash.verficarBcrypt(senhaSelect, usuarioSelect.getSenha());
             if (!senhaIgualBanco){
-                resp.sendRedirect(req.getContextPath() + "/login.jsp");
+                resp.sendRedirect(req.getContextPath() + jsp_login);
                 return;
             }
             session.setAttribute("usuarioEmail", usuarioSelect.getEmail());
-            resp.sendRedirect(req.getContextPath() + "/geladeira-servlet.jsp");
+            resp.sendRedirect(req.getContextPath() + jsp_visaoGeralUsu);
 
         } else {
             Empresa empresaSelect = empresaDAO.buscarEmpresa(emailSelect);
@@ -68,13 +74,13 @@ public class Login extends HttpServlet {
                 // vendo se a senha digitada é a mesma da armazenada no banco
                 boolean senhaIgualBanco = Hash.verficarBcrypt(senhaSelect, empresaSelect.getSenha());
                 if (!senhaIgualBanco){
-                    resp.sendRedirect(req.getContextPath() + "/login.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_login);
                     return;
                 }
                 session.setAttribute("empresaEmail", empresaSelect.getEmail());
-                resp.sendRedirect(req.getContextPath() + "/frigorifico-servlet.jsp");
+                resp.sendRedirect(req.getContextPath() + jsp_visaoGeralEmp);
             } else {
-                resp.sendRedirect(req.getContextPath() + "/login.jsp");
+                resp.sendRedirect(req.getContextPath() + jsp_login);
             }
         }
     }

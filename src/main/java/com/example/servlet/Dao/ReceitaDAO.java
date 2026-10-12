@@ -48,7 +48,7 @@ public class ReceitaDAO {
 
 
     // ========== ALTERAR RECEITA DO USUARIO ==========
-    public int alterarReceitaUsuario(Receita receita){
+    public int alterarReceitaUsuario(Receita receitaAntiga, Receita receitaNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -57,13 +57,13 @@ public class ReceitaDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
-            pstmt.setString(1, receita.getUsuario().getCpf());
-            pstmt.setString(2, receita.getNome());
-            pstmt.setString(3, receita.getDescricao());
-            pstmt.setString(4, receita.getModoPreparo());
-            pstmt.setObject(5, receita.getDtReceita());
-            pstmt.setBoolean(6, receita.isFoiFeita());
-            pstmt.setInt(7, receita.getIdReceita());
+            pstmt.setString(1, receitaNova.getUsuario().getCpf());
+            pstmt.setString(2, receitaNova.getNome());
+            pstmt.setString(3, receitaNova.getDescricao());
+            pstmt.setString(4, receitaNova.getModoPreparo());
+            pstmt.setObject(5, receitaNova.getDtReceita());
+            pstmt.setBoolean(6, receitaNova.isFoiFeita());
+            pstmt.setInt(7, receitaAntiga.getIdReceita());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // verifica se deu certo
@@ -129,7 +129,7 @@ public class ReceitaDAO {
 
 
     // ========== ALTERAR RECEITA DA EMPRESA ==========
-    public int alterarReceitaEmpresa(Receita receita){
+    public int alterarReceitaEmpresa(Receita receitaAntiga, Receita receitaNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -138,13 +138,13 @@ public class ReceitaDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
-            pstmt.setString(1, receita.getEmpresa().getCnpj());
-            pstmt.setString(2, receita.getNome());
-            pstmt.setString(3, receita.getDescricao());
-            pstmt.setString(4, receita.getModoPreparo());
-            pstmt.setObject(5, receita.getDtReceita());
-            pstmt.setBoolean(6, receita.isFoiFeita());
-            pstmt.setInt(7, receita.getIdReceita());
+            pstmt.setString(1, receitaNova.getEmpresa().getCnpj());
+            pstmt.setString(2, receitaNova.getNome());
+            pstmt.setString(3, receitaNova.getDescricao());
+            pstmt.setString(4, receitaNova.getModoPreparo());
+            pstmt.setObject(5, receitaNova.getDtReceita());
+            pstmt.setBoolean(6, receitaNova.isFoiFeita());
+            pstmt.setInt(7, receitaAntiga.getIdReceita());
 
             if (pstmt.executeUpdate() > 0){
                 return 1; // verifica se deu certo

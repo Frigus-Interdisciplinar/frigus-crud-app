@@ -48,19 +48,20 @@ public class FrigorificosDAO {
 
 
     //==============ALTERAR=============
-    public int alterarFrigorifico(Frigorificos frigorifico){
+    public int alterarFrigorifico(Frigorificos frigorificoAntigo, Frigorificos frigorificoNovo){
         Conexao conexao = new Conexao(); // abrindo a conexão
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?  where id = ?;";
+            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?, nome = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
-            pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
-            pstmt.setString(2, frigorifico.getStatus().name());
-            pstmt.setInt(3, frigorifico.getEndereco().getIdEndereco());
-            pstmt.setString(4, frigorifico.getTipo());
-            pstmt.setInt(5, frigorifico.getIdFrigorifico());
+            pstmt.setString(1, frigorificoNovo.getEmpresa().getCnpj());
+            pstmt.setString(2, frigorificoNovo.getStatus().name());
+            pstmt.setInt(3, frigorificoNovo.getEndereco().getIdEndereco());
+            pstmt.setString(4, frigorificoNovo.getTipo());
+            pstmt.setString(5, frigorificoNovo.getNome());
+            pstmt.setInt(6, frigorificoAntigo.getIdFrigorifico());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -138,7 +139,8 @@ public class FrigorificosDAO {
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("status")),
                         endereco,
-                        rset.getString("tipo")
+                        rset.getString("tipo"),
+                        rset.getString("nome")
                 );
                 listaFrigorificos.add(frigorifico);
             }

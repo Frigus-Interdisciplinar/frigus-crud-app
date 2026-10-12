@@ -43,7 +43,7 @@ public class ListaComprasDAO {
 
 
     //========== ALTERAR LISTA DE COMPRA PARA O USUARIO ==========
-    public int alterarListaComprasUsuario(ListaCompras listaCompras){
+    public int alterarListaComprasUsuario(ListaCompras listaComprasAntiga, ListaCompras listaComprasNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -51,9 +51,9 @@ public class ListaComprasDAO {
             String comandoSql = "update listaCompras set idUsuario = ?, dtLista = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
-            pstmt.setString(1, listaCompras.getUsuario().getCpf());
-            pstmt.setObject(2, listaCompras.getDtLista());
-            pstmt.setInt(3, listaCompras.getIdLista());
+            pstmt.setString(1, listaComprasNova.getUsuario().getCpf());
+            pstmt.setObject(2, listaComprasNova.getDtLista());
+            pstmt.setInt(3, listaComprasAntiga.getIdLista());
             // verificando se deu foi possivel executar
             if (pstmt.executeUpdate() > 0 ){
                 return 1;// deu certo
@@ -122,7 +122,76 @@ public class ListaComprasDAO {
     }// ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELO USUARIO==========
 
 
+    // ============== BUSCAR LISTA USUARIO POR ID ===============
+    public ListaCompras buscarCompraUsuarioPorId(String cpf, int idListaCompra){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
+        ListaCompras compra = null;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select * from listaCompras where lc.idUsuario = ? and id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+            pstmt.setInt(2, idListaCompra);
+            // usando o result set para pegar as informações
+            rset = pstmt.executeQuery();
+            if (rset.next()){
+
+                // criando o usuario
+                Usuario usuario = new Usuario();
+                usuario.setCpf(cpf);
+                compra = new ListaCompras(
+                        rset.getInt("id"),
+                        usuario,
+                        rset.getObject("dtLista", LocalDate.class)
+                );
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return compra;
+    }
+    // ============== BUSCAR LISTA USUARIO POR ID ===============
+
+
+    // ============== BUSCAR TODAS AS LISTAS DO USUARIO ===============
+    public List<ListaCompras> buscarTodasComprasUsuario(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        List<ListaCompras> lista = null;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select * from listaCompras where lc.idUsuario = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+            // usando o result set para pegar as informações
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+
+                // criando o usuario
+                Usuario usuario = new Usuario();
+                usuario.setCpf(cpf);
+                ListaCompras compra = new ListaCompras(
+                        rset.getInt("id"),
+                        usuario,
+                        rset.getObject("dtLista", LocalDate.class)
+                );
+                lista.add(compra);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return lista;
+    }
+    // ============== BUSCAR TODAS AS LISTAS DO USUARIO ===============
 
     // ================= USUARIO =================
 
@@ -165,7 +234,7 @@ public class ListaComprasDAO {
 
 
     //========== ALTERAR LISTA DE COMPRA PARA A EMPRESA ==========
-    public int alterarListaComprasEmpresa(ListaCompras listaCompras){
+    public int alterarListaComprasEmpresa(ListaCompras listaComprasAntiga, ListaCompras listaComprasNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -173,9 +242,9 @@ public class ListaComprasDAO {
             String comandoSql = "update listaCompras set idEmpresa = ?, dtLista = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
-            pstmt.setString(1, listaCompras.getEmpresa().getCnpj());
-            pstmt.setObject(2, listaCompras.getDtLista());
-            pstmt.setInt(3, listaCompras.getIdLista());
+            pstmt.setString(1, listaComprasNova.getEmpresa().getCnpj());
+            pstmt.setObject(2, listaComprasNova.getDtLista());
+            pstmt.setInt(3, listaComprasAntiga.getIdLista());
             // verificando se foi possivel executar
             if (pstmt.executeUpdate() > 0 ){
                 return 1;// deu certo
@@ -244,6 +313,78 @@ public class ListaComprasDAO {
     }// ========== BUSCAR LISTA DE COMPRAS PELA DATA E PELA EMPRESA==========
 
 
+    // ============== BUSCAR LISTA EMPRESA POR ID ===============
+    public ListaCompras buscarCompraEmpresaPorId(String cnpj, int idListaCompra){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        ListaCompras compra = null;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select * from listaCompras where lc.idEmpresa = ? and id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+            pstmt.setInt(2, idListaCompra);
+            // usando o result set para pegar as informações
+            rset = pstmt.executeQuery();
+            if (rset.next()){
+
+                // criando o usuario
+                Empresa empresa = new Empresa();
+                empresa.setCnpj(cnpj);
+                compra = new ListaCompras(
+                        rset.getInt("id"),
+                        empresa,
+                        rset.getObject("dtLista", LocalDate.class)
+                );
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return compra;
+    }
+    // ============== BUSCAR LISTA EMPRESA POR ID ===============
+
+
+    // ============== BUSCAR TODAS AS LISTAS DA EMPRESA ===============
+    public List<ListaCompras> buscarTodasCompraEmpresa(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        List<ListaCompras> lista = null;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select * from listaCompras where lc.idEmpresa = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+            // usando o result set para pegar as informações
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+
+                // criando o usuario
+                Empresa empresa = new Empresa();
+                empresa.setCnpj(cnpj);
+                ListaCompras compra = new ListaCompras(
+                        rset.getInt("id"),
+                        empresa,
+                        rset.getObject("dtLista", LocalDate.class)
+                );
+                lista.add(compra);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return lista;
+    }
+    // ============== BUSCAR TODAS AS LISTAS DA EMPRESA ===============
+
+
     // ================= EMPRESA =================
 
 
@@ -274,5 +415,6 @@ public class ListaComprasDAO {
         }
     }
     // ================= DELETAR ===================
+
     // ================= UNIVERSAL =================
 }

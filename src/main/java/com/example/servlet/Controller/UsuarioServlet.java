@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet(urlPatterns = {
-        "/tela-padrao",
+        "/perfil-usuario",
         "/criar-usuario",
         "/senha-usuario",
         "/alterar-usuario",
@@ -24,31 +24,51 @@ import java.io.IOException;
         name = "/criarUsuario")
 public class UsuarioServlet extends HttpServlet {
     private UsuarioDAO usuarioDAO;
-    private HttpSession session;
     private Validacao validar;
+
+    private static final String jsp_tela_perfil = "/assets/pages/perfil-usuario.jsp";
+    private static final String jsp_inserir = "/assets/pages/criar-usuario.jsp";
+    private static final String jsp_senha = "/assets/pages/senha-usuario.jsp";
+    private static final String jsp_alterar = "/assets/pages/alterar-usuario.jsp";
+    private static final String jsp_alterar_email = "/assets/pages/alterar-email-usuario.jsp";
+    private static final String jsp_alterar_senha = "/assets/pages/alterar-senha-usuario.jsp";
+    private static final String jsp_deletar = "/assets/pages/deletar-usuario.jsp";
+    private static final String jsp_visao_geral = "/assets/pages/visao-geral-usu.jsp";
+    private static final String jsp_plano = "/assets/pages/criar-plano-usu.jsp";
 
     @Override
     public void init(){
         usuarioDAO = new UsuarioDAO();
         validar = new Validacao();
+
     }
 
-//
-//    @Override
-//    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-//    throws ServletException, IOException{
-//        // pegando o caminho do usuario
-//        String action = req.getParameter("action");
-//
-//        switch (action){
-//            case "/tela-padrao":{
-//                String email = (String) session.getAttribute("usuarioEmail");
-//                Usuario usuario = usuarioDAO.buscarUsuario(email);
-//                resp.getWriter().println(usuario);
-//            }
-//
-//        }
-//    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    throws ServletException, IOException{
+        // pegando o caminho do usuario
+        String path = req.getServletPath();
+        HttpSession session = req.getSession(false);
+        // verifica se esta logado
+        if(session == null || session.getAttribute("usuarioEmail") == null){
+            resp.sendRedirect(req.getContextPath() + jsp_inserir);
+            return;
+        }
+
+        String email = (String) session.getAttribute("usuarioEmail");
+
+        switch (path){
+            case "/perfil-usuario":{
+                Usuario usuario = usuarioDAO.buscarUsuario(email);
+                req.setAttribute("usuario", usuario);
+                req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
+                break;
+            }
+            default:
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 
 
 
@@ -58,7 +78,7 @@ public class UsuarioServlet extends HttpServlet {
         // pegando o caminho do usuario
         String action = req.getParameter("action");
         // salvando as informações entre as requisições
-        session = req.getSession();
+        HttpSession session = req.getSession();
 
         switch (action){
             case "/criar-usuario": {
@@ -76,7 +96,7 @@ public class UsuarioServlet extends HttpServlet {
                 boolean vEmail = validar.validarEmail(email);
 
                 if ( !vCpf || !vnome || !vEmail ){
-                    resp.sendRedirect(req.getContextPath() + "/criar-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_inserir);
                     break;
                 }
 
@@ -96,7 +116,7 @@ public class UsuarioServlet extends HttpServlet {
                 session.setAttribute("sobrenome", sobrenome);
                 session.setAttribute("email", email);
 
-                resp.sendRedirect(req.getContextPath() + "/senha-usuario.jsp");
+                resp.sendRedirect(req.getContextPath() + jsp_senha);
                 break;
             }
 
@@ -114,7 +134,7 @@ public class UsuarioServlet extends HttpServlet {
                 String email = (String) session.getAttribute("email");
 
                 if (!senha.equals(senhaConfirmada)) {
-                    resp.sendRedirect(req.getContextPath() + "/senha-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_senha);
                     break;
                 }
 
@@ -142,9 +162,9 @@ public class UsuarioServlet extends HttpServlet {
                     session.removeAttribute("sobrenome");
                     session.removeAttribute("email");
 
-                    resp.sendRedirect(req.getContextPath() + "/criar-plano-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_plano);
                 } else {
-                    resp.sendRedirect(req.getContextPath() + "/senha-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_senha);
                 }
                 break;
             }
@@ -166,7 +186,7 @@ public class UsuarioServlet extends HttpServlet {
                 boolean vSenha = validar.validarSenha(senha);
 
                 if (!vNome || !vEmail || !vSenha){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
                     break;
                 }
 
@@ -199,10 +219,10 @@ public class UsuarioServlet extends HttpServlet {
 
                 if (funcionou == 1){
                     session.setAttribute("usuarioEmail", usuarioAlterado.getEmail());
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
                 }
                 break;
             }
@@ -218,7 +238,7 @@ public class UsuarioServlet extends HttpServlet {
                 boolean vEmail = validar.validarEmail(emailNovo);
 
                 if( !vEmail){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-email-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_email);
                     break;
                 }
 
@@ -229,10 +249,10 @@ public class UsuarioServlet extends HttpServlet {
 
                 if (funcionou == 1){
                     session.setAttribute("usuarioEmail", emailNovo);
-                    resp.sendRedirect(req.getContextPath() + "tela-padrao.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-email-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_email);
                 }
                 break;
             }
@@ -250,7 +270,7 @@ public class UsuarioServlet extends HttpServlet {
                 boolean vSenha = validar.validarSenha(senhaNova);
 
                 if( !vSenha ){
-                    resp.sendRedirect(req.getContextPath() + "/alterar-senha-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_senha);
                     break;
                 }
                 // hasheando a senha
@@ -262,10 +282,10 @@ public class UsuarioServlet extends HttpServlet {
                 int funcionou = usuarioDAO.alterarSenhaUsuario(usuarioBanco, senhaHash);
 
                 if (funcionou == 1){
-                    resp.sendRedirect(req.getContextPath() + "tela-padrao.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + "/alterar-senha-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_alterar_senha);
                 }
                 break;
             }
@@ -278,7 +298,8 @@ public class UsuarioServlet extends HttpServlet {
                 // validando
                 boolean vEmail = validar.validarEmail(email);
                 if ( !vEmail ){
-                    resp.sendRedirect(req.getContextPath() + "/deletar-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
+                    return;
                 }
 
                 // criando o usuario usando o email
@@ -287,10 +308,10 @@ public class UsuarioServlet extends HttpServlet {
                 int funcionou = usuarioDAO.deletarUsuario(usuario);
 
                 if (funcionou == 1){
-                    resp.sendRedirect(req.getContextPath() + "/tela-padrao.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + "/deletar-usuario.jsp");
+                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
                 }
                 break;
             }
