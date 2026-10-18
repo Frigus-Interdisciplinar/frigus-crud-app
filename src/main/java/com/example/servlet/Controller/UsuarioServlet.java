@@ -35,6 +35,7 @@ public class UsuarioServlet extends HttpServlet {
     private static final String jsp_deletar = "/assets/pages/deletar-usuario.jsp";
     private static final String jsp_visao_geral = "/assets/pages/visao-geral-usu.jsp";
     private static final String jsp_plano = "/assets/pages/criar-plano-usu.jsp";
+    private static final String jsp_login = "/assets/pages/login.jsp";
 
     @Override
     public void init(){
@@ -47,27 +48,20 @@ public class UsuarioServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException{
-        // pegando o caminho do usuario
-        String path = req.getServletPath();
         HttpSession session = req.getSession(false);
         // verifica se esta logado
         if(session == null || session.getAttribute("usuarioEmail") == null){
-            resp.sendRedirect(req.getContextPath() + jsp_inserir);
+            resp.sendRedirect(req.getContextPath() + jsp_login);
             return;
         }
-
-        String email = (String) session.getAttribute("usuarioEmail");
-
-        switch (path){
-            case "/perfil-usuario":{
-                Usuario usuario = usuarioDAO.buscarUsuario(email);
-                req.setAttribute("usuario", usuario);
-                req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
-                break;
-            }
-            default:
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        if(!req.getContextPath().equals("/perfil-usuario")){
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
+        String email = (String) session.getAttribute("usuarioEmail");
+        Usuario usuario = usuarioDAO.buscarUsuario(email);
+        req.setAttribute("usuario", usuario);
+        req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
     }
 
 
@@ -75,12 +69,16 @@ public class UsuarioServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // pegando o caminho do usuario
-        String action = req.getParameter("action");
+        String path = req.getServletPath();
         // salvando as informações entre as requisições
-        HttpSession session = req.getSession();
+        HttpSession session = req.getSession(false);
+        // vendo se o usuario ainda esta logado
+        if(session == null || session.getAttribute("usuarioEmail") == null){
+            resp.sendRedirect(req.getContextPath() + jsp_login);
+            return;
+        }
 
-        switch (action){
+        switch (path){
             case "/criar-usuario": {
                 // pegando os dados do fornmulario de cadastro
                 String nomeCompleto = req.getParameter("nome");
@@ -90,14 +88,36 @@ public class UsuarioServlet extends HttpServlet {
                 // formatando o cpf
                 String cpfPuro = validar.formatarCpf(cpf);
 
+                if(nomeCompleto == null){
+                    voltaComErro(req, resp, "O primeiro nome não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
+                if(email == null){
+                    voltaComErro(req, resp, "O email não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
+                if(cpf == null){
+                    voltaComErro(req, resp, "O cpf não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
+
+
                 // validando
                 boolean vCpf = validar.validarCpf(cpfPuro);
-                boolean vnome = validar.validarNome(nomeCompleto);
+                boolean vNome = validar.validarNome(nomeCompleto);
                 boolean vEmail = validar.validarEmail(email);
 
-                if ( !vCpf || !vnome || !vEmail ){
-                    resp.sendRedirect(req.getContextPath() + jsp_inserir);
-                    break;
+                if (!vCpf){
+                    voltaComErro(req, resp, "Cpf inválido!!!", jsp_inserir);
+                    return;
+                }
+                if (!vNome){
+                    voltaComErro(req, resp, "Nome inválido!!!", jsp_inserir);
+                    return;
+                }
+                if (!vEmail){
+                    voltaComErro(req, resp, "E-mail inválido!!!", jsp_inserir);
+                    return;
                 }
 
 
@@ -109,6 +129,11 @@ public class UsuarioServlet extends HttpServlet {
                     sobrenome += nomeUsuario[i] + " ";
                 }
                 sobrenome = sobrenome.trim();
+
+                if(sobrenome == null){
+                    voltaComErro(req, resp, "O sobrenome não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
 
                 // salvando as informações na session
                 session.setAttribute("cpf", cpf);
@@ -127,16 +152,26 @@ public class UsuarioServlet extends HttpServlet {
                 String senha = req.getParameter("senha");
                 String senhaConfirmada = req.getParameter("confirmarSenha");
 
+                if (senha == null){
+                    voltaComErro(req, resp, "A senha não deve ser vazia!!!", jsp_senha);
+                    return;
+                }
+                if (senhaConfirmada == null){
+                    voltaComErro(req, resp, "A confirmação da senha não deve ser vazia!!!", jsp_senha);
+                    return;
+                }
+
+                if (!senha.equals(senhaConfirmada)) {
+                    resp.sendRedirect(req.getContextPath() + jsp_senha);
+                    break;
+                }
+
                 // pegando as informações salvas com o session
                 String cpf = (String) session.getAttribute("cpf");
                 String primeiroNome = (String) session.getAttribute("primeiroNome");
                 String sobrenome = (String) session.getAttribute("sobrenome");
                 String email = (String) session.getAttribute("email");
 
-                if (!senha.equals(senhaConfirmada)) {
-                    resp.sendRedirect(req.getContextPath() + jsp_senha);
-                    break;
-                }
 
                 String senhaHash = Hash.bcrypt(senha);
 
@@ -150,9 +185,7 @@ public class UsuarioServlet extends HttpServlet {
                 );
 
 
-                int funcionou = usuarioDAO.adicionarUsuario(usuario);
-
-                if (funcionou == 1) {
+                if (usuarioDAO.adicionarUsuario(usuario) == 1) {
                     // salvando o usuario
                     session.setAttribute("usuarioEmail", usuario.getEmail());
 
@@ -161,12 +194,12 @@ public class UsuarioServlet extends HttpServlet {
                     session.removeAttribute("primeiroNome");
                     session.removeAttribute("sobrenome");
                     session.removeAttribute("email");
-
                     resp.sendRedirect(req.getContextPath() + jsp_plano);
+                    return;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + jsp_senha);
+                    voltaComErro(req, resp, "Erro ao Salvar a senha. Por favor tente novamente.", jsp_senha);
+                    return;
                 }
-                break;
             }
 
 
@@ -179,15 +212,36 @@ public class UsuarioServlet extends HttpServlet {
                 String email = req.getParameter("email");
                 String senha = req.getParameter("senha");
 
+                if(nomeCompleto == null){
+                    voltaComErro(req, resp, "O primeiro nome não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
+                if(email == null){
+                    voltaComErro(req, resp, "O email não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
+                if(senha == null){
+                    voltaComErro(req, resp, "A senha não pode ser vazia!!!", jsp_inserir);
+                    return;
+                }
+
 
                 // validando
                 boolean vNome = validar.validarNome(nomeCompleto);
                 boolean vEmail = validar.validarEmail(email);
                 boolean vSenha = validar.validarSenha(senha);
 
-                if (!vNome || !vEmail || !vSenha){
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
-                    break;
+                if (!vNome){
+                    voltaComErro(req, resp, "Nome inválido!!!", jsp_inserir);
+                    return;
+                }
+                if (!vEmail){
+                    voltaComErro(req, resp, "E-mail inválido!!!", jsp_inserir);
+                    return;
+                }
+                if (!vSenha){
+                    voltaComErro(req, resp, "Senha inválida!!!", jsp_inserir);
+                    return;
                 }
 
                 // convertendo e formatando os dados
@@ -199,6 +253,10 @@ public class UsuarioServlet extends HttpServlet {
                 }
                 sobrenome = sobrenome.trim();
 
+                if(sobrenome == null){
+                    voltaComErro(req, resp, "O sobrenome não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
 
                 // hasheando a senha
                 String senhaHash = Hash.bcrypt(senha);
@@ -215,14 +273,12 @@ public class UsuarioServlet extends HttpServlet {
                         senhaHash
                 );
 
-                int funcionou = usuarioDAO.alterarUsuario(usuarioBanco, usuarioAlterado);
-
-                if (funcionou == 1){
+                if (usuarioDAO.alterarUsuario(usuarioBanco, usuarioAlterado) == 1){
                     session.setAttribute("usuarioEmail", usuarioAlterado.getEmail());
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar);
+                    voltaComErro(req, resp, "Erro ao alterar o seu perfil. Por favor tente novamente.", jsp_alterar);
                 }
                 break;
             }
@@ -233,6 +289,11 @@ public class UsuarioServlet extends HttpServlet {
 
                 // pegando o email do formulario
                 String emailNovo = req.getParameter("email");
+
+                if(emailNovo == null){
+                    voltaComErro(req, resp, "O e-mail não pode ser vazio!!!", jsp_inserir);
+                    return;
+                }
 
                 // validando
                 boolean vEmail = validar.validarEmail(emailNovo);
@@ -245,14 +306,12 @@ public class UsuarioServlet extends HttpServlet {
                 // resgatando o usuario do banco
                 Usuario usuarioBanco = usuarioDAO.buscarUsuario(email);
 
-                int funcionou = usuarioDAO.alterarEmailUsuario(usuarioBanco, emailNovo);
-
-                if (funcionou == 1){
+                if (usuarioDAO.alterarEmailUsuario(usuarioBanco, emailNovo) == 1){
                     session.setAttribute("usuarioEmail", emailNovo);
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar_email);
+                    voltaComErro(req, resp, "Erro ao alterar seu e-mail. Por favor tente novamente.", jsp_alterar_email);
                 }
                 break;
             }
@@ -265,6 +324,11 @@ public class UsuarioServlet extends HttpServlet {
 
                 // pegando a senha do formulario
                 String senhaNova = req.getParameter("senha");
+
+                if(senhaNova == null){
+                    voltaComErro(req, resp, "A senha não pode ser vazia!!!", jsp_inserir);
+                    return;
+                }
 
                 // validando
                 boolean vSenha = validar.validarSenha(senhaNova);
@@ -279,46 +343,41 @@ public class UsuarioServlet extends HttpServlet {
                 // resgatando o usuario do banco
                 Usuario usuarioBanco = usuarioDAO.buscarUsuario(email);
 
-                int funcionou = usuarioDAO.alterarSenhaUsuario(usuarioBanco, senhaHash);
 
-                if (funcionou == 1){
+                if (usuarioDAO.alterarSenhaUsuario(usuarioBanco, senhaHash) == 1){
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar_senha);
+                    voltaComErro(req, resp, "Erro ao alterar sua senha. Por favor tente novamente", jsp_alterar_senha);
                 }
                 break;
             }
 
 
             case "/deletar-usuario":{
-                // pegando o email do formulario
-                String email = req.getParameter("email");
-
-                // validando
-                boolean vEmail = validar.validarEmail(email);
-                if ( !vEmail ){
-                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
-                    return;
-                }
+                // pegando o email da session
+                String email = (String) session.getAttribute("usuarioEmail");
 
                 // criando o usuario usando o email
                 Usuario usuario = usuarioDAO.buscarUsuario(email);
 
-                int funcionou = usuarioDAO.deletarUsuario(usuario);
 
-                if (funcionou == 1){
+                if (usuarioDAO.deletarUsuario(usuario) == 1){
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral);
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_deletar);
+                    voltaComErro(req, resp, "Erro ao deletar seu perfil. Por favor tente novamente.", jsp_deletar);
                 }
                 break;
             }
-
-
             default:
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
+    }
+    // volta para a pagina com uma mensagem de erro
+    public static void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem, String pagina)
+            throws ServletException, IOException{
+        req.setAttribute("erro", mensagem);
+        req.getRequestDispatcher(pagina).forward(req, resp);
     }
 }

@@ -1,9 +1,10 @@
 
 
 -- apagar o banco quando necessario
+/*
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
-
+*/
 --Criação das tabelas
 CREATE TABLE Usuario(
 	cpf         varchar(11)  primary key,
@@ -28,6 +29,16 @@ CREATE TABLE MarcasParceiras(
 	idProdutos      int         not null,
 	observacoes     text            null
 );
+
+/*
+create view MarcasParceiras as 
+select 
+	id,
+	idEmpresa,
+	idProduto as idProdutos,
+	observacoes
+from MarcaParceira;
+*/
 
 CREATE TABLE Assinatura(
 	id              serial          primary key,
@@ -57,6 +68,16 @@ CREATE TABLE Ingredientes(
 	quantidade    int         not null default 1
 );
 
+/*
+create view Ingredientes as 
+select 
+	id,
+	idReceita,
+	idProduto as idProdutos,
+	quantidade
+from Ingrediente;
+*/
+
 CREATE TABLE ListaCompras(
 	id          serial primary key,
 	idUsuario   varchar(11)       null,
@@ -71,6 +92,16 @@ CREATE TABLE ProdutoLista(
 	quantidade      int    not null
 );
 
+/*
+create view ProdutoLista as
+select
+	id,
+	idListaCompras,
+	idProduto as idProdutos,
+	quantidade
+from ItemLista;
+*/
+
 CREATE TABLE Produtos(
 	id              serial         primary key,
 	nome            varchar(20)    not null,
@@ -80,6 +111,11 @@ CREATE TABLE Produtos(
 	marca           varchar(20)    not null,
 	unidadeMedida   varchar(10)    not null
 );
+/*
+create view Produtos as
+select * 
+from Produto;
+*/
 
 CREATE TABLE Frigorificos(
 	id              serial      primary key,
@@ -89,6 +125,12 @@ CREATE TABLE Frigorificos(
 	tipo            varchar(20) not null default 'Freezer',
 	nome            varchar(50) not null
 );
+
+/*
+create view Frigorificos as
+select * 
+from Frigorifico;
+*/
 
 CREATE TABLE ProdutosFrigorifico(
 	id                serial      primary key,
@@ -100,6 +142,20 @@ CREATE TABLE ProdutosFrigorifico(
 	lote              int             null,
 	quantidade        int         not null default 0
 );
+
+/*
+create view ProdutosFrigorifico as
+select
+	id,
+	idNotificacao,    
+	idFrigorifico as idFrigorificos, 
+	idProduto as idProdutos,
+	dtValidade,
+	status,
+	lote,
+	quantidade
+from ItemFrigorifico;
+*/
 
 CREATE TABLE Compra(
 	id              serial         primary key,
@@ -129,6 +185,21 @@ CREATE TABLE ProdutosGeladeira(
 	quantidade        int         not null default 0
 
 );
+
+
+/*
+create view ProdutosGeladeira as
+select
+	id,
+	idNotificacao,
+	idGeladeira,
+	idProduto as idProdutos,
+	dtValidade,
+	status,
+	lote,
+	quantidade
+from ItemGeladeira;
+*/
 
 CREATE TABLE Notificacao(
 	id              serial primary key,
@@ -6421,5 +6492,133 @@ COMMIT;
 select * from produtosgeladeira where idGeladeira = 5
 
 select count(*) from geladeira
+
+
+
+
+
+
+
+
+/*
+Exercício 1: Usuários acima da média de valor estocado
+
+Calcule o valor total estocado por usuário nas geladeiras (quantidade * preco), ignorando itens com status VENCIDO. Liste nome, sobrenome, tipo de assinatura e valor estocado dos usuários acima da média geral, do maior para o menor.
+
+Tabelas: Usuario, Geladeira, ProdutosGeladeira, Produtos, Assinatura
+Dica: uma CTE para o total por usuário e outra para a média, e depois o JOIN.
+*/
+
+
+with valor_estocado as(
+select 
+	u.cpf,
+	sum(pg.quantidade * p.preco) as total,
+	avg(total) as media_total
+	from produtosgeladeira pg
+	join geladeira g on g.id = pg.idgeladeira
+	join usuario u on u.cpf = g.idusuario
+	join produtos p on p.id = pg.idprodutos
+	where pg.status <> 'VENCIDO'
+	group by u.cpf
+),
+
+
+info_usu as(
+select 
+	u.nome,
+	u.sobrenome,
+	a.tipoassinatura,
+	ve.media_total
+	from valor_estocado ve
+	join usuario u on u.cpf = ve.cpf
+	join assinatura a on u.cpf = a.idusuario
+	where ve.total > ve.media_total
+	order by ve.total desc
+)
+
+select * from info_usu;
+
+
+
+
+
+
+
+
+
+
+
+/*
+Exercício 2: Receitas que o usuário consegue fazer
+
+Para cada receita de usuário (idUsuario não nulo), conte quantos ingredientes ela exige e quantos deles o dono tem em alguma geladeira dele, com status diferente de VENCIDO. Liste as receitas em que o usuário tem todos os ingredientes, com nome da receita, nome do usuário e foiFeita.
+
+Tabelas: Receita, Ingredientes, Geladeira, ProdutosGeladeira
+Dica: uma CTE com o total de ingredientes por receita e outra com os ingredientes disponíveis. Cuidado para não contar o mesmo produto duas vezes se ele estiver em duas geladeiras (COUNT(DISTINCT ...)).
+Exercício 3: Categoria dominante por empresa
+
+Para cada empresa com assinatura COMERCIAL, descubra a categoria de produto com maior quantidade total nos seus frigoríficos. Retorne nome da empresa, categoria e quantidade total.
+
+Tabelas: Empresa, Assinatura, Frigorificos, ProdutosFrigorifico, Produtos
+Dica: CTE com soma por empresa e categoria, e depois ROW_NUMBER() ou RANK() para pegar a 1ª de cada empresa. Pense no que acontece em caso de empate.
+Exercício 4: Estoque unificado vencendo em 7 dias
+
+Crie uma CTE que una (UNION ALL) os itens de ProdutosGeladeira e ProdutosFrigorifico com as colunas origem (‘GELADEIRA’ ou ‘FRIGORIFICO’), idProdutos, dtValidade e quantidade. Depois, mostre os 5 produtos com maior quantidade total que vencem entre hoje e hoje + 7 dias, com nome, categoria, quantidade na geladeira, quantidade no frigorífico e total.
+
+Dica: na consulta final, use SUM(...) FILTER (WHERE origem = ...) ou CASE para separar as duas origens.
+Exercício 5: Calendário de vencimentos (CTE recursiva)
+
+Gere com uma CTE recursiva todos os dias de 01/10/2026 a 31/10/2026. Faça um LEFT JOIN com ProdutosGeladeira e mostre, para cada dia, quantos itens vencem e a soma das quantidades. Dias sem vencimentos devem aparecer com 0.
+
+Dica: estrutura WITH RECURSIVE dias AS (SELECT ... UNION ALL SELECT dia + 1 ... WHERE dia < ...). Atenção ao COALESCE e ao tipo date.
+Parte 2: Query correlacionada
+Exercício 1: Itens acima da média do próprio produto
+
+Liste os itens de ProdutosGeladeira cuja quantidade é maior que a média de quantidade daquele mesmo produto em todas as geladeiras. Mostre o nome do produto, o id da geladeira, a quantidade e a média do produto.
+
+Dica: a subquery no WHERE referencia idProdutos da query externa. Você pode repetir a mesma subquery no SELECT para exibir a média.
+Exercício 2: Item que vence primeiro em cada geladeira
+
+Para cada geladeira, retorne o item com a menor dtValidade entre os itens que ainda não estão VENCIDO: nome da geladeira, nome do dono, nome do produto e data. Use subquery correlacionada no WHERE, sem ROW_NUMBER.
+
+Dica: WHERE dtValidade = (SELECT MIN(...) FROM ProdutosGeladeira x WHERE x.idGeladeira = pg.idGeladeira AND x.status <> 'VENCIDO'). Lembre de repetir o filtro de status na query externa e pense nos empates.
+Exercício 3: Produtos estocados que nunca viraram ingrediente
+
+Liste os produtos que existem em alguma geladeira (EXISTS) e que nunca foram usados como ingrediente de receita (NOT EXISTS). Mostre nome, categoria e a quantidade total estocada nas geladeiras (essa quantidade pode ser outra subquery correlacionada no SELECT).
+
+Tabelas: Produtos, ProdutosGeladeira, Ingredientes
+Exercício 4: Painel por empresa com subqueries no SELECT
+
+Para cada empresa com assinatura COMERCIAL, retorne com subqueries correlacionadas no SELECT:
+
+nome da empresa;
+quantidade de frigoríficos;
+quantidade de itens VENCIDO nesses frigoríficos;
+data da última compra da empresa (MAX(dtCompra)).
+
+Ordene por itens vencidos, do maior para o menor, e depois por nome.
+
+Dica: o item 3 precisa de ProdutosFrigorifico ligado a Frigorificos dentro da subquery. Empresas sem compra devem aparecer com NULL.
+Exercício 5: Preço acima da média da categoria
+
+Liste os produtos com preço maior que a média da sua própria categoria e que aparecem em pelo menos uma lista de compras de usuário (não de empresa), usando EXISTS correlacionado. Mostre nome, categoria, preço, média da categoria e a diferença percentual.
+
+Tabelas: Produtos, ProdutoLista, ListaCompras
+Dica: duas correlações: uma para a média (por categoria) e outra no EXISTS (por idProdutos, filtrando idUsuario IS NOT NULL).
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	

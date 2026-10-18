@@ -151,4 +151,29 @@ public class FrigorificosDAO {
         }
         return listaFrigorificos;
     }// ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
+
+
+    // TOTAL DE FRIGORIFICOS
+    public int totalFrigorificosEmpresa(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        int total = 0;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select count(*) as total from Frigorificos where idEmpresa = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cnpj);
+            rset = pstmt.executeQuery();
+
+            if(rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return total;
+    }
+    // TOTAL DE FRIGORIFICOS
 }
