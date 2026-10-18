@@ -1,11 +1,11 @@
-
-
 -- apagar o banco quando necessario
 /*
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 */
---Criação das tabelas
+
+/*
+-- Criacao das tabelas
 CREATE TABLE Usuario(
 	cpf         varchar(11)  primary key,
 	nome        varchar(20)  not null,
@@ -21,24 +21,12 @@ CREATE TABLE Empresa(
 	senha       varchar(16)  not null     unique
 );
 
-
-
-CREATE TABLE MarcasParceiras(
+CREATE TABLE MarcaParceira(
 	id              serial      primary key,
 	idEmpresa       varchar(14) not null,
-	idProdutos      int         not null,
+	idProduto       int         not null,
 	observacoes     text            null
 );
-
-/*
-create view MarcasParceiras as 
-select 
-	id,
-	idEmpresa,
-	idProduto as idProdutos,
-	observacoes
-from MarcaParceira;
-*/
 
 CREATE TABLE Assinatura(
 	id              serial          primary key,
@@ -49,10 +37,9 @@ CREATE TABLE Assinatura(
 	descricao       text            not null
 );
 
-
 CREATE TABLE Receita(
 	id            serial      primary key,
-	idEmpresa     varchar(14)     null,    
+	idEmpresa     varchar(14)     null,
 	idUsuario     varchar(11)     null,
 	nome          varchar(50) not null,
 	descricao     text            null,
@@ -61,22 +48,12 @@ CREATE TABLE Receita(
 	foiFeita      boolean     not null default false
 );
 
-CREATE TABLE Ingredientes(
+CREATE TABLE Ingrediente(
 	id            serial      primary key,
 	idReceita     int         not null,
-	idProdutos    int         not null,
+	idProduto     int         not null,
 	quantidade    int         not null default 1
 );
-
-/*
-create view Ingredientes as 
-select 
-	id,
-	idReceita,
-	idProduto as idProdutos,
-	quantidade
-from Ingrediente;
-*/
 
 CREATE TABLE ListaCompras(
 	id          serial primary key,
@@ -85,24 +62,14 @@ CREATE TABLE ListaCompras(
 	dtLista     date          not null default current_date
 );
 
-CREATE TABLE ProdutoLista(
+CREATE TABLE ItemLista(
 	id              serial primary key,
 	idListaCompras  int    not null,
-	idProdutos      int    not null,
+	idProduto       int    not null,
 	quantidade      int    not null
 );
 
-/*
-create view ProdutoLista as
-select
-	id,
-	idListaCompras,
-	idProduto as idProdutos,
-	quantidade
-from ItemLista;
-*/
-
-CREATE TABLE Produtos(
+CREATE TABLE Produto(
 	id              serial         primary key,
 	nome            varchar(20)    not null,
 	descricao       text               null,
@@ -111,13 +78,8 @@ CREATE TABLE Produtos(
 	marca           varchar(20)    not null,
 	unidadeMedida   varchar(10)    not null
 );
-/*
-create view Produtos as
-select * 
-from Produto;
-*/
 
-CREATE TABLE Frigorificos(
+CREATE TABLE Frigorifico(
 	id              serial      primary key,
 	idEndereco      int         not null,
 	idEmpresa       varchar(14) not null,
@@ -126,36 +88,16 @@ CREATE TABLE Frigorificos(
 	nome            varchar(50) not null
 );
 
-/*
-create view Frigorificos as
-select * 
-from Frigorifico;
-*/
-
-CREATE TABLE ProdutosFrigorifico(
+CREATE TABLE ItemFrigorifico(
 	id                serial      primary key,
 	idNotificacao     int         not null,
-	idFrigorificos    int         not null,
-	idProdutos        int         not null,
+	idFrigorifico     int         not null,
+	idProduto         int         not null,
 	dtValidade        date        not null,
 	status            varchar(20) not null default 'REGULAR',
 	lote              int             null,
 	quantidade        int         not null default 0
 );
-
-/*
-create view ProdutosFrigorifico as
-select
-	id,
-	idNotificacao,    
-	idFrigorifico as idFrigorificos, 
-	idProduto as idProdutos,
-	dtValidade,
-	status,
-	lote,
-	quantidade
-from ItemFrigorifico;
-*/
 
 CREATE TABLE Compra(
 	id              serial         primary key,
@@ -174,32 +116,16 @@ CREATE TABLE Geladeira(
 	nome           varchar(50) not null
 );
 
-CREATE TABLE ProdutosGeladeira(
+CREATE TABLE ItemGeladeira(
 	id                serial      primary key,
 	idNotificacao     int         not null,
 	idGeladeira       int         not null,
-	idProdutos        int         not null,
+	idProduto         int         not null,
 	dtValidade        date        not null,
 	status            varchar(20) not null default 'REGULAR',
 	lote              int             null,
 	quantidade        int         not null default 0
-
 );
-
-
-/*
-create view ProdutosGeladeira as
-select
-	id,
-	idNotificacao,
-	idGeladeira,
-	idProduto as idProdutos,
-	dtValidade,
-	status,
-	lote,
-	quantidade
-from ItemGeladeira;
-*/
 
 CREATE TABLE Notificacao(
 	id              serial primary key,
@@ -220,12 +146,7 @@ CREATE TABLE Endereco(
 );
 
 
-
-
-
-
-
---Ligação entre tabelas e Checks
+-- Ligacao entre tabelas e Checks
 
 alter table Geladeira
 	add constraint fk_geladeira_usuario
@@ -233,35 +154,35 @@ alter table Geladeira
 	on delete cascade
 	on update cascade;
 
-alter table Frigorificos
-	add constraint fk_frigorificos_empresa
+alter table Frigorifico
+	add constraint fk_frigorifico_empresa
 	foreign key (idEmpresa) references Empresa(cnpj)
 	on delete cascade
 	on update cascade;
 
-ALTER TABLE frigorificos
-ADD CONSTRAINT fk_frigorificos_endereco
+ALTER TABLE Frigorifico
+ADD CONSTRAINT fk_frigorifico_endereco
 FOREIGN KEY (idEndereco)
-REFERENCES endereco(id)
+REFERENCES Endereco(id)
 ON UPDATE CASCADE;
 
-alter table ProdutosGeladeira
-	add constraint fk_prodgeladeira_geladeira
+alter table ItemGeladeira
+	add constraint fk_itemgeladeira_geladeira
 	foreign key (idGeladeira) references Geladeira(id)
 	on delete cascade
 	on update cascade,
-	add constraint fk_prodgeladeira_produtos
-	foreign key (idProdutos) references Produtos(id)
+	add constraint fk_itemgeladeira_produto
+	foreign key (idProduto) references Produto(id)
 	on delete cascade
 	on update cascade;
 
-alter table ProdutosFrigorifico
-	add constraint fk_prodfrigorifico_frigorificos
-	foreign key (idFrigorificos) references Frigorificos(id)
+alter table ItemFrigorifico
+	add constraint fk_itemfrigorifico_frigorifico
+	foreign key (idFrigorifico) references Frigorifico(id)
 	on delete cascade
 	on update cascade,
-	add constraint fk_prodfrigorifico_produtos
-	foreign key (idProdutos) references Produtos(id)
+	add constraint fk_itemfrigorifico_produto
+	foreign key (idProduto) references Produto(id)
 	on delete cascade
 	on update cascade;
 
@@ -280,13 +201,13 @@ alter table Receita
 		(idUsuario is null and idEmpresa is not null)
 	);
 
-alter table Ingredientes
-	add constraint fk_ingredientes_receita
+alter table Ingrediente
+	add constraint fk_ingrediente_receita
 	foreign key (idReceita) references Receita(id)
 	on delete cascade
 	on update cascade,
-	add constraint fk_ingredientes_produtos
-	foreign key (idProdutos) references Produtos(id)
+	add constraint fk_ingrediente_produto
+	foreign key (idProduto) references Produto(id)
 	on delete cascade
 	on update cascade;
 
@@ -304,11 +225,12 @@ alter table Assinatura
 		(idUsuario is not null and idEmpresa is null) or
 		(idUsuario is null and idEmpresa is not null)
 	);
-	CREATE UNIQUE INDEX uq_assinatura_usuario
+
+CREATE UNIQUE INDEX uq_assinatura_usuario
 	ON Assinatura(idUsuario)
 	WHERE idUsuario IS NOT NULL;
 
-	CREATE UNIQUE INDEX uq_assinatura_empresa
+CREATE UNIQUE INDEX uq_assinatura_empresa
 	ON Assinatura(idEmpresa)
 	WHERE idEmpresa IS NOT NULL;
 
@@ -342,23 +264,23 @@ alter table ListaCompras
 		(idUsuario is null and idEmpresa is not null)
 	);
 
-alter table ProdutoLista
-	add constraint fk_produtolista_listacompras
+alter table ItemLista
+	add constraint fk_itemlista_listacompras
 	foreign key (idListaCompras) references ListaCompras(id)
 	on delete cascade
 	on update cascade,
-	add constraint fk_produtolista_produtos
-	foreign key (idProdutos) references Produtos(id)
+	add constraint fk_itemlista_produto
+	foreign key (idProduto) references Produto(id)
 	on delete cascade
 	on update cascade;
 
-alter table MarcasParceiras
-	add constraint fk_marcasparceiras_empresa
+alter table MarcaParceira
+	add constraint fk_marcaparceira_empresa
 	foreign key (idEmpresa) references Empresa(cnpj)
 	on delete cascade
 	on update cascade,
-	add constraint fk_marcasparceiras_produtos
-	foreign key (idProdutos) references Produtos(id)
+	add constraint fk_marcaparceira_produto
+	foreign key (idProduto) references Produto(id)
 	on delete cascade
 	on update cascade;
 
@@ -366,38 +288,32 @@ alter table Usuario
 	add constraint chk_cpf_formato
 	check (cpf ~ '^[0-9]{11}$');
 
-
 alter table Empresa
 	add constraint chk_cnpj_formato
 	check (cnpj ~ '^[A-Z0-9]{12}[0-9]{2}$');
 
-
 alter table Usuario
 	add constraint chk_email_formato
 	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
-	
 
 alter table Empresa
 	add constraint chk_email_formato
 	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
-
-
-alter table Ingredientes
-	add constraint chk_quantidade_ingredientes
+alter table Ingrediente
+	add constraint chk_quantidade_ingrediente
 	check (quantidade >= 0);
 
+alter table ItemLista
+	add constraint chk_quantidade_itemlista
+	check (quantidade >= 0);
 
-alter table ProdutoLista
-	add constraint chk_quantidade_produtolista
+alter table ItemGeladeira
+	add constraint chk_quantidade_itemgeladeira
 	check (quantidade >= 0);
-	
-alter table ProdutosGeladeira
-	add constraint chk_quantidade_produtolista
-	check (quantidade >= 0);
-	
-alter table ProdutosFrigorifico
-	add constraint chk_quantidade_produtolista
+
+alter table ItemFrigorifico
+	add constraint chk_quantidade_itemfrigorifico
 	check (quantidade >= 0);
 
 ALTER TABLE Endereco
@@ -405,12 +321,9 @@ ADD CONSTRAINT chk_cep_formato
 CHECK (cep ~ '^\d{8}$');
 
 
-
-
-
-
-
-
+-- =====================================================================
+-- DATALOAD
+-- =====================================================================
 
 BEGIN;
 
@@ -726,7 +639,7 @@ VALUES
 ('YNDX1QC3000107', 'Restaurante Fogão de Lenha', 'financeiro@restaurantefogaodelenha.example.net', 'Milho!2562'),
 ('NE5BYXD3000105', 'Restaurante Terra Nordestina', 'ola@restauranteterranordestina.example.com', 'Orquidea&1481');
 
-INSERT INTO Produtos
+INSERT INTO Produto
 (id, nome, descricao, preco, categoria, marca, unidadeMedida)
 VALUES
 (1, 'Leite Integral', 'Leite UHT integral, caixa com 1 litro.', 5.49, 'LATICIONIOS', 'Vale Branco', 'L'),
@@ -830,7 +743,7 @@ VALUES
 (99, 'Cebola', 'Cebola amarela, vendida por kg.', 5.99, 'HORTALICAS', 'Quintal Verde', 'kg'),
 (100, 'Cenoura', 'Cenoura selecionada, vendida por kg.', 5.49, 'HORTALICAS', 'Quintal Verde', 'kg');
 
-INSERT INTO Produtos
+INSERT INTO Produto
 (id, nome, descricao, preco, categoria, marca, unidadeMedida)
 VALUES
 (101, 'Beterraba', 'Beterraba fresca, vendida por kg.', 5.99, 'HORTALICAS', 'Quintal Verde', 'kg'),
@@ -1648,7 +1561,7 @@ VALUES
 (199, '07206028233', 'Geladeira da Copa', 'OCUPACAO_MODERADA', 'Geladeira'),
 (200, '90140923349', 'Geladeira Familiar', 'OCUPACAO_ALTA', 'Geladeira');
 
-INSERT INTO Frigorificos
+INSERT INTO Frigorifico
 (id, idEndereco, idEmpresa, nome, status, tipo)
 VALUES
 (1, 1, 'WZUFW710000112', 'Câmara Fria Principal', 'VAZIO', 'Câmara Fria'),
@@ -1752,7 +1665,7 @@ VALUES
 (99, 116, '98VRRL32000114', 'Freezer Horizontal da Filial', 'CHEIA', 'Freezer Horizontal'),
 (100, 63, '99739420000151', 'Balcão Refrigerado da Cozinha', 'OCUPACAO_MODERADA', 'Balcão Refrigerado');
 
-INSERT INTO Frigorificos
+INSERT INTO Frigorifico
 (id, idEndereco, idEmpresa, nome, status, tipo)
 VALUES
 (101, 63, '99739420000151', 'Freezer Horizontal do Salão', 'OCUPACAO_ALTA', 'Freezer Horizontal'),
@@ -1816,8 +1729,8 @@ VALUES
 (159, 100, 'NE5BYXD3000105', 'Câmara Fria do Salão', 'OCUPACAO_ALTA', 'Câmara Fria'),
 (160, 100, 'NE5BYXD3000105', 'Freezer de Apoio', 'OCUPACAO_ALTA', 'Freezer');
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (1, 7, 2, 1, '2026-10-17', 'REGULAR', 1363, 3),
 (2, 8, 3, 41, '2026-10-27', 'REGULAR', 2804, 3),
@@ -1920,8 +1833,8 @@ VALUES
 (99, 40, 25, 49, '2026-10-22', 'REGULAR', 2762, 3),
 (100, 47, 25, 116, '2026-12-06', 'VALIDADE_LONGA', NULL, 1);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (101, 21, 26, 9, '2026-10-14', 'PROXIMO_VENCIMENTO', 4734, 4),
 (102, 4, 26, 95, '2026-10-13', 'PROXIMO_VENCIMENTO', 8370, 1),
@@ -2024,8 +1937,8 @@ VALUES
 (199, 8, 51, 54, '2026-10-05', 'VENCIDO', 9341, 3),
 (200, 15, 51, 56, '2026-10-27', 'REGULAR', NULL, 1);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (201, 22, 51, 114, '2027-01-05', 'VALIDADE_LONGA', 4800, 3),
 (202, 29, 51, 119, '2026-10-07', 'ATENCAO', 5302, 2),
@@ -2128,8 +2041,8 @@ VALUES
 (299, 45, 80, 151, '2026-10-09', 'ATENCAO', 1108, 6),
 (300, 5, 80, 22, '2026-10-15', 'REGULAR', NULL, 1);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (301, 27, 81, 21, '2026-10-27', 'REGULAR', 3403, 6),
 (302, 37, 81, 1, '2026-09-28', 'VENCIDO', 3557, 1),
@@ -2232,8 +2145,8 @@ VALUES
 (399, 29, 105, 132, '2027-06-04', 'VALIDADE_LONGA', 3506, 1),
 (400, 17, 106, 49, '2026-10-09', 'ATENCAO', 7420, 2);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (401, 4, 106, 71, '2026-10-25', 'REGULAR', 9191, 3),
 (402, 12, 106, 76, '2026-11-21', 'VALIDADE_LONGA', NULL, 1),
@@ -2336,8 +2249,8 @@ VALUES
 (499, 19, 137, 98, '2026-10-13', 'PROXIMO_VENCIMENTO', 5006, 2),
 (500, 45, 137, 111, '2026-10-07', 'ATENCAO', 6344, 1);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (501, 7, 137, 138, '2026-11-06', 'VALIDADE_LONGA', NULL, 1),
 (502, 39, 138, 198, '2027-01-05', 'VALIDADE_LONGA', 7848, 1),
@@ -2440,8 +2353,8 @@ VALUES
 (599, 35, 159, 129, '2026-10-17', 'REGULAR', NULL, 1),
 (600, 44, 160, 11, '2026-10-28', 'VALIDADE_LONGA', NULL, 2);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (601, 12, 160, 98, '2026-10-15', 'REGULAR', 8033, 3),
 (602, 14, 160, 130, '2027-01-05', 'VALIDADE_LONGA', 1577, 1),
@@ -2544,8 +2457,8 @@ VALUES
 (699, 27, 185, 97, '2026-10-09', 'ATENCAO', 3213, 1),
 (700, 25, 185, 104, '2026-10-09', 'ATENCAO', NULL, 1);
 
-INSERT INTO ProdutosGeladeira
-(id, idNotificacao, idGeladeira, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemGeladeira
+(id, idNotificacao, idGeladeira, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (701, 43, 185, 64, '2026-10-13', 'PROXIMO_VENCIMENTO', 4172, 2),
 (702, 35, 185, 86, '2026-10-14', 'PROXIMO_VENCIMENTO', 5838, 1),
@@ -2592,8 +2505,8 @@ VALUES
 (743, 25, 200, 48, '2026-10-07', 'ATENCAO', 4622, 3),
 (744, 33, 200, 42, '2026-10-10', 'ATENCAO', NULL, 1);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (1, 35, 2, 79, '2026-10-07', 'ATENCAO', 8725, 3),
 (2, 46, 2, 195, '2026-10-10', 'ATENCAO', 4320, 30),
@@ -2696,8 +2609,8 @@ VALUES
 (99, 5, 21, 182, '2026-10-02', 'VENCIDO', 7327, 5),
 (100, 12, 21, 17, '2026-10-22', 'REGULAR', 3329, 3);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (101, 31, 22, 41, '2026-10-15', 'REGULAR', 1224, 12),
 (102, 38, 22, 114, '2026-11-21', 'VALIDADE_LONGA', 4723, 36),
@@ -2800,8 +2713,8 @@ VALUES
 (199, 30, 42, 120, '2026-11-06', 'VALIDADE_LONGA', 7424, 2),
 (200, 37, 42, 116, '2027-04-05', 'VALIDADE_LONGA', 9327, 5);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (201, 40, 42, 120, '2026-10-15', 'REGULAR', 9224, 48),
 (202, 47, 42, 116, '2026-11-21', 'VALIDADE_LONGA', 1337, 12),
@@ -2904,8 +2817,8 @@ VALUES
 (299, 13, 61, 8, '2026-11-21', 'VALIDADE_LONGA', 7523, 8),
 (300, 22, 61, 182, '2026-10-15', 'REGULAR', 4636, 18);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (301, 29, 61, 16, '2026-10-09', 'ATENCAO', 9424, 2),
 (302, 19, 61, 85, '2026-10-03', 'VENCIDO', 3499, 5),
@@ -3008,8 +2921,8 @@ VALUES
 (399, 13, 82, 81, '2026-10-09', 'ATENCAO', 2260, 20),
 (400, 21, 82, 78, '2026-10-15', 'REGULAR', 3186, 1);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (401, 24, 82, 133, '2026-10-28', 'VALIDADE_LONGA', 5959, 24),
 (402, 35, 82, 63, '2026-10-09', 'ATENCAO', 4633, 12),
@@ -3112,8 +3025,8 @@ VALUES
 (499, 22, 101, 55, '2026-10-22', 'REGULAR', 6965, 20),
 (500, 29, 101, 56, '2026-12-06', 'VALIDADE_LONGA', 8288, 5);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (501, 12, 102, 11, '2026-10-05', 'VENCIDO', 1705, 18),
 (502, 20, 102, 20, '2026-10-12', 'PROXIMO_VENCIMENTO', 3010, 2),
@@ -3216,8 +3129,8 @@ VALUES
 (599, 36, 123, 11, '2026-11-21', 'VALIDADE_LONGA', 6739, 2),
 (600, 45, 123, 182, '2026-10-28', 'VALIDADE_LONGA', 3850, 3);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (601, 47, 126, 159, '2026-10-28', 'VALIDADE_LONGA', 9598, 18),
 (602, 6, 126, 116, '2027-02-04', 'VALIDADE_LONGA', 9935, 10),
@@ -3320,8 +3233,8 @@ VALUES
 (699, 27, 145, 56, '2026-10-04', 'VENCIDO', 1681, 40),
 (700, 35, 145, 59, '2026-10-08', 'ATENCAO', 2779, 12);
 
-INSERT INTO ProdutosFrigorifico
-(id, idNotificacao, idFrigorificos, idProdutos, dtValidade, status, lote, quantidade)
+INSERT INTO ItemFrigorifico
+(id, idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade)
 VALUES
 (701, 13, 145, 71, '2026-10-15', 'REGULAR', 4177, 10),
 (702, 22, 145, 186, '2026-11-06', 'VALIDADE_LONGA', 8873, 10),
@@ -3398,8 +3311,8 @@ VALUES
 (773, 38, 160, 44, '2026-10-15', 'REGULAR', 4328, 10),
 (774, 45, 160, 54, '2026-11-21', 'VALIDADE_LONGA', 5874, 25);
 
-INSERT INTO MarcasParceiras
-(id, idEmpresa, idProdutos, observacoes)
+INSERT INTO MarcaParceira
+(id, idEmpresa, idProduto, observacoes)
 VALUES
 (1, 'WZUFW710000112', 73, 'Fornecimento recorrente com entrega semanal programada para a unidade.'),
 (2, 'LQMTSF20000189', 78, 'Marca parceira para reposição quinzenal; condições comerciais renovadas a cada semestre.'),
@@ -3697,8 +3610,8 @@ VALUES
 (199, '98643361000150', NULL, 'Risoto de camarão', 'Prato nobre do menu.', 'Refogue cebola na manteiga, junte o arroz, deglaceie com vinho e acrescente caldo aos poucos. Finalize com camarões salteados e parmesão.', '2026-10-03', true),
 (200, 'YNDX1QC3000107', NULL, 'Filé ao molho madeira', 'Clássico do almoço executivo.', 'Grelhe o filé mignon no ponto, prepare o molho com vinho, cebola, cogumelos e manteiga e sirva sobre o filé.', '2026-10-04', false);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (1, 1, 58, 1),
 (2, 1, 6, 2),
@@ -3801,8 +3714,8 @@ VALUES
 (99, 17, 111, 1),
 (100, 17, 62, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (101, 17, 15, 1),
 (102, 17, 99, 1),
@@ -3905,8 +3818,8 @@ VALUES
 (199, 36, 24, 1),
 (200, 36, 75, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (201, 36, 11, 2),
 (202, 36, 188, 1),
@@ -4009,8 +3922,8 @@ VALUES
 (299, 54, 71, 1),
 (300, 54, 182, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (301, 54, 32, 1),
 (302, 54, 107, 1),
@@ -4113,8 +4026,8 @@ VALUES
 (399, 71, 106, 1),
 (400, 71, 169, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (401, 71, 86, 1),
 (402, 71, 161, 1),
@@ -4217,8 +4130,8 @@ VALUES
 (499, 90, 11, 2),
 (500, 90, 163, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (501, 90, 170, 1),
 (502, 91, 29, 1),
@@ -4321,8 +4234,8 @@ VALUES
 (599, 109, 109, 2),
 (600, 109, 99, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (601, 109, 192, 1),
 (602, 109, 169, 1),
@@ -4425,8 +4338,8 @@ VALUES
 (699, 127, 10, 1),
 (700, 127, 99, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (701, 127, 192, 1),
 (702, 127, 195, 1),
@@ -4529,8 +4442,8 @@ VALUES
 (799, 146, 8, 1),
 (800, 147, 30, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (801, 147, 177, 2),
 (802, 147, 161, 1),
@@ -4633,8 +4546,8 @@ VALUES
 (899, 166, 51, 1),
 (900, 166, 99, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (901, 166, 105, 1),
 (902, 166, 98, 1),
@@ -4737,8 +4650,8 @@ VALUES
 (999, 184, 99, 1),
 (1000, 184, 170, 1);
 
-INSERT INTO Ingredientes
-(id, idReceita, idProdutos, quantidade)
+INSERT INTO Ingrediente
+(id, idReceita, idProduto, quantidade)
 VALUES
 (1001, 185, 119, 1),
 (1002, 185, 83, 1),
@@ -5003,8 +4916,8 @@ VALUES
 (169, NULL, 'HK1HSTQ0000174', '2026-09-07'),
 (170, NULL, 'KSCMHHU0000180', '2026-08-08');
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (1, 1, 113, 2),
 (2, 1, 137, 1),
@@ -5107,8 +5020,8 @@ VALUES
 (99, 19, 124, 1),
 (100, 19, 11, 4);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (101, 19, 146, 2),
 (102, 20, 102, 2),
@@ -5211,8 +5124,8 @@ VALUES
 (199, 38, 100, 1),
 (200, 38, 24, 3);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (201, 39, 85, 2),
 (202, 39, 1, 1),
@@ -5315,8 +5228,8 @@ VALUES
 (299, 57, 29, 3),
 (300, 57, 155, 2);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (301, 58, 194, 1),
 (302, 58, 76, 2),
@@ -5419,8 +5332,8 @@ VALUES
 (399, 76, 86, 1),
 (400, 76, 150, 4);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (401, 76, 158, 2),
 (402, 77, 187, 1),
@@ -5523,8 +5436,8 @@ VALUES
 (499, 95, 133, 2),
 (500, 95, 159, 1);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (501, 95, 75, 2),
 (502, 95, 122, 2),
@@ -5627,8 +5540,8 @@ VALUES
 (599, 104, 126, 24),
 (600, 104, 20, 10);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (601, 104, 31, 36),
 (602, 104, 33, 48),
@@ -5731,8 +5644,8 @@ VALUES
 (699, 112, 81, 30),
 (700, 113, 49, 10);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (701, 113, 54, 20),
 (702, 113, 60, 8),
@@ -5835,8 +5748,8 @@ VALUES
 (799, 121, 116, 15),
 (800, 121, 75, 30);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (801, 121, 96, 36),
 (802, 121, 187, 48),
@@ -5939,8 +5852,8 @@ VALUES
 (899, 130, 196, 6),
 (900, 130, 73, 15);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (901, 130, 191, 24),
 (902, 130, 15, 10),
@@ -6043,8 +5956,8 @@ VALUES
 (999, 139, 186, 20),
 (1000, 139, 145, 8);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (1001, 139, 12, 15),
 (1002, 139, 77, 30),
@@ -6147,8 +6060,8 @@ VALUES
 (1099, 148, 81, 10),
 (1100, 148, 19, 20);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (1101, 148, 124, 20),
 (1102, 148, 40, 15),
@@ -6251,8 +6164,8 @@ VALUES
 (1199, 156, 123, 12),
 (1200, 156, 133, 24);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (1201, 156, 7, 10),
 (1202, 157, 38, 8),
@@ -6355,8 +6268,8 @@ VALUES
 (1299, 165, 16, 8),
 (1300, 165, 179, 6);
 
-INSERT INTO ProdutoLista
-(id, idListaCompras, idProdutos, quantidade)
+INSERT INTO ItemLista
+(id, idListaCompras, idProduto, quantidade)
 VALUES
 (1301, 165, 196, 12),
 (1302, 165, 73, 8),
@@ -6470,155 +6383,23 @@ VALUES
 (49, NULL, '4QIOO841000138', 'Casa do Padeiro Insumos - Unidade Belo Horizonte', '2026-09-14', 276.58),
 (50, '69362392690', NULL, 'Padaria Ponto Quente', '2026-09-16', 208.07);
 
-SELECT setval('marcasparceiras_id_seq', 79);
-SELECT setval('assinatura_id_seq', 300);
-SELECT setval('receita_id_seq', 200);
-SELECT setval('ingredientes_id_seq', 1084);
-SELECT setval('listacompras_id_seq', 170);
-SELECT setval('produtolista_id_seq', 1357);
-SELECT setval('produtos_id_seq', 200);
-SELECT setval('frigorificos_id_seq', 160);
-SELECT setval('produtosfrigorifico_id_seq', 774);
-SELECT setval('compra_id_seq', 50);
-SELECT setval('geladeira_id_seq', 200);
-SELECT setval('produtosgeladeira_id_seq', 744);
-SELECT setval('notificacao_id_seq', 50);
-SELECT setval('endereco_id_seq', 120);
+SELECT setval(pg_get_serial_sequence('MarcaParceira','id'), (SELECT MAX(id) FROM MarcaParceira));
+SELECT setval(pg_get_serial_sequence('Assinatura','id'), (SELECT MAX(id) FROM Assinatura));
+SELECT setval(pg_get_serial_sequence('Receita','id'), (SELECT MAX(id) FROM Receita));
+SELECT setval(pg_get_serial_sequence('Ingrediente','id'), (SELECT MAX(id) FROM Ingrediente));
+SELECT setval(pg_get_serial_sequence('ListaCompras','id'), (SELECT MAX(id) FROM ListaCompras));
+SELECT setval(pg_get_serial_sequence('ItemLista','id'), (SELECT MAX(id) FROM ItemLista));
+SELECT setval(pg_get_serial_sequence('Produto','id'), (SELECT MAX(id) FROM Produto));
+SELECT setval(pg_get_serial_sequence('Frigorifico','id'), (SELECT MAX(id) FROM Frigorifico));
+SELECT setval(pg_get_serial_sequence('ItemFrigorifico','id'), (SELECT MAX(id) FROM ItemFrigorifico));
+SELECT setval(pg_get_serial_sequence('Compra','id'), (SELECT MAX(id) FROM Compra));
+SELECT setval(pg_get_serial_sequence('Geladeira','id'), (SELECT MAX(id) FROM Geladeira));
+SELECT setval(pg_get_serial_sequence('ItemGeladeira','id'), (SELECT MAX(id) FROM ItemGeladeira));
+SELECT setval(pg_get_serial_sequence('Notificacao','id'), (SELECT MAX(id) FROM Notificacao));
+SELECT setval(pg_get_serial_sequence('Endereco','id'), (SELECT MAX(id) FROM Endereco));
 
 COMMIT;
 
-
-
-select * from produtosgeladeira where idGeladeira = 5
-
-select count(*) from geladeira
-
-
-
-
-
-
-
-
-/*
-Exercício 1: Usuários acima da média de valor estocado
-
-Calcule o valor total estocado por usuário nas geladeiras (quantidade * preco), ignorando itens com status VENCIDO. Liste nome, sobrenome, tipo de assinatura e valor estocado dos usuários acima da média geral, do maior para o menor.
-
-Tabelas: Usuario, Geladeira, ProdutosGeladeira, Produtos, Assinatura
-Dica: uma CTE para o total por usuário e outra para a média, e depois o JOIN.
 */
 
 
-with valor_estocado as(
-select 
-	u.cpf,
-	sum(pg.quantidade * p.preco) as total,
-	avg(total) as media_total
-	from produtosgeladeira pg
-	join geladeira g on g.id = pg.idgeladeira
-	join usuario u on u.cpf = g.idusuario
-	join produtos p on p.id = pg.idprodutos
-	where pg.status <> 'VENCIDO'
-	group by u.cpf
-),
-
-
-info_usu as(
-select 
-	u.nome,
-	u.sobrenome,
-	a.tipoassinatura,
-	ve.media_total
-	from valor_estocado ve
-	join usuario u on u.cpf = ve.cpf
-	join assinatura a on u.cpf = a.idusuario
-	where ve.total > ve.media_total
-	order by ve.total desc
-)
-
-select * from info_usu;
-
-
-
-
-
-
-
-
-
-
-
-/*
-Exercício 2: Receitas que o usuário consegue fazer
-
-Para cada receita de usuário (idUsuario não nulo), conte quantos ingredientes ela exige e quantos deles o dono tem em alguma geladeira dele, com status diferente de VENCIDO. Liste as receitas em que o usuário tem todos os ingredientes, com nome da receita, nome do usuário e foiFeita.
-
-Tabelas: Receita, Ingredientes, Geladeira, ProdutosGeladeira
-Dica: uma CTE com o total de ingredientes por receita e outra com os ingredientes disponíveis. Cuidado para não contar o mesmo produto duas vezes se ele estiver em duas geladeiras (COUNT(DISTINCT ...)).
-Exercício 3: Categoria dominante por empresa
-
-Para cada empresa com assinatura COMERCIAL, descubra a categoria de produto com maior quantidade total nos seus frigoríficos. Retorne nome da empresa, categoria e quantidade total.
-
-Tabelas: Empresa, Assinatura, Frigorificos, ProdutosFrigorifico, Produtos
-Dica: CTE com soma por empresa e categoria, e depois ROW_NUMBER() ou RANK() para pegar a 1ª de cada empresa. Pense no que acontece em caso de empate.
-Exercício 4: Estoque unificado vencendo em 7 dias
-
-Crie uma CTE que una (UNION ALL) os itens de ProdutosGeladeira e ProdutosFrigorifico com as colunas origem (‘GELADEIRA’ ou ‘FRIGORIFICO’), idProdutos, dtValidade e quantidade. Depois, mostre os 5 produtos com maior quantidade total que vencem entre hoje e hoje + 7 dias, com nome, categoria, quantidade na geladeira, quantidade no frigorífico e total.
-
-Dica: na consulta final, use SUM(...) FILTER (WHERE origem = ...) ou CASE para separar as duas origens.
-Exercício 5: Calendário de vencimentos (CTE recursiva)
-
-Gere com uma CTE recursiva todos os dias de 01/10/2026 a 31/10/2026. Faça um LEFT JOIN com ProdutosGeladeira e mostre, para cada dia, quantos itens vencem e a soma das quantidades. Dias sem vencimentos devem aparecer com 0.
-
-Dica: estrutura WITH RECURSIVE dias AS (SELECT ... UNION ALL SELECT dia + 1 ... WHERE dia < ...). Atenção ao COALESCE e ao tipo date.
-Parte 2: Query correlacionada
-Exercício 1: Itens acima da média do próprio produto
-
-Liste os itens de ProdutosGeladeira cuja quantidade é maior que a média de quantidade daquele mesmo produto em todas as geladeiras. Mostre o nome do produto, o id da geladeira, a quantidade e a média do produto.
-
-Dica: a subquery no WHERE referencia idProdutos da query externa. Você pode repetir a mesma subquery no SELECT para exibir a média.
-Exercício 2: Item que vence primeiro em cada geladeira
-
-Para cada geladeira, retorne o item com a menor dtValidade entre os itens que ainda não estão VENCIDO: nome da geladeira, nome do dono, nome do produto e data. Use subquery correlacionada no WHERE, sem ROW_NUMBER.
-
-Dica: WHERE dtValidade = (SELECT MIN(...) FROM ProdutosGeladeira x WHERE x.idGeladeira = pg.idGeladeira AND x.status <> 'VENCIDO'). Lembre de repetir o filtro de status na query externa e pense nos empates.
-Exercício 3: Produtos estocados que nunca viraram ingrediente
-
-Liste os produtos que existem em alguma geladeira (EXISTS) e que nunca foram usados como ingrediente de receita (NOT EXISTS). Mostre nome, categoria e a quantidade total estocada nas geladeiras (essa quantidade pode ser outra subquery correlacionada no SELECT).
-
-Tabelas: Produtos, ProdutosGeladeira, Ingredientes
-Exercício 4: Painel por empresa com subqueries no SELECT
-
-Para cada empresa com assinatura COMERCIAL, retorne com subqueries correlacionadas no SELECT:
-
-nome da empresa;
-quantidade de frigoríficos;
-quantidade de itens VENCIDO nesses frigoríficos;
-data da última compra da empresa (MAX(dtCompra)).
-
-Ordene por itens vencidos, do maior para o menor, e depois por nome.
-
-Dica: o item 3 precisa de ProdutosFrigorifico ligado a Frigorificos dentro da subquery. Empresas sem compra devem aparecer com NULL.
-Exercício 5: Preço acima da média da categoria
-
-Liste os produtos com preço maior que a média da sua própria categoria e que aparecem em pelo menos uma lista de compras de usuário (não de empresa), usando EXISTS correlacionado. Mostre nome, categoria, preço, média da categoria e a diferença percentual.
-
-Tabelas: Produtos, ProdutoLista, ListaCompras
-Dica: duas correlações: uma para a média (por categoria) e outra no EXISTS (por idProdutos, filtrando idUsuario IS NOT NULL).
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	

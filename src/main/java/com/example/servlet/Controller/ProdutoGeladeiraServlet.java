@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-@WebServlet(urlPatterns = {"/tela-padrao-pg",
-        "/inserir-pg",
-        "/alterar-pg",
-        "/deletar-pg",
-        "/busca-pg"},
+@WebServlet(urlPatterns = {"/tela-padrao-ig",
+        "/inserir-ig",
+        "/alterar-ig",
+        "/deletar-ig",
+        "/busca-ig"},
         name = "produtoGeladeira")
 public class ProdutoGeladeiraServlet extends HttpServlet {
     private ProdutosGeladeiraDAO pgDao;
@@ -41,10 +41,10 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
 
     // Caminhos das páginas
     private static final String jsp_login = "/assets/pages/login.jsp";
-    private static final String JSP_INSERIR = "/assets/pages/inserir-pg.jsp";
-    private static final String JSP_ALTERAR = "/assets/pages/alterar-pg.jsp";
-    private static final String JSP_DELETAR = "/assets/pages/deletar-pg.jsp";
-    private static final String URL_LISTA = "/tela-padrao-pg";
+    private static final String JSP_INSERIR = "/assets/pages/inserir-ig.jsp";
+    private static final String JSP_ALTERAR = "/assets/pages/alterar-ig.jsp";
+    private static final String JSP_DELETAR = "/assets/pages/deletar-ig.jsp";
+    private static final String URL_LISTA = "/tela-padrao-ig";
 
     @Override
     public void init() {
@@ -69,10 +69,10 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
 
         // qual ação?
         switch (req.getServletPath()) {
-            case "/inserir-pg":
+            case "/inserir-ig":
                 inserir(req, resp, usuario);
                 break;
-            case "alterar-pg":
+            case "alterar-ig":
 
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -158,9 +158,9 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
 
         Produto produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
 
-        ProdutosGeladeira pg = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
+        ProdutosGeladeira ig = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
 
-        if (!gravarProdutoEItem(produto, pg)) {
+        if (!gravarProdutoEItem(produto, ig)) {
             voltarComErro(req, resp, "Não foi possível salvar o produto. Tente novamente.");
             return;
         }
@@ -242,19 +242,19 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
 
         Produto produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
 
-        ProdutosGeladeira pg = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
+        ProdutosGeladeira ig = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
 
     }
 
     // ================= GRAVAR PRODUTO + ITEM =================
-    private boolean gravarProdutoEItem(Produto produto, ProdutosGeladeira pg) {
+    private boolean gravarProdutoEItem(Produto produto, ProdutosGeladeira ig) {
         // grava o produto.
         if (prodDao.inserirProduto(produto) != 1) {
             return false;
         }
 
         // grava o item da geladeira
-        if (pgDao.inserirProdutoGeladeira(pg) == 1) {
+        if (pgDao.inserirProdutoGeladeira(ig) == 1) {
             return true;
         }
 

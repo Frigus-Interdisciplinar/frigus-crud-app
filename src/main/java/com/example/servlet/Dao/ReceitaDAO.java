@@ -100,18 +100,18 @@ public class ReceitaDAO {
             String comandoSql = "SELECT count(*) " +
                     "FROM Receita r " +
                     "WHERE r.idUsuario = ? " +
-                    "  AND EXISTS (SELECT 1 FROM Ingredientes i0 WHERE i0.idReceita = r.id) " +
+                    "  AND EXISTS (SELECT 1 FROM Ingrediente i0 WHERE i0.idReceita = r.id) " +
                     "  AND NOT EXISTS ( " +
                     "        SELECT 1 " +
-                    "        FROM Ingredientes i " +
+                    "        FROM Ingrediente i " +
                     "        WHERE i.idReceita = r.id " +
                     "          AND i.quantidade > COALESCE(( " +
-                    "                SELECT SUM(pg.quantidade) " +
-                    "                FROM ProdutosGeladeira pg " +
-                    "                JOIN Geladeira g ON g.id = pg.idGeladeira " +
+                    "                SELECT SUM(ig.quantidade) " +
+                    "                FROM ItemGeladeira ig " +
+                    "                JOIN Geladeira g ON g.id = ig.idGeladeira " +
                     "                WHERE g.idUsuario   = r.idUsuario " +
-                    "                  AND pg.idProdutos = i.idProdutos " +
-                    "                  AND pg.dtValidade >= CURRENT_DATE " +
+                    "                  AND ig.idProduto = i.idProduto " +
+                    "                  AND ig.dtValidade >= CURRENT_DATE " +
                     "          ), 0) " +
                     "  );";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -140,20 +140,20 @@ public class ReceitaDAO {
         try{
             String comandoSql = """
         WITH estoque AS (
-            SELECT pg.idProdutos, SUM(pg.quantidade) AS qtd
-            FROM ProdutosGeladeira pg
-            JOIN Geladeira g ON g.id = pg.idGeladeira
+            SELECT ig.idProduto, SUM(ig.quantidade) AS qtd
+            FROM ItemGeladeira ig
+            JOIN Geladeira g ON g.id = ig.idGeladeira
             WHERE g.idUsuario = ?
-              AND pg.dtValidade >= CURRENT_DATE
-            GROUP BY pg.idProdutos
+              AND ig.dtValidade >= CURRENT_DATE
+            GROUP BY ig.idProduto
         )
         SELECT r.id,
                r.nome,
                COUNT(*) AS total_ingredientes,
                COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
         FROM Receita r
-        JOIN Ingredientes i ON i.idReceita  = r.id
-        LEFT JOIN estoque e ON e.idProdutos = i.idProdutos
+        JOIN Ingrediente i ON i.idReceita  = r.id
+        LEFT JOIN estoque e ON e.idProduto = i.idProduto
         WHERE r.idUsuario = ?
         GROUP BY r.id, r.nome
         ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
@@ -280,18 +280,18 @@ public class ReceitaDAO {
             SELECT COUNT(*)
             FROM Receita r
             WHERE r.idEmpresa = ?
-              AND EXISTS (SELECT 1 FROM Ingredientes i0 WHERE i0.idReceita = r.id)
+              AND EXISTS (SELECT 1 FROM Ingrediente i0 WHERE i0.idReceita = r.id)
               AND NOT EXISTS (
                     SELECT 1
-                    FROM Ingredientes i
+                    FROM Ingrediente i
                     WHERE i.idReceita = r.id
                       AND i.quantidade > COALESCE((
-                            SELECT SUM(pf.quantidade)
-                            FROM ProdutosFrigorifico pf
-                            JOIN Frigorificos f ON f.id = pf.idFrigorificos
+                            SELECT SUM(if.quantidade)
+                            FROM ItemFrigorifico if
+                            JOIN Frigorifico f ON f.id = if.idFrigorifico
                             WHERE f.idEmpresa   = r.idEmpresa
-                              AND pf.idProdutos = i.idProdutos
-                              AND pf.dtValidade >= CURRENT_DATE
+                              AND if.idProduto = i.idProduto
+                              AND if.dtValidade >= CURRENT_DATE
                       ), 0)
               )
         """;
@@ -322,20 +322,20 @@ public class ReceitaDAO {
         try{
             String comandoSql = """
         WITH estoque AS (
-            SELECT pf.idProdutos, SUM(pf.quantidade) AS qtd
-            FROM Produtosfrigorifico pf
-            JOIN frigorificos f ON f.id = pf.idFrigorificos
+            SELECT if.idProduto, SUM(if.quantidade) AS qtd
+            FROM ItemFrigorifico if
+            JOIN Frigorifico f ON f.id = if.idFrigorifico
             WHERE f.idEmpresa = ?
-              AND pf.dtValidade >= CURRENT_DATE
-            GROUP BY pf.idProdutos
+              AND if.dtValidade >= CURRENT_DATE
+            GROUP BY if.idProduto
         )
         SELECT r.id,
                r.nome,
                COUNT(*) AS total_ingredientes,
                COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
         FROM Receita r
-        JOIN Ingredientes i ON i.idReceita  = r.id
-        LEFT JOIN estoque e ON e.idProdutos = i.idProdutos
+        JOIN Ingrediente i ON i.idReceita  = r.id
+        LEFT JOIN estoque e ON e.idProduto = i.idProduto
         WHERE r.idEmpresa = ?
         GROUP BY r.id, r.nome
         ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
