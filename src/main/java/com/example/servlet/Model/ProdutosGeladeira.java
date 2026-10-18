@@ -14,6 +14,8 @@ public class ProdutosGeladeira {
     private StatusProduto status;
     private int lote;
     private int quantidade;
+    // atributo para ver quanto tempo cada produto ainda tem antes de vencer ( é algo a mais para a tela geral do site )
+    private int tempoRestante;
 
     // Construtor vazio
     public ProdutosGeladeira() {
@@ -117,6 +119,14 @@ public class ProdutosGeladeira {
 
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public int getTempoRestante() {
+        return tempoRestante;
+    }
+
+    public void setTempoRestante(int tempoRestante) {
+        this.tempoRestante = tempoRestante;
     }
 
     @Override

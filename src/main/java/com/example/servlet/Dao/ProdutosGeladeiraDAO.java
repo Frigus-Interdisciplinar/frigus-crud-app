@@ -7,6 +7,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.Categoria;
 import com.example.servlet.Util.Enum.StatusArmazenamento;
+import com.example.servlet.Util.Enum.StatusProduto;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -16,11 +17,11 @@ import java.util.List;
 public class ProdutosGeladeiraDAO {
 
     //==============INSERIR===============
-    public int inserirProdutoGeladeira(ProdutosGeladeira pg){
+    public int inserirProdutoGeladeira(ProdutosGeladeira pg) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
-        try{
+        try {
             // insere as informações relacionada aos produtos domesticos
             String comandoSql = "insert into ProdutosGeladeira (idNotificacao, idGeladeira, idProdutos, DtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
@@ -33,32 +34,28 @@ public class ProdutosGeladeiraDAO {
             pstmt.setInt(6, pg.getLote());
             pstmt.setInt(7, pg.getQuantidade());
 
-            if (pstmt.executeUpdate() > 0){
+            if (pstmt.executeUpdate() > 0) {
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
                 if (chaves.next()) pg.setIdProdutosGeladeira(chaves.getInt(1));
                 return 1;// verifica se deu certo
-            }
-            else {
+            } else {
                 return 0;// não foi posivel executar
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
             return -1;// erro!!
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);// desconectar
         }
     }//==============INSERIR===============
 
 
-
     //==============ATUALIZAR===============
-    public int alterarProdutoGeladeira(ProdutosGeladeira pgAntiga, ProdutosGeladeira pgNova){
+    public int alterarProdutoGeladeira(ProdutosGeladeira pgAntiga, ProdutosGeladeira pgNova) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
-        try{
+        try {
             // altera as informações relacionada aos produtos domesticos
             String comandoSql = "Update ProdutosGeladeira set idNotificacao = ?, idGeladeira = ?, idProdutos = ?, DtValidade = ?, status = ?, lote = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -72,29 +69,26 @@ public class ProdutosGeladeiraDAO {
             pstmt.setInt(7, pgNova.getQuantidade());
             pstmt.setInt(8, pgAntiga.getIdProdutosGeladeira());
 
-            if (pstmt.executeUpdate() > 0){
+            if (pstmt.executeUpdate() > 0) {
                 return 1;// verifica se deu certo
-            }
-            else {
+            } else {
                 return 0;// não foi posivel executar
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
             return -1;
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);// desconectar
         }
     }//==============ATUALIZAR===============
 
 
     //==============DELETAR===============
-    public int deletarProdutoGeladeira(ProdutosGeladeira pg){
+    public int deletarProdutoGeladeira(ProdutosGeladeira pg) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
-        try{
+        try {
             // deleta as informações relacionada aos produtos domesticos
             String comandoSql = "delete from ProdutosGeladeira where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -102,42 +96,32 @@ public class ProdutosGeladeiraDAO {
             pstmt.setInt(1, pg.getIdProdutosGeladeira());
 
 
-            if (pstmt.executeUpdate() > 0){
+            if (pstmt.executeUpdate() > 0) {
                 return 1;// verifica se deu certo
-            }
-            else {
+            } else {
                 return 0;// não foi posivel executar
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
             return -1;
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);// desconectar
         }
     }//==============DELETAR===============
-
-
-
-
-
-
-
 
 
     // ========= BUSCAR =========
 
 
     // LISTA DE PRODUTOS PARA O DOMÉSTICO - TABELA produtoGeladeira
-    public List<ProdutosGeladeira> buscarTodosProdutosGeladeira(int idGeladeira){
+    public List<ProdutosGeladeira> buscarTodosProdutosGeladeira(int idGeladeira) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar(); // abrindo a conexão com o banco
 
         List<ProdutosGeladeira> lista = new ArrayList<>();// cria a lista de todos os produtos
         ResultSet rset = null; // consulta a tabela
 
-        try{
+        try {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
                     "       g.id as idGeladeira, g.idUsuario, g.nome as nomeGeladeira, g.status, g.tipo " +
@@ -151,7 +135,7 @@ public class ProdutosGeladeiraDAO {
             rset = pstmt.executeQuery(); // executa a consulta SQL
 
             // armazena os valores em um list<>
-            while (rset.next()){
+            while (rset.next()) {
                 Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
@@ -187,29 +171,24 @@ public class ProdutosGeladeiraDAO {
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
                 lista.add(pg);
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn); // fechando a conexão
         }
         return lista;
     } // LISTA DE PRODUTOS PARA O DOMÉSTICO - TABELA produtoGeladeira
 
 
-
-
-
     // BUSCAR PRODUTOS NA TABELA produtoGeladeira PELO LOTE
-    public List<ProdutosGeladeira> buscarProdutosGeladeiraPeloLote(int lote){
+    public List<ProdutosGeladeira> buscarProdutosGeladeiraPeloLote(int lote) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         List<ProdutosGeladeira> lista = new ArrayList<>();
         ResultSet rset = null;
 
-        try{
+        try {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
                     "       g.id as idGeladeira, g.idUsuario, g.nome as nomeGeladeira, g.status, g.tipo " +
@@ -221,7 +200,7 @@ public class ProdutosGeladeiraDAO {
             pstmt.setInt(1, lote);
             rset = pstmt.executeQuery();
 
-            while (rset.next()){
+            while (rset.next()) {
                 Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
@@ -257,11 +236,9 @@ public class ProdutosGeladeiraDAO {
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
                 lista.add(pg);
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);
         }
         return lista;
@@ -269,14 +246,14 @@ public class ProdutosGeladeiraDAO {
 
 
     // BUSCAR PRODUTOS PELA DATA DE VALIDADE
-    public List<ProdutosGeladeira> buscarProdutosGeladeiraPorValidade(LocalDate dtValidade){
+    public List<ProdutosGeladeira> buscarProdutosGeladeiraPorValidade(LocalDate dtValidade) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         List<ProdutosGeladeira> lista = new ArrayList<>();
         ResultSet rset = null;
 
-        try{
+        try {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
                     "       g.id as idGeladeira, g.idUsuario, g.nome as nomeGeladeira, g.status, g.tipo " +
@@ -289,7 +266,7 @@ public class ProdutosGeladeiraDAO {
             pstmt.setObject(1, dtValidade);
             rset = pstmt.executeQuery();
 
-            while(rset.next()){
+            while (rset.next()) {
                 Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
@@ -326,27 +303,24 @@ public class ProdutosGeladeiraDAO {
                 lista.add(pg);
             }
 
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);
         }
         return lista;
     }// BUSCAR PRODUTOS PELA DATA DE VALIDADE
 
 
-
     // BUSCAR 1 PRODUTO DA GELADEIRA POR ID DO PRODUTO
-    public ProdutosGeladeira buscarProdutoGeladeiraPorId(int idProdutoGeladeira){
+    public ProdutosGeladeira buscarProdutoGeladeiraPorId(int idProdutoGeladeira) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         ResultSet rset = null;
         ProdutosGeladeira pg = null;
 
-        try{
+        try {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
                     "       g.id as idGeladeira, g.idUsuario, g.nome as nomeGeladeira, g.status, g.tipo " +
@@ -357,7 +331,7 @@ public class ProdutosGeladeiraDAO {
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             pstmt.setInt(1, idProdutoGeladeira);// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
-            if (rset.next()){
+            if (rset.next()) {
                 Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
@@ -392,28 +366,24 @@ public class ProdutosGeladeiraDAO {
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);
         }
         return pg;
     }// BUSCAR 1 PRODUTO DA GELADEIRA POR ID DO PRODUTO
 
 
-
-
     // BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
-    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(String nome){
+    public ProdutosGeladeira buscarProdutoGeladeiraPeloNome(String nome) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         ResultSet rset = null;
         ProdutosGeladeira pg = null;
 
-        try{
+        try {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidademedida, " +
                     "       pg.id as idProdutosGeladeira, pg.idNotificacao, pg.dtValidade, pg.lote, pg.quantidade, " +
                     "       g.id as idGeladeira, g.idUsuario, g.nome as nomeGeladeira, g.status, g.tipo " +
@@ -422,9 +392,9 @@ public class ProdutosGeladeiraDAO {
                     "join geladeira g on g.id = pg.idGeladeira " +
                     "where lower(p.nome) like ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1,  "%" + nome.toLowerCase() + "%");// setando os parâmetros da instrução
+            pstmt.setString(1, "%" + nome.toLowerCase() + "%");// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
-            if (rset.next()){
+            if (rset.next()) {
                 Produto produto = new Produto(
                         rset.getString("nome"),
                         rset.getString("descricao"),
@@ -459,13 +429,162 @@ public class ProdutosGeladeiraDAO {
                 );
                 pg.setIdProdutosGeladeira(rset.getInt("idProdutosGeladeira"));
             }
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-        }
-        finally {
+        } finally {
             conexao.desconectar(conn);
         }
         return pg;
     }// BUSCAR 1 PRODUTO NA TABELA produtoGeladeira PELO NOME
+
+    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
+    public List<ProdutosGeladeira> produtosPertoValidade(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        List<ProdutosGeladeira> lista = new ArrayList<>();
+
+        try {
+            String comandoSql = "select p.nome as produto, g.nome as geladeira, pg.quantidade, pg.status, (pg.dtValidade - current_date) as tempoRestante " +
+                    "from produtosGeladeira pg " +
+                    "join geladeira g on pg.idGeladeira = g.id " +
+                    "join produtos p on pg.idProdutos = p.id " +
+                    "where g.idUsuario = ? " +
+                    "order by pg.dtValidade " +
+                    "limit 5;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                Produto p = new Produto();
+                p.setNome(rset.getString("produto"));
+
+                Geladeira g = new Geladeira();
+                g.setNome(rset.getString("geladeira"));
+
+                ProdutosGeladeira pg = new ProdutosGeladeira();
+                pg.setProduto(p);
+                pg.setGeladeira(g);
+                pg.setQuantidade(rset.getInt("quantidade"));
+                pg.setStatus(StatusProduto.valueOf(rset.getString("status")));
+                pg.setTempoRestante(rset.getInt("tempoRestante"));
+                lista.add(pg);
+            }
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return lista;
+    }
+    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
+
+
+
+    // TOTAL DE PRODUTOS VENCIDOS
+    public int totalProdutosVencidos(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosGeladeira pg " +
+                    "join geladeira g on pg.idGeladeira = g.id " +
+                    "join produtos p on pg.idProdutos = p.id " +
+                    "where g.idUsuario = ?  and pg.status = 'VENCIDO';";
+
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS VENCIDOS
+
+
+
+    // TOTAL DE PRODUTOS ARMAZENADOS
+    public int totalProdutosArmazenados(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosGeladeira pg " +
+                    "join geladeira g on pg.idGeladeira = g.id " +
+                    "join produtos p on pg.idProdutos = p.id " +
+                    "where g.idUsuario = ?;";
+
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS ARMAZENADOS
+
+
+
+
+    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
+    public int totalProdutosProximoVencimento(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosGeladeira pg " +
+                    "join geladeira g on pg.idGeladeira = g.id " +
+                    "join produtos p on pg.idProdutos = p.id " +
+                    "where g.idUsuario = ?  and pg.status in ('ATENCAO', 'PROXIMO_VENCIMENTO');";
+
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cpf);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
+
 }

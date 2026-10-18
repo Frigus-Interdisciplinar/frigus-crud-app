@@ -183,7 +183,7 @@ public class IngredienteDAO {
 
 
     //METODO PARA BUSCAR 1 RECEITA
-    public List<Ingredientes> buscarReceita(int idReceita){
+    public List<Ingredientes> buscarReceita(String nome){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -213,11 +213,11 @@ public class IngredienteDAO {
                     "FROM ingredientes i " +
                     "JOIN produtos p ON p.id = i.idProdutos " +
                     "JOIN receita r ON r.id = i.idReceita " +
-                    "WHERE r.id = ?";
+                    "WHERE lower(r.nome) like ?";
 
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
-            pstmt.setInt(1, idReceita);
+            pstmt.setString(1, nome);
             rset = pstmt.executeQuery();
 
             while (rset.next()){

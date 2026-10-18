@@ -187,4 +187,28 @@ public class GeladeiraDAO {
         }
         return geladeira;
     }// ==============BUSCAR UMA GELADEIRA PELO ID DO USUARIO E PELO ID DA GELADEIRA ===============
+
+    // TOTAL DE GELADEIRAS
+    public int totalGeladeirasUsuario(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        int total = 0;
+        ResultSet rset = null;
+        try {
+            String comandoSql = "select count(*) as total from geladeira where idUsuario = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cpf);
+            rset = pstmt.executeQuery();
+
+            if(rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return total;
+    }
+    // TOTAL DE GELADEIRAS
 }

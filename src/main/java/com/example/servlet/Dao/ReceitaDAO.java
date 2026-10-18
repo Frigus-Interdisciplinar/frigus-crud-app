@@ -1,9 +1,12 @@
 package com.example.servlet.Dao;
 
+import com.example.servlet.Dto.SugestaoReceita;
 import com.example.servlet.Model.Receita;
 import com.example.servlet.Util.Conexao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReceitaDAO {
 
@@ -81,6 +84,107 @@ public class ReceitaDAO {
         }
 
     }// ========== ALTERAR RECEITA DO USUARIO ==========
+
+
+
+
+
+    // RECEITAS DISPONIVEIS - USUARIO
+    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+    public int totalReceitasDisponiveisUsuario(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        ResultSet rset = null;
+
+        try {
+            String comandoSql = "SELECT count(*) " +
+                    "FROM Receita r " +
+                    "WHERE r.idUsuario = ? " +
+                    "  AND EXISTS (SELECT 1 FROM Ingredientes i0 WHERE i0.idReceita = r.id) " +
+                    "  AND NOT EXISTS ( " +
+                    "        SELECT 1 " +
+                    "        FROM Ingredientes i " +
+                    "        WHERE i.idReceita = r.id " +
+                    "          AND i.quantidade > COALESCE(( " +
+                    "                SELECT SUM(pg.quantidade) " +
+                    "                FROM ProdutosGeladeira pg " +
+                    "                JOIN Geladeira g ON g.id = pg.idGeladeira " +
+                    "                WHERE g.idUsuario   = r.idUsuario " +
+                    "                  AND pg.idProdutos = i.idProdutos " +
+                    "                  AND pg.dtValidade >= CURRENT_DATE " +
+                    "          ), 0) " +
+                    "  );";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cpf);
+            rset = pstmt.executeQuery();
+            if(rset.next()) return rset.getInt(1);
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+
+        return 0;
+    }
+    // RECEITAS DISPONIVEIS - USUARIO
+    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+
+
+    // SUGESTOES DE RECEITA
+    public List<SugestaoReceita> listarSugestoesUsuario(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        List<SugestaoReceita> lista = new ArrayList<>();
+        ResultSet rs = null;
+        try{
+            String comandoSql = """
+        WITH estoque AS (
+            SELECT pg.idProdutos, SUM(pg.quantidade) AS qtd
+            FROM ProdutosGeladeira pg
+            JOIN Geladeira g ON g.id = pg.idGeladeira
+            WHERE g.idUsuario = ?
+              AND pg.dtValidade >= CURRENT_DATE
+            GROUP BY pg.idProdutos
+        )
+        SELECT r.id,
+               r.nome,
+               COUNT(*) AS total_ingredientes,
+               COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
+        FROM Receita r
+        JOIN Ingredientes i ON i.idReceita  = r.id
+        LEFT JOIN estoque e ON e.idProdutos = i.idProdutos
+        WHERE r.idUsuario = ?
+        GROUP BY r.id, r.nome
+        ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
+                 r.nome
+        LIMIT 3
+        """;
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+
+            pstmt.setString(1, cpf);
+            pstmt.setString(2, cpf);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                lista.add(new SugestaoReceita(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getInt("total_ingredientes"),
+                        rs.getInt("ingredientes_disponiveis")
+                ));
+            }
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return lista;
+    }
+    // SUGESTOES DE RECEITA
+
 
 
     // ================== USUARIO ==================
@@ -164,6 +268,106 @@ public class ReceitaDAO {
     }// ========== ALTERAR RECEITA DA EMPRESA ==========
 
 
+    // RECEITAS DISPONIVEIS - EMPRESA
+    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+    public int totalReceitasDisponiveisEmpresa(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        ResultSet rset = null;
+
+        try {
+            String comandoSql = """
+            SELECT COUNT(*)
+            FROM Receita r
+            WHERE r.idEmpresa = ?
+              AND EXISTS (SELECT 1 FROM Ingredientes i0 WHERE i0.idReceita = r.id)
+              AND NOT EXISTS (
+                    SELECT 1
+                    FROM Ingredientes i
+                    WHERE i.idReceita = r.id
+                      AND i.quantidade > COALESCE((
+                            SELECT SUM(pf.quantidade)
+                            FROM ProdutosFrigorifico pf
+                            JOIN Frigorificos f ON f.id = pf.idFrigorificos
+                            WHERE f.idEmpresa   = r.idEmpresa
+                              AND pf.idProdutos = i.idProdutos
+                              AND pf.dtValidade >= CURRENT_DATE
+                      ), 0)
+              )
+        """;
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cnpj);
+            rset = pstmt.executeQuery();
+            if(rset.next()) return rset.getInt(1);
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+
+        return 0;
+    }
+    // RECEITAS DISPONIVEIS - EMPRESA
+    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+
+
+
+    // SUGESTOES DE RECEITA
+    public List<SugestaoReceita> listarSugestoesEmpresa(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+        List<SugestaoReceita> lista = new ArrayList<>();
+        ResultSet rs = null;
+        try{
+            String comandoSql = """
+        WITH estoque AS (
+            SELECT pf.idProdutos, SUM(pf.quantidade) AS qtd
+            FROM Produtosfrigorifico pf
+            JOIN frigorificos f ON f.id = pf.idFrigorificos
+            WHERE f.idEmpresa = ?
+              AND pf.dtValidade >= CURRENT_DATE
+            GROUP BY pf.idProdutos
+        )
+        SELECT r.id,
+               r.nome,
+               COUNT(*) AS total_ingredientes,
+               COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
+        FROM Receita r
+        JOIN Ingredientes i ON i.idReceita  = r.id
+        LEFT JOIN estoque e ON e.idProdutos = i.idProdutos
+        WHERE r.idEmpresa = ?
+        GROUP BY r.id, r.nome
+        ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
+                 r.nome
+        LIMIT 3
+        """;
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+
+            pstmt.setString(1, cnpj);
+            pstmt.setString(2, cnpj);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                lista.add(new SugestaoReceita(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getInt("total_ingredientes"),
+                        rs.getInt("ingredientes_disponiveis")
+                ));
+            }
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return lista;
+    }
+    // SUGESTOES DE RECEITA
+
+
 
     // ================== EMPRESA ==================
 
@@ -196,4 +400,5 @@ public class ReceitaDAO {
         }
 
     }// ========== DELETAR RECEITA UNIVERSAL ==========
+
 }

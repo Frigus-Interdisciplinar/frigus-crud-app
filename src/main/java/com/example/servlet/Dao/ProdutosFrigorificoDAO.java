@@ -5,7 +5,6 @@ import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.Categoria;
 import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Enum.StatusProduto;
-import com.example.servlet.Util.Service.ArmazenamentoService;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -504,4 +503,149 @@ public class ProdutosFrigorificoDAO {
         }
         return pf;
     }// BUSCAR 1 PRODUTO NA TABELA produtoFrigorificos PELO NOME
+
+
+    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
+    public List<ProdutosFrigorifico> produtosPertoValidade(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        List<ProdutosFrigorifico> lista = new ArrayList<>();
+
+        try {
+            String comandoSql = "select p.nome as produto, f.nome as frigorifico, pf.quantidade, pf.status, (pf.dtValidade - current_date) as tempoRestante " +
+                    "from produtosFrigorifico pf " +
+                    "join Frigorificos f on pf.idFrigorificos = f.id " +
+                    "join produtos p on pf.idProdutos = p.id " +
+                    "where f.idEmpresa = ? " +
+                    "order by pf.dtValidade " +
+                    "limit 5;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                Produto p = new Produto();
+                p.setNome(rset.getString("produto"));
+
+                Frigorificos f = new Frigorificos();
+                f.setNome(rset.getString("frigorifico"));
+
+                ProdutosFrigorifico pf = new ProdutosFrigorifico();
+                pf.setProduto(p);
+                pf.setFrigorificos(f);
+                pf.setQuantidade(rset.getInt("quantidade"));
+                pf.setStatus(StatusProduto.valueOf(rset.getString("status")));
+                pf.setTempoRestante(rset.getInt("tempoRestante"));
+                lista.add(pf);
+            }
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return lista;
+    }
+    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
+
+
+
+
+    // TOTAL DE PRODUTOS VENCIDOS
+    public int totalProdutosVencidos(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosFrigorifico pf " +
+                    "join Frigorificos f on pf.idFrigorificos = f.id " +
+                    "join produtos p on pf.idProdutos = p.id " +
+                    "where f.idEmpresa = ? and pf.status = 'VENCIDO';";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS VENCIDOS
+
+
+
+    // TOTAL DE PRODUTOS ARMAZENADOS
+    public int totalProdutosArmazenados(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosFrigorifico pf " +
+                    "join Frigorificos f on pf.idFrigorificos = f.id " +
+                    "join produtos p on pf.idProdutos = p.id " +
+                    "where f.idEmpresa = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS ARMAZENADOS
+
+
+
+    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
+    public int totalProdutosProximoVencimento(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexão do o banco
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try {
+            String comandoSql = "select count(*) " +
+                    "from produtosFrigorifico pf " +
+                    "join Frigorificos f on pf.idFrigorificos = f.id " +
+                    "join produtos p on pf.idProdutos = p.id " +
+                    "where f.idEmpresa = ? and pf.status in ('ATENCAO', 'PROXIMO_VENCIMENTO');";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando os valores para a operação
+            pstmt.setString(1, cnpj);
+
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechado a conexão com o banco
+        }
+        return total;
+    }
+    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
 }

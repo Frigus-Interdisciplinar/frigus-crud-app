@@ -123,6 +123,7 @@ public class Planos extends HttpServlet {
                 } else {
                     resp.sendRedirect(req.getContextPath() + jsp_criar_plano_usu);
                 }
+                resp.setHeader("");
                 break;
             }
 

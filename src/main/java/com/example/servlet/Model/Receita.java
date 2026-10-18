@@ -49,8 +49,7 @@ public class Receita {
     }
 
     // Construtor para receitas de usuarios sem descricao
-    public Receita(int idReceita, Usuario usuario, String nome, String modoPreparo, LocalDate dtReceita, boolean foiFeita) {
-        this.idReceita = idReceita;
+    public Receita(Usuario usuario, String nome, String modoPreparo, LocalDate dtReceita, boolean foiFeita) {
         this.usuario = usuario;
         this.nome = nome;
         this.modoPreparo = modoPreparo;

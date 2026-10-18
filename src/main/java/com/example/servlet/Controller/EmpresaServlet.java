@@ -45,7 +45,7 @@ public class EmpresaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
-        String path = req.getServletPath();
+
         HttpSession session = req.getSession(false);
 
         // verifica se esta logado
@@ -56,16 +56,16 @@ public class EmpresaServlet extends HttpServlet {
 
         String email = (String) session.getAttribute("empresaEmail");
 
-        switch (path){
-            case "/perfil-empresa":{
-                Empresa empresa = empresaDAO.buscarEmpresa(email);
-                req.setAttribute("empresa", empresa);
-                req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
-                break;
-            }
-            default:
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        if (!req.getContextPath().equals("/perfil-empresa")){
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
+
+        Empresa empresa = empresaDAO.buscarEmpresa(email);
+        req.setAttribute("empresa", empresa);
+        req.getRequestDispatcher(jsp_tela_perfil).forward(req, resp);
+
+
 
     }
 
@@ -73,16 +73,12 @@ public class EmpresaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // pegando o caminho do usuario
-        String action = req.getParameter("action");
+        String path = req.getServletPath();
 
         // salvando as informações entre as requisições
         HttpSession session = req.getSession();
 
-        switch (action){
-
-
-
+        switch (path){
             case "/criar-empresa": {
                 // pegando os dados do fornmulario de cadastro
                 String nome = req.getParameter("nome");

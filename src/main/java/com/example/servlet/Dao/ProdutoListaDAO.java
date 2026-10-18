@@ -7,6 +7,8 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.List;
 
 public class ProdutoListaDAO {
 
@@ -170,5 +172,65 @@ public class ProdutoListaDAO {
         }
     }// ============== VERIFICAR SE O PRODUTO ESTÁ NA LISTA ==============
 
+    // TODOS OS PRODUTOS EM UMA LISTA USUARIO
+    public int totalItensNumaCompraUsuario(String cpf){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
 
+        ResultSet rset = null;
+        int total = 0;
+
+        try{
+            String comandoSql = "select count(pl.*) as total " +
+                    "from ProdutoLista pl " +
+                    "join ListaCompras lc on pl.idListaCompras = lc.id " +
+                    "where lc.idUsuario = ? and lc.dtLista = (select dtLista from ListaCompras where idUsuario = ? order by dtLista desc limit 1);";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cpf);
+            pstmt.setString(2, cpf);
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return total;
+    }
+    // TODOS OS PRODUTOS EM UMA LISTA USUARIO
+
+
+
+
+
+    // TODOS OS PRODUTOS EM UMA LISTA EMPRESA
+    public int totalItensNumaCompraEmpresa(String cnpj){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try{
+            String comandoSql = "select count(pl.*) as total " +
+                    "from ProdutoLista pl " +
+                    "join ListaCompras lc on pl.idListaCompras = lc.id " +
+                    "where lc.idEmpresa = ? and lc.dtLista = (select dtLista from ListaCompras where idEmpresa = ? order by dtLista desc limit 1);";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cnpj);
+            pstmt.setString(2, cnpj);
+            rset = pstmt.executeQuery();
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return total;
+    }
+    // TODOS OS PRODUTOS EM UMA LISTA EMPRESA
 }
