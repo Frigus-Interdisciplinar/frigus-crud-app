@@ -20,6 +20,15 @@ public class Frigorificos {
         this.empresa = empresa;
         this.endereco = endereco;
         this.tipo = tipo;
+        this.status = StatusArmazenamento.VAZIO;
+        this.nome = nome;
+    }
+
+    public Frigorificos(Empresa empresa, Endereco endereco, String tipo, StatusArmazenamento status, String nome) {
+        this.empresa = empresa;
+        this.endereco = endereco;
+        this.tipo = tipo;
+        this.status = status;
         this.nome = nome;
     }
 

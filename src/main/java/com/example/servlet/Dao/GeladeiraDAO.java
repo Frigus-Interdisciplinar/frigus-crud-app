@@ -108,6 +108,32 @@ public class GeladeiraDAO {
 
 
 
+    // ========= DELETAR ==========
+    public int deletarGeladeira(String cpf, int id){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        try{
+            String comandoSql = "delete from geladeira where idUsuario = ? and id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cpf);
+            pstmt.setInt(2, id);
+            if (pstmt.executeUpdate() > 0){
+                return 1;
+            }else {
+                return 0;
+            }
+
+        }catch (SQLException sql){
+            sql.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+    }
+    // ========= DELETAR ==========
+
 
     // ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
     public List<Geladeira> buscarTodasGeladeira(String cpf){

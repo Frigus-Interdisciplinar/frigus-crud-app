@@ -111,6 +111,34 @@ public class FrigorificosDAO {
 
 
 
+    // ================== DELETAR ==================
+    public int deletarFrigorifico(String cnpj, int id){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao
+        try{
+            String comandoSql = "delete from frigorifico where idEmpresa = ? and id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cnpj);
+            pstmt.setInt(2, id);
+            if (pstmt.executeUpdate() > 0){
+                return 1;
+            }else {
+                return 0;
+            }
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+    }
+    // ================== DELETAR ==================
+
+
+
+
     // ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
     public List<Frigorificos> buscarFrigorificoEmpresa(String cnpj){
         Conexao conexao = new Conexao();
