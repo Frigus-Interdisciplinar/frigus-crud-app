@@ -3,8 +3,10 @@ package com.example.servlet.Teste;
 import com.example.servlet.Dao.*;
 import com.example.servlet.Model.*;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Enum.Categoria;
 import com.example.servlet.Util.Enum.StatusProduto;
+import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Service.ArmazenamentoService;
 
@@ -58,7 +60,7 @@ public class Main {
 //                "KG");
 //
 //        // instanciando o objeto produto dao para fazer as operações do crud
-            ProdutoDAO produtoDAO = new ProdutoDAO();
+        ProdutoDAO produtoDAO = new ProdutoDAO();
         //System.out.println(produtoDAO.inserirProduto(prod));
 //
 //        // criar o objeto para realizar os metodos de alterar e deletar
@@ -94,7 +96,7 @@ public class Main {
                 "silvestre Cavaliere",
                 "mauro.silvestre@hotmail.com",
                 "123456"
-                );
+        );
 
         // instanciando o objeto dao
         //UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -131,12 +133,6 @@ public class Main {
 //
 
 
-
-
-
-
-
-
 //
 //
 //
@@ -149,7 +145,7 @@ public class Main {
 //
 //
 //
-//        ProdutosGeladeira pg = new ProdutosGeladeira(
+//        ProdutosGeladeira ig = new ProdutosGeladeira(
 //                1,
 //                g,
 //                prod,
@@ -164,11 +160,10 @@ public class Main {
 //
 //        ProdutosGeladeiraDAO pgdao = new ProdutosGeladeiraDAO();
 ////
-//        pgdao.inserirProdutoGeladeira(pg);
-//        System.out.println(pgdao.inserirProdutoGeladeira(pg));
+//        pgdao.inserirProdutoGeladeira(ig);
+//        System.out.println(pgdao.inserirProdutoGeladeira(ig));
 //        StatusProduto.values();
 //
-
 
 
         // empresa
@@ -194,11 +189,11 @@ public class Main {
 //                "7698367",
 //                "Top lugares para dar um role no sabado de manhã"
 //        );
-       // EmpresaDAO empresaDAO = new EmpresaDAO();
+        // EmpresaDAO empresaDAO = new EmpresaDAO();
 //        System.out.println(empresaDAO.cadastrarEmpresa(empresa));
 //        System.out.println(empresaDAO.cadastrarEmpresa(empresaSdescricao));
 
-       // Empresa empresaBuscaAlterar = empresaDAO.buscarEmpresa("75410109000510");
+        // Empresa empresaBuscaAlterar = empresaDAO.buscarEmpresa("75410109000510");
 
 //        System.out.println(empresaBuscaAlterar);
 //        System.out.println(empresaDAO.alterarEmpresa(empresaBuscaAlterar, empresaAtualizada));
@@ -209,7 +204,6 @@ public class Main {
 //        System.out.println(empresaDAO.alterarEmailEmpresa(empresaSdescricao, email));
 //        Empresa empresaBuscaDeletar = empresaDAO.buscarEmpresa("73758788000173");
 //        System.out.println(empresaDAO.excluirEmpresa(empresaBuscaDeletar));
-
 
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -223,7 +217,7 @@ public class Main {
                 TipoAssinatura.PLUS
         );
         AssinaturaDAO assinaturaDAO = new AssinaturaDAO();
-       // System.out.println(assinaturaDAO.inserirAssinaturaUsuario(assiUsuario));
+        // System.out.println(assinaturaDAO.inserirAssinaturaUsuario(assiUsuario));
 //
 //        Assinatura assiUsuarioSdescricao = new Assinatura(
 //                usuarioStelefone,
@@ -311,39 +305,40 @@ public class Main {
 
         //System.out.println(gelaDao.inserirGeladeira(geladeira));
 
-        Produto prodConsulta = produtoDAO.buscarprodutoPorId(51);
-
-        Geladeira gelaConsulta = gelaDao.buscarUnicaGeladeira("12345678910", 51);
-        //System.out.println(gelaConsulta);
-
-        ProdutosGeladeira pg = new ProdutosGeladeira(
-                1,
-                gelaConsulta,
-                prodConsulta,
-                LocalDate.of(2026,9, 20),
-                12,
-                5
-        );
-        ProdutosGeladeiraDAO pgDao = new ProdutosGeladeiraDAO();
-        String coxa = "Coxa de ";
-        ProdutosGeladeira pgConsulta = pgDao.buscarProdutoGeladeiraPorId(77);
-        //System.out.println(pgConsulta);
-//        for (ProdutosGeladeira pgn : pgConsulta){
+//        Produto prodConsulta = produtoDAO.buscarprodutoPorId(51);
 //
-//            System.out.println(pgConsulta);
-//        }
+//        Geladeira gelaConsulta = gelaDao.buscarUnicaGeladeira("12345678910", 51);
+//        //System.out.println(gelaConsulta);
+//
+//        ProdutosGeladeira ig = new ProdutosGeladeira(
+//                1,
+//                gelaConsulta,
+//                prodConsulta,
+//                LocalDate.of(2026,9, 20),
+//                12,
+//                5
+//        );
+//        ProdutosGeladeiraDAO pgDao = new ProdutosGeladeiraDAO();
+//        String coxa = "Coxa de ";
+//        ProdutosGeladeira pgConsulta = pgDao.buscarProdutoGeladeiraPorId(77);
+//        //System.out.println(pgConsulta);
+////        for (ProdutosGeladeira pgn : pgConsulta){
+////
+////            System.out.println(pgConsulta);
+////        }
+//
+//        Geladeira gelaNova = gelaDao.buscarUnicaGeladeira("78537787671", 4);
+//        Produto prodNova = produtoDAO.buscarprodutoPorId(4);
+//        ProdutosGeladeira pgNova = new ProdutosGeladeira(
+//                4,
+//                gelaNova,
+//                prodNova,
+//                LocalDate.of(2026,9, 20),
+//                12,
+//                5
+//        );
+//        System.out.println(pgDao.alterarProdutoGeladeira(pgConsulta, pgNova));
+        //System.out.println(pgDao.inserirProdutoGeladeira(ig));
 
-        Geladeira gelaNova = gelaDao.buscarUnicaGeladeira("78537787671", 4);
-        Produto prodNova = produtoDAO.buscarprodutoPorId(4);
-        ProdutosGeladeira pgNova = new ProdutosGeladeira(
-                4,
-                gelaNova,
-                prodNova,
-                LocalDate.of(2026,9, 20),
-                12,
-                5
-        );
-        System.out.println(pgDao.alterarProdutoGeladeira(pgConsulta, pgNova));
-        //System.out.println(pgDao.inserirProdutoGeladeira(pg));
     }
 }

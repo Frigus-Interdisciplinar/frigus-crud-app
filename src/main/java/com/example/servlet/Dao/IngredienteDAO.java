@@ -18,7 +18,7 @@ public class IngredienteDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "insert into ingredientes (idReceita, idProdutos, quantidade) values (?,?,?);";
+            String comandoSql = "insert into Ingrediente (idReceita, idProduto, quantidade) values (?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
@@ -53,7 +53,7 @@ public class IngredienteDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "update ingredientes set idReceita = ?, idProdutos = ?, quantidade = ? where id = ?;";
+            String comandoSql = "update Ingrediente set idReceita = ?, idProduto = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
@@ -86,7 +86,7 @@ public class IngredienteDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "delete from ingredientes where id = ?";
+            String comandoSql = "delete from Ingrediente where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
@@ -139,7 +139,7 @@ public class IngredienteDAO {
                     "r.modoPreparo, " +
                     "r.dtReceita, " +
                     "r.foiFeita "  +
-                    " from ingredientes i join produtos p on p.id = i.idProdutos join receita r on r.id = i.idReceita where i.id = ?;";
+                    " from Ingrediente i join Produto p on p.id = i.idProduto join receita r on r.id = i.idReceita where i.id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
             pstmt.setInt(1, idIngrediente);
@@ -210,8 +210,8 @@ public class IngredienteDAO {
                     "r.dtReceita, " +
                     "r.foiFeita " +
 
-                    "FROM ingredientes i " +
-                    "JOIN produtos p ON p.id = i.idProdutos " +
+                    "FROM Ingrediente i " +
+                    "JOIN Produto p ON p.id = i.idProduto " +
                     "JOIN receita r ON r.id = i.idReceita " +
                     "WHERE lower(r.nome) like ?";
 
@@ -288,8 +288,8 @@ public class IngredienteDAO {
                     "r.dtReceita, " +
                     "r.foiFeita " +
 
-                    "FROM ingredientes i " +
-                    "JOIN produtos p ON p.id = i.idProdutos " +
+                    "FROM Ingrediente i " +
+                    "JOIN Produto p ON p.id = i.idProduto " +
                     "JOIN (" +
                     "select * from receita order by random() limit 10 )" +
                     " r ON r.id = i.idReceita;";

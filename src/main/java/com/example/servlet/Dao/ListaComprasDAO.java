@@ -81,7 +81,7 @@ public class ListaComprasDAO {
         List<ProdutoLista> lista = new ArrayList<>();
 
         try{
-            String comandoSql = "select pl.id as idProdutoLista, pl.idProdutos,pl.quantidade, lc.id as idListaCompras, lc.idUsuario as cpf, lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idUsuario = ?;";
+            String comandoSql = "select pl.id as idProdutoLista, pl.idProduto,pl.quantidade, lc.id as idListaCompras, lc.idUsuario as cpf, lc.dtLista from ItemLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idUsuario = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor da data
             pstmt.setObject(1, dtValidade);
@@ -91,7 +91,7 @@ public class ListaComprasDAO {
             while(rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto();
-                produto.setIdProdutos(rset.getInt("idProdutos"));
+                produto.setIdProdutos(rset.getInt("idProduto"));
 
                 // criando o objeto usuario
                 Usuario usuario = new Usuario();
@@ -130,7 +130,7 @@ public class ListaComprasDAO {
         ListaCompras compra = null;
         ResultSet rset = null;
         try {
-            String comandoSql = "select * from listaCompras where lc.idUsuario = ? and id = ?;";
+            String comandoSql = "select * from listaCompras where idUsuario = ? and id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setString(1, cpf);
@@ -163,10 +163,10 @@ public class ListaComprasDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
-        List<ListaCompras> lista = null;
+        List<ListaCompras> lista = new ArrayList<>();
         ResultSet rset = null;
         try {
-            String comandoSql = "select * from listaCompras where lc.idUsuario = ?;";
+            String comandoSql = "select * from listaCompras where idUsuario = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setString(1, cpf);
@@ -273,7 +273,7 @@ public class ListaComprasDAO {
         ProdutoLista produtoLista = null;
 
         try{
-            String comandoSql = "select pl.id as idProdutoLista pl.idProdutos,pl.quantidade, lc.id as idListaCompras, lc.idEmpresa as cnpj, lc.dtLista from produtoLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idEmpresa = ?;";
+            String comandoSql = "select pl.id as idProdutoLista, pl.idProduto,pl.quantidade, lc.id as idListaCompras, lc.idEmpresa as cnpj, lc.dtLista from ItemLista pl join listaCompras lc on lc.id = pl.idListaCompras where lc.dtLista = ? and lc.idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor da data
             pstmt.setObject(1, dtValideade);
@@ -283,7 +283,7 @@ public class ListaComprasDAO {
             while(rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto();
-                produto.setIdProdutos(rset.getInt("idProdutos"));
+                produto.setIdProdutos(rset.getInt("idProduto"));
 
                 // criando o objeto usuario
                 Empresa empresa = new Empresa();
@@ -321,7 +321,7 @@ public class ListaComprasDAO {
         ListaCompras compra = null;
         ResultSet rset = null;
         try {
-            String comandoSql = "select * from listaCompras where lc.idEmpresa = ? and id = ?;";
+            String comandoSql = "select * from listaCompras where idEmpresa = ? and id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setString(1, cnpj);
@@ -354,10 +354,10 @@ public class ListaComprasDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
-        List<ListaCompras> lista = null;
+        List<ListaCompras> lista = new ArrayList<>();
         ResultSet rset = null;
         try {
-            String comandoSql = "select * from listaCompras where lc.idEmpresa = ?;";
+            String comandoSql = "select * from listaCompras where idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação
             pstmt.setString(1, cnpj);

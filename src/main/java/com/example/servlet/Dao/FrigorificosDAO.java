@@ -18,13 +18,14 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "insert into frigorificos (idEmpresa, status, idEndereco, tipo) values (?,?,?,?);";
+            String comandoSql = "insert into Frigorifico (idEmpresa, status, idEndereco, tipo, nome) values (?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para o comando
             pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
             pstmt.setString(2, frigorifico.getStatus().name());
             pstmt.setInt(3, frigorifico.getEndereco().getIdEndereco());
             pstmt.setString(4, frigorifico.getTipo());
+            pstmt.setString(5, frigorifico.getNome());
 
             if (pstmt.executeUpdate() > 0){
                 ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
@@ -53,7 +54,7 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update Frigorificos set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?, nome = ?  where id = ?;";
+            String comandoSql = "update Frigorifico set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?, nome = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
             pstmt.setString(1, frigorificoNovo.getEmpresa().getCnpj());
@@ -88,7 +89,7 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();// abrindo a conexão com o banco
 
         try{
-            String comandoSlq = "update frigorificos set status = ? where id = ?";
+            String comandoSlq = "update Frigorifico set status = ? where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSlq);
             // setando os valores para a operação
             pstmt.setString(1, frigorificos.getStatus().name());
@@ -120,7 +121,7 @@ public class FrigorificosDAO {
         List<Frigorificos> listaFrigorificos = new ArrayList<>();
 
         try{
-            String comandoSql = "select * from frigorificos where idEmpresa = ?;";
+            String comandoSql = "select * from Frigorifico where idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o valor do id da empresa
             pstmt.setString(1, cnpj);
@@ -160,7 +161,7 @@ public class FrigorificosDAO {
         int total = 0;
         ResultSet rset = null;
         try {
-            String comandoSql = "select count(*) as total from Frigorificos where idEmpresa = ?;";
+            String comandoSql = "select count(*) as total from Frigorifico where idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();

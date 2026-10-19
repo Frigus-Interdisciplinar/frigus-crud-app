@@ -18,7 +18,7 @@ public class ProdutoListaDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "Insert into produtoLista (idListaCompras, idProdutos, quantidade) values(?,?,?);";
+            String comandoSql = "Insert into ItemLista (idListaCompras, idProduto, quantidade) values(?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
             // setando os valores para a execução
             pstmt.setInt(1, produtoLista.getListaCompras().getIdLista());
@@ -50,7 +50,7 @@ public class ProdutoListaDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "update produtoLista set idListaCompras = ?, idProdutos = ?, quantidade = ? where id = ?;";
+            String comandoSql = "update ItemLista set idListaCompras = ?, idProduto = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setInt(1, produtoListaNova.getListaCompras().getIdLista());
@@ -82,7 +82,7 @@ public class ProdutoListaDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            String comandoSql = "delete from produtoLista where id = ?;";
+            String comandoSql = "delete from ItemLista where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setInt(1, produtoLista.getIdProdutoLista());
@@ -114,7 +114,7 @@ public class ProdutoListaDAO {
         ProdutoLista produtoLista = null;
 
         try {
-            String comandoSql = "select * from produtoLista where id = ? and idListaCompras = ?;";
+            String comandoSql = "select * from ItemLista where id = ? and idListaCompras = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // sentando os valores dos ids
             pstmt.setInt(1, idProdutoLista);
@@ -126,7 +126,7 @@ public class ProdutoListaDAO {
                 compras.setIdLista( rset.getInt("idListaCompras"));
                 // criando o objeto produto
                 Produto produto = new Produto();
-                produto.setIdProdutos(rset.getInt("idProdutos"));
+                produto.setIdProdutos(rset.getInt("idProduto"));
                 produtoLista = new ProdutoLista(
                         rset.getInt("id"),
                         compras,
@@ -153,7 +153,7 @@ public class ProdutoListaDAO {
 
         ResultSet rset = null;
         try{
-            String comandoSql = "select 1 from produtoLista where idProdutos = ? and idListaCompras = ?;";
+            String comandoSql = "select 1 from ItemLista where idProduto = ? and idListaCompras = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // primeiro parâmetro: produto
             pstmt.setInt(1, produto.getIdProdutos());
@@ -182,7 +182,7 @@ public class ProdutoListaDAO {
 
         try{
             String comandoSql = "select count(pl.*) as total " +
-                    "from ProdutoLista pl " +
+                    "from ItemLista pl " +
                     "join ListaCompras lc on pl.idListaCompras = lc.id " +
                     "where lc.idUsuario = ? and lc.dtLista = (select dtLista from ListaCompras where idUsuario = ? order by dtLista desc limit 1);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -215,7 +215,7 @@ public class ProdutoListaDAO {
 
         try{
             String comandoSql = "select count(pl.*) as total " +
-                    "from ProdutoLista pl " +
+                    "from ItemLista pl " +
                     "join ListaCompras lc on pl.idListaCompras = lc.id " +
                     "where lc.idEmpresa = ? and lc.dtLista = (select dtLista from ListaCompras where idEmpresa = ? order by dtLista desc limit 1);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);

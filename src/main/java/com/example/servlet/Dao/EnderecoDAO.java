@@ -122,7 +122,7 @@ public class EnderecoDAO {
 
         try{
             String comandoSql = "select distinct en.* " +
-            "from frigorificos f " +
+            "from Frigorifico f " +
             "join endereco en on en.id = f.idEndereco " +
             "where f.idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
