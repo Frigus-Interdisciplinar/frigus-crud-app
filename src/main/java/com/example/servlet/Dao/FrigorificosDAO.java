@@ -54,15 +54,14 @@ public class FrigorificosDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update Frigorifico set idEmpresa = ?, status = ?, idEndereco = ?, tipo = ?, nome = ?  where id = ?;";
+            String comandoSql = "update Frigorifico set idEmpresa = ?, idEndereco = ?, tipo = ?, nome = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
             pstmt.setString(1, frigorificoNovo.getEmpresa().getCnpj());
-            pstmt.setString(2, frigorificoNovo.getStatus().name());
-            pstmt.setInt(3, frigorificoNovo.getEndereco().getIdEndereco());
-            pstmt.setString(4, frigorificoNovo.getTipo());
-            pstmt.setString(5, frigorificoNovo.getNome());
-            pstmt.setInt(6, frigorificoAntigo.getIdFrigorifico());
+            pstmt.setInt(2, frigorificoNovo.getEndereco().getIdEndereco());
+            pstmt.setString(3, frigorificoNovo.getTipo());
+            pstmt.setString(4, frigorificoNovo.getNome());
+            pstmt.setInt(5, frigorificoAntigo.getIdFrigorifico());
 
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
@@ -112,14 +111,14 @@ public class FrigorificosDAO {
 
 
     // ================== DELETAR ==================
-    public int deletarFrigorifico(String cnpj, int id){
+    public int deletarFrigorifico(Frigorificos frigorifico){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
         try{
             String comandoSql = "delete from frigorifico where idEmpresa = ? and id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cnpj);
-            pstmt.setInt(2, id);
+            pstmt.setString(1, frigorifico.getEmpresa().getCnpj());
+            pstmt.setInt(2, frigorifico.getIdFrigorifico());
             if (pstmt.executeUpdate() > 0){
                 return 1;
             }else {
@@ -140,7 +139,7 @@ public class FrigorificosDAO {
 
 
     // ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
-    public List<Frigorificos> buscarFrigorificoEmpresa(String cnpj){
+    public List<Frigorificos> buscarTodosFrigorifico(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
 
@@ -180,6 +179,51 @@ public class FrigorificosDAO {
         }
         return listaFrigorificos;
     }// ==============BUSCAR TODOS OS FRIGORIFICOS DA EMPRESA PELO ID DA MESMA ===============
+
+
+
+    // ==============BUSCAR UM FRIGORIFICO PELO ID ===============
+    public Frigorificos buscarFrigorificoPorId(String cnpj, int id){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao
+
+        ResultSet rset = null;
+
+        Frigorificos frigorifico = null;
+
+        try{
+            String comandoSql = "select * from Frigorifico where idEmpresa = ? and id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o valor do id da empresa
+            pstmt.setString(1, cnpj);
+            pstmt.setInt(2, id);
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                // criando o objeto endereço
+                Endereco endereco = new Endereco();
+                endereco.setIdEndereco(rset.getInt("idEndereco"));
+
+                // criando o objeto empresa
+                Empresa empresa = new Empresa();
+                empresa.setCnpj(rset.getString("idEmpresa"));
+                // criando o objeto frigorifico
+                 frigorifico = new Frigorificos(
+                        rset.getInt("id"),
+                        empresa,
+                        StatusArmazenamento.valueOf(rset.getString("status")),
+                        endereco,
+                        rset.getString("tipo"),
+                        rset.getString("nome")
+                );
+
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao
+        }
+        return frigorifico;
+    }// ==============BUSCAR UM FRIGORIFICO PELO ID ===============
 
 
     // TOTAL DE FRIGORIFICOS

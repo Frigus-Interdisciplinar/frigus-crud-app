@@ -52,14 +52,13 @@ public class GeladeiraDAO {
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "update geladeira set idUsuario = ?, status = ?, tipo = ?, nome = ?  where id = ?;";
+            String comandoSql = "update geladeira set idUsuario = ?, tipo = ?, nome = ?  where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
             pstmt.setString(1, geladeiraNova.getUsuario().getCpf());
-            pstmt.setString(2, geladeiraNova.getStatus().name());;
-            pstmt.setString(3, geladeiraNova.getTipo());
-            pstmt.setString(4, geladeiraNova.getNome());
-            pstmt.setInt(5, geladeiraAntiga.getIdGeladeira());
+            pstmt.setString(2, geladeiraNova.getTipo());
+            pstmt.setString(3, geladeiraNova.getNome());
+            pstmt.setInt(4, geladeiraAntiga.getIdGeladeira());
             if (pstmt.executeUpdate() > 0){
                 return 1;// verifica se deu certo
             }
