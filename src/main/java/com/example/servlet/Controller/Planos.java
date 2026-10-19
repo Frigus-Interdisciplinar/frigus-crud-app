@@ -116,15 +116,15 @@ public class Planos extends HttpServlet {
                         usuario,
                         plano
                 );
-                int funcionou = assinaturaDAO.inserirAssinaturaUsuario(assinaturaUsuario);
 
-                if (funcionou == 1) {
+                if (assinaturaDAO.inserirAssinaturaUsuario(assinaturaUsuario) == 1) {
+                    req.setAttribute("plano", plano);
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
+                    return;
                 } else {
                     resp.sendRedirect(req.getContextPath() + jsp_criar_plano_usu);
+                    return;
                 }
-                resp.setHeader("");
-                break;
             }
 
             case "/alterar-plano-usuario":{
@@ -147,13 +147,14 @@ public class Planos extends HttpServlet {
 
                 int funcionou = assinaturaDAO.alterarAssinUsuario(assinaturaAntiga, assinaturaNova);
                 if (funcionou == 1){
+                    req.setAttribute("plano", plano);
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
                     break;
                 }
                 else {
                     resp.sendRedirect(req.getContextPath() + jsp_alterar_plano_usu);
+                    return;
                 }
-                break;
             }
 
 
@@ -167,6 +168,7 @@ public class Planos extends HttpServlet {
 
                 int funcionou = assinaturaDAO.deletarAssinaturaUsuario(assinatura);
                 if(funcionou == 1){
+                    req.removeAttribute("plano");
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
                     break;
                 }
@@ -193,11 +195,14 @@ public class Planos extends HttpServlet {
                 );
                 int funcionouAssiEmpr = assinaturaDAO.inserirAssinaturaEmpresa(assinaturaEmpresa);
                 if (funcionouAssiEmpr == 1) {
+                    req.setAttribute("plano", plano);
                     resp.sendRedirect(req.getContextPath() + "/produto.jsp");
+                    return;
                 } else {
                     resp.sendRedirect(req.getContextPath() + "/planoEmpresa.jsp");
+                    return;
                 }
-                break;
+
             }
 
 
@@ -221,13 +226,14 @@ public class Planos extends HttpServlet {
 
                 int funcionou = assinaturaDAO.alterarAssinEmpresa(assinaturaAntiga, assinaturaNova);
                 if (funcionou == 1){
+                    req.setAttribute("plano", plano);
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral_emp);
                     break;
                 }
                 else {
                     resp.sendRedirect(req.getContextPath() + jsp_alterar_plano_emp);
+                    break;
                 }
-                break;
             }
 
 
@@ -243,6 +249,7 @@ public class Planos extends HttpServlet {
                 int funcionou = assinaturaDAO.deletarAssinaturaEmpresa(assinatura);
 
                 if(funcionou == 1){
+                    req.removeAttribute("plano");
                     resp.sendRedirect(req.getContextPath() + jsp_visao_geral_emp);
                     break;
                 }
