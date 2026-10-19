@@ -125,7 +125,7 @@ public class ProdutosFrigorificoDAO {
     // ========= BUSCAR =========
 
     // LISTA DE TODOS OS PRODUTOS
-    public List<ProdutosFrigorifico> buscarProdutoFrigorificos(){
+    public List<ProdutosFrigorifico> buscarProdutoFrigorificos(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar(); // abrindo a conexão com o banco
 
@@ -140,8 +140,10 @@ public class ProdutosFrigorificoDAO {
                     "from Produto p " +
                     "join ItemFrigorifico if on p.id = if.idProduto " +
                     "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join endereco en on f.idEndereco = en.id;";
+                    "join endereco en on f.idEndereco = en.id " +
+                    "where f.idEmpresa = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery(); // executa a consulta SQL
 
             // armazena os valores em um list<>
@@ -358,7 +360,7 @@ public class ProdutosFrigorificoDAO {
 
 
     // BUSCAR 1 PRODUTO NA TABELA produtoFrigorificos POR ID
-    public ProdutosFrigorifico buscarProdutoFrigorificoPorId(int idProduto){
+    public ProdutosFrigorifico buscarProdutoFrigorificoPorId(int idItemFrigorifico){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -374,9 +376,9 @@ public class ProdutosFrigorificoDAO {
                     "join ItemFrigorifico if on p.id = if.idProduto " +
                     "join Frigorifico f on if.idFrigorifico = f.id " +
                     "join endereco en on f.idEndereco = en.id " +
-                    "where p.id = ?;";
+                    "where if.id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setInt(1, idProduto);// setando os parâmetros da instrução
+            pstmt.setInt(1, idItemFrigorifico);// setando os parâmetros da instrução
             rset = pstmt.executeQuery();
             if (rset.next()){
                 Produto produto = new Produto(

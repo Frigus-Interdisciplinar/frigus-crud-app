@@ -255,7 +255,7 @@ public class ReceitaServletUsuario extends HttpServlet {
                                 quantidade
                         );
                         if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
-                            resp.sendRedirect(req.getContextPath() + jsp_ver_receita);
+                            resp.sendRedirect(req.getContextPath() + url_servlet);
                             return;
                         }
                         else {
