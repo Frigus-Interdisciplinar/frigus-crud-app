@@ -3,7 +3,6 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 */
-
 /*
 -- Criacao das tabelas
 CREATE TABLE Usuario(
@@ -161,10 +160,11 @@ alter table Frigorifico
 	on update cascade;
 
 ALTER TABLE Frigorifico
-ADD CONSTRAINT fk_frigorifico_endereco
-FOREIGN KEY (idEndereco)
-REFERENCES Endereco(id)
-ON UPDATE CASCADE;
+	ADD CONSTRAINT fk_frigorifico_endereco
+	FOREIGN KEY (idEndereco)
+	REFERENCES Endereco(id)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE;
 
 alter table ItemGeladeira
 	add constraint fk_itemgeladeira_geladeira
@@ -6400,6 +6400,14 @@ SELECT setval(pg_get_serial_sequence('Endereco','id'), (SELECT MAX(id) FROM Ende
 
 COMMIT;
 
+
+select * from endereco
+
+select * from frigorifico
+
+delete from endereco where id = 1
+
+select id, idEndereco from frigorifico where idEndereco in (select idEndereco from frigorifico group by idEndereco having count(idEndereco) = 1);
+
+select * from endereco where id = 1
 */
-
-
