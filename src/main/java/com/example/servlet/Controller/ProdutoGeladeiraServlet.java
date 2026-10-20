@@ -2,7 +2,6 @@ package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.AssinaturaDAO;
 import com.example.servlet.Dao.GeladeiraDAO;
-import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ProdutosGeladeiraDAO;
 import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Geladeira;
@@ -36,7 +35,6 @@ import java.util.List;
 public class ProdutoGeladeiraServlet extends HttpServlet {
     private ProdutosGeladeiraDAO igDAO;
     private GeladeiraDAO geladeiraDAO;
-    private ProdutoDAO prodDAO;
     private AssinaturaDAO assinaturaDAO;
     private Validacao validar;
 
@@ -56,7 +54,6 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
     public void init(){
         igDAO = new ProdutosGeladeiraDAO();
         geladeiraDAO = new GeladeiraDAO();
-        prodDAO = new ProdutoDAO();
         assinaturaDAO = new AssinaturaDAO();
         validar = new Validacao();
     }
@@ -276,27 +273,14 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
                     produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
                 }
 
-                if (prodDAO.inserirProduto(produto) == 1){
-                    ProdutosGeladeira itemg = new ProdutosGeladeira(0, geladeira, produto, dataValidade, lote, quantidade);
-                    if (igDAO.inserirProdutoGeladeira(itemg) == 1){
-                        // atualizando o status da geladeira
-                        ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
-                        geladeiraDAO.atualizarStatus(geladeira);
+                ProdutosGeladeira itemg = new ProdutosGeladeira(0, geladeira, produto, dataValidade, lote, quantidade);
+                if (igDAO.inserirProdutoGeladeira(itemg) == 1){
+                    // atualizando o status da geladeira
+                    ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
+                    geladeiraDAO.atualizarStatus(geladeira);
 
-                        resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
-                        return;
-                    }
-                    else {
-                        if (prodDAO.removerProduto(produto) == 1){
-                            voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
-                            return;
-                        }
-                        else {
-                            System.err.println("produto ficou orfão!!");
-                            voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
-                            return;
-                        }
-                    }
+                    resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
+                    return;
                 }
                 else {
                     voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
@@ -437,10 +421,9 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
                     return;
                 }
 
-                Produto produtoAntigo = prodDAO.buscarprodutoPorId(itemAntigo.getProduto().getIdProdutos());
                 Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), itemAntigo.getGeladeira().getIdGeladeira());
 
-                if (produtoAntigo == null || geladeira == null){
+                if (geladeira == null){
                     voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
                     return;
                 }
@@ -459,29 +442,16 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
                     return;
                 }
 
-                if (prodDAO.alterarProduto(produtoAntigo, produtoNovo) == 1){
-                    Produto produtoJaAlterado = prodDAO.buscarprodutoPorId(produtoAntigo.getIdProdutos());
-                    ProdutosGeladeira itemNovo = new ProdutosGeladeira(0, geladeira, produtoJaAlterado, dataValidade, lote, quantidade);
-                    if (igDAO.alterarProdutoGeladeira(itemAntigo, itemNovo) == 1){
-                        // atualizando o status da geladeira
-                        ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
-                        geladeiraDAO.atualizarStatus(geladeira);
+                ProdutosGeladeira itemNovo = new ProdutosGeladeira(0, geladeira, produtoNovo, dataValidade, lote, quantidade);
+                if (igDAO.alterarProdutoGeladeira(itemAntigo, itemNovo) == 1){
+                    // atualizando o status da geladeira
+                    ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
+                    geladeiraDAO.atualizarStatus(geladeira);
 
-                        resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
-                        return;
-                    }
-                    else {
-                        if (prodDAO.alterarProduto(produtoJaAlterado, produtoAntigo) == 1){
-                            voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
-                            return;
-                        }
-                        else {
-                            System.err.println("produto foi alterado mas o item na geladeira não!!!");
-                            voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
-                            return;
-                        }
-                    }
-                }else {
+                    resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
+                    return;
+                }
+                else {
                     voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
                     return;
                 }
@@ -503,19 +473,13 @@ public class ProdutoGeladeiraServlet extends HttpServlet {
                    voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                    return;
                }
-               Produto produto = prodDAO.buscarprodutoPorId(itemg.getProduto().getIdProdutos());
                Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), itemg.getGeladeira().getIdGeladeira());
 
-               if(produto == null || geladeira == null){
+               if(geladeira == null){
                    voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                    return;
                }
-               // o item é removido primeiro porque ele referencia o produto
                if (igDAO.deletarProdutoGeladeira(itemg) == 1){
-                   if (prodDAO.removerProduto(produto) != 1){
-                       System.err.println("produto ficou orfão!!!");
-                   }
-
                    // atualizando o status da geladeira
                    Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
                    if (assinatura != null){

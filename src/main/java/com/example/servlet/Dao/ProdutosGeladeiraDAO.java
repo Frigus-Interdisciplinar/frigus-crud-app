@@ -20,29 +20,57 @@ public class ProdutosGeladeiraDAO {
     public int inserirProdutoGeladeira(ProdutosGeladeira ig) {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
+        Produto produto = ig.getProduto();
 
         try {
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // insere o produto
+            String comandoSql = "insert into Produto(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+
+            pstmtProduto.setString(1, produto.getNome());
+            pstmtProduto.setString(2, produto.getDescricao());
+            pstmtProduto.setDouble(3, produto.getPreco());
+            pstmtProduto.setString(4, produto.getCategoria().name());
+            pstmtProduto.setString(5, produto.getMarca());
+            pstmtProduto.setString(6, produto.getUnidadeMedida());
+
+            if (pstmtProduto.executeUpdate() <= 0) {
+                conn.rollback();
+                return 0;// não foi posivel executar
+            }
+            ResultSet chaves = pstmtProduto.getGeneratedKeys();// adicionando a chave criada pelo banco
+            if (chaves.next()) produto.setIdProdutos(chaves.getInt(1));
+
             // insere as informações relacionada aos produtos domesticos
-            String comandoSql = "insert into ItemGeladeira (idNotificacao, idGeladeira, idProduto, DtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+            String comandoSqlItem = "insert into ItemGeladeira (idNotificacao, idGeladeira, idProduto, DtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSqlItem, Statement.RETURN_GENERATED_KEYS);
             // definindo parâmetros da instrução
             pstmt.setInt(1, ig.getIdNotificacao());
             pstmt.setInt(2, ig.getGeladeira().getIdGeladeira());
-            pstmt.setInt(3, ig.getProduto().getIdProdutos());
+            pstmt.setInt(3, produto.getIdProdutos());
             pstmt.setObject(4, ig.getDtValidade());
             pstmt.setString(5, ig.getStatus().name());
             pstmt.setInt(6, ig.getLote());
             pstmt.setInt(7, ig.getQuantidade());
 
-            if (pstmt.executeUpdate() > 0) {
-                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-                if (chaves.next()) ig.setIdProdutosGeladeira(chaves.getInt(1));
-                return 1;// verifica se deu certo
-            } else {
+            if (pstmt.executeUpdate() <= 0) {
+                conn.rollback();
+                produto.setIdProdutos(0);
                 return 0;// não foi posivel executar
             }
+            chaves = pstmt.getGeneratedKeys();
+            if (chaves.next()) ig.setIdProdutosGeladeira(chaves.getInt(1));
+
+            conn.commit();
+            return 1;// verifica se deu certo
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            // o rollback torna esses ids falsos
+            produto.setIdProdutos(0);
+            ig.setIdProdutosGeladeira(0);
             return -1;// erro!!
         } finally {
             conexao.desconectar(conn);// desconectar
@@ -55,27 +83,53 @@ public class ProdutosGeladeiraDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
+        // o item continua apontando para o mesmo produto, então o id vem do item antigo
+        int idProduto = pgAntiga.getProduto().getIdProdutos();
+        Produto produtoNovo = pgNova.getProduto();
+
         try {
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // altera as informações do produto
+            String comandoSql = "update Produto set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSql);
+
+            pstmtProduto.setString(1, produtoNovo.getNome());
+            pstmtProduto.setString(2, produtoNovo.getDescricao());
+            pstmtProduto.setDouble(3, produtoNovo.getPreco());
+            pstmtProduto.setString(4, produtoNovo.getCategoria().name());
+            pstmtProduto.setString(5, produtoNovo.getMarca());
+            pstmtProduto.setString(6, produtoNovo.getUnidadeMedida());
+            pstmtProduto.setInt(7, idProduto);
+
+            if (pstmtProduto.executeUpdate() <= 0) {
+                conn.rollback();
+                return 0;// não foi posivel executar
+            }
+
             // altera as informações relacionada aos produtos domesticos
-            String comandoSql = "Update ItemGeladeira set idNotificacao = ?, idGeladeira = ?, idProduto = ?, DtValidade = ?, status = ?, lote = ?, quantidade = ? where id = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            String comandoSqlItem = "Update ItemGeladeira set idNotificacao = ?, idGeladeira = ?, idProduto = ?, DtValidade = ?, status = ?, lote = ?, quantidade = ? where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSqlItem);
             // definindo parâmetros da instrução
             pstmt.setInt(1, pgNova.getIdNotificacao());
             pstmt.setInt(2, pgNova.getGeladeira().getIdGeladeira());
-            pstmt.setInt(3, pgNova.getProduto().getIdProdutos());
+            pstmt.setInt(3, idProduto);
             pstmt.setObject(4, pgNova.getDtValidade());
             pstmt.setString(5, pgNova.getStatus().name());
             pstmt.setInt(6, pgNova.getLote());
             pstmt.setInt(7, pgNova.getQuantidade());
             pstmt.setInt(8, pgAntiga.getIdProdutosGeladeira());
 
-            if (pstmt.executeUpdate() > 0) {
-                return 1;// verifica se deu certo
-            } else {
+            if (pstmt.executeUpdate() <= 0) {
+                conn.rollback();
                 return 0;// não foi posivel executar
             }
+
+            conn.commit();
+            return 1;// verifica se deu certo
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         } finally {
             conexao.desconectar(conn);// desconectar
@@ -89,20 +143,34 @@ public class ProdutosGeladeiraDAO {
         Connection conn = conexao.conectar();
 
         try {
-            // deleta as informações relacionada aos produtos domesticos
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // o item sai primeiro porque ele referencia o produto
             String comandoSql = "delete from ItemGeladeira where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // definindo parâmetros da instrução
             pstmt.setInt(1, ig.getIdProdutosGeladeira());
 
-
-            if (pstmt.executeUpdate() > 0) {
-                return 1;// verifica se deu certo
-            } else {
+            if (pstmt.executeUpdate() <= 0) {
+                conn.rollback();
                 return 0;// não foi posivel executar
             }
+
+            comandoSql = "delete from Produto where id = ? ";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSql);
+            // definido os parâmetros da instrução
+            pstmtProduto.setInt(1, ig.getProduto().getIdProdutos());
+
+            if (pstmtProduto.executeUpdate() <= 0) {
+                conn.rollback();
+                return 0;// não foi posivel executar
+            }
+
+            conn.commit();
+            return 1;// verifica se deu certo
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         } finally {
             conexao.desconectar(conn);// desconectar
