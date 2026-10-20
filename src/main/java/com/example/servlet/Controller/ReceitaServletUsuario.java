@@ -255,7 +255,7 @@ public class ReceitaServletUsuario extends HttpServlet {
                                 quantidade
                         );
                         if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
-                            resp.sendRedirect(req.getContextPath() + jsp_ver_receita);
+                            resp.sendRedirect(req.getContextPath() + url_servlet);
                             return;
                         }
                         else {
@@ -285,6 +285,178 @@ public class ReceitaServletUsuario extends HttpServlet {
                     voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
                     return;
                 }
+            }
+
+
+
+            case "/alterar-receita-usuario":{
+                // pegando as informações do formulario
+                String nomeReceitaAntiga = req.getParameter("nomeReceita");
+                // produto
+                String nomeProd = req.getParameter("nomeProduto");
+                String descricaoProd = req.getParameter("descricaoProd");
+                String precoTxt = req.getParameter("preco");
+                String categoriaTxt = req.getParameter("categoria");
+                String marca = req.getParameter("marca");
+                String unidadeMedida = req.getParameter("unidadeMedida");
+
+                // receita
+                String nomeReceita = req.getParameter("nomeReceita");
+                String descricaoReceita = req.getParameter("descricaoReceita");
+                String modoPreparo = req.getParameter("modoPreparo");
+                String dataReceitaTxt = req.getParameter("dataReceita");
+                String foiFeitaTxt = req.getParameter("foiFeita");
+
+                // ingrediente
+                String quantidadeTxt = req.getParameter("quantidade");
+
+                // verificando se tem campos nulos
+                if (nomeProd == null || nomeProd.isBlank()){
+                    voltaComErro(req, resp, "O nome do produto não deve ser vazio!", jsp_inserir_receita);
+                    return;
+                }
+                if (precoTxt == null || precoTxt.isBlank()){
+                    voltaComErro(req, resp, "O preço do produto não deve ser vazio!", jsp_inserir_receita);
+                    return;
+                }
+                if (categoriaTxt == null || categoriaTxt.isBlank()){
+                    voltaComErro(req, resp, "A categoria do produto não deve ser vazia!", jsp_inserir_receita);
+                    return;
+                }
+                if (marca == null || marca.isBlank()){
+                    voltaComErro(req, resp, "A marca do produto não deve ser vazia!", jsp_inserir_receita);
+                    return;
+                }
+                if (unidadeMedida == null || unidadeMedida.isBlank()){
+                    voltaComErro(req, resp, "A unidade de medida do produto não deve ser vazia!", jsp_inserir_receita);
+                    return;
+                }
+                if (nomeReceita == null || nomeReceita.isBlank()){
+                    voltaComErro(req, resp, "O nome da receita não deve ser vazia!", jsp_inserir_receita);
+                    return;
+                }
+                if (modoPreparo == null || modoPreparo.isBlank()){
+                    voltaComErro(req, resp, "O modo de preparo da receita não deve ser vazio!", jsp_inserir_receita);
+                    return;
+                }
+                if (dataReceitaTxt == null || dataReceitaTxt.isBlank()){
+                    voltaComErro(req, resp, "A data de preparo da receita não deve ser vazia!", jsp_inserir_receita);
+                    return;
+                }
+                if (foiFeitaTxt == null || foiFeitaTxt.isBlank()){
+                    voltaComErro(req, resp, "A pergunta Foi feita? deve ser respondida!!", jsp_inserir_receita);
+                    return;
+                }
+
+                // convertendo e validadando os dados
+
+                boolean vNomeProd = validar.validarNomeProduto(nomeProd);
+                if (!vNomeProd){
+                    voltaComErro(req, resp, "Nome do produto inválido! Por favor digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+
+                Double preco = Double.parseDouble(precoTxt.replace(",", "."));
+                boolean vPreco = validar.validarPreco(preco);
+                if (preco == null || !vPreco){
+                    voltaComErro(req, resp, "Preço inválido! Por favor Digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+
+                Categoria categoria;
+                try {
+                    categoria = Categoria.valueOf(categoriaTxt);
+                } catch (IllegalArgumentException e) {
+                    voltaComErro(req, resp, "Categoria inválida! Por favor Digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+
+
+                boolean vNomeReceita = validar.validarNome(nomeReceita);
+                if(!vNomeReceita){
+                    voltaComErro(req, resp, "Nome de receita inválido! Por favor Digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+
+                Integer quantidade = Integer.parseInt(quantidadeTxt);
+                boolean vQuant = validar.validarQuantidade(quantidade);
+                if (quantidade == null || !vQuant){
+                    voltaComErro(req, resp, "Qunatidade inválida! Por favor Digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+
+                LocalDate dataReceita = LocalDate.parse(dataReceitaTxt);
+                if (dataReceita == null){
+                    voltaComErro(req, resp, "Data inválida! Por favor Digite novamente.", jsp_inserir_receita);
+                    return;
+                }
+                boolean foiFeita = Boolean.parseBoolean(foiFeitaTxt);
+
+
+                Receita receitaAntiga = ingredienteDAO.buscarReceita(nomeReceitaAntiga);
+                
+
+
+                // criando o objeto produto, receita e ingrediente
+                Produto produto;
+                Receita receita;
+                Ingredientes ingrediente;
+
+
+                if (descricaoProd == null  || descricaoProd.isBlank()){
+                    produto = new Produto(nomeProd, preco, categoria, marca, unidadeMedida);
+                }
+                else {
+                    produto = new Produto(nomeProd, descricaoProd, preco, categoria, marca, unidadeMedida);
+                }
+
+                if (descricaoReceita == null  || descricaoReceita.isBlank()){
+                    receita = new Receita(usuario, nomeReceita, modoPreparo, dataReceita, foiFeita);
+                }
+                else {
+                    receita = new Receita(usuario, nomeReceita, descricaoReceita, modoPreparo, dataReceita, foiFeita);
+                }
+
+                // inserindo no banco
+                if (prodDAO.inserirProduto(produto) == 1){
+                    if (receitaDAO.inserirReceitaUsuario(receita) == 1){
+                        ingrediente = new Ingredientes(
+                                receita,
+                                produto,
+                                quantidade
+                        );
+                        if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
+                            resp.sendRedirect(req.getContextPath() + url_servlet);
+                            return;
+                        }
+                        else {
+                            if (prodDAO.removerProduto(produto) == 1 && receitaDAO.deletarReceita(receita) == 1){
+                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente.", jsp_inserir_receita);
+                                return;
+                            }
+                            else{
+                                System.err.println("Produto ficou orfão e a receita também!!");
+                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
+                                return;
+                            }
+                        }
+                    }
+                    else {
+                        if (prodDAO.removerProduto(produto) == 1){
+                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
+                            return;
+                        }else {
+                            System.err.println("Produto ficou orfão!!");
+                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
+                            return;
+                        }
+                    }
+                }
+                else {
+                    voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
+                    return;
+                }
+            }
             }
         }
 

@@ -4,7 +4,6 @@ import com.example.servlet.Dao.AssinaturaDAO;
 import com.example.servlet.Dao.GeladeiraDAO;
 import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ProdutosGeladeiraDAO;
-import com.example.servlet.Dao.UsuarioDAO;
 import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Geladeira;
 import com.example.servlet.Model.Produto;
@@ -24,318 +23,521 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
-@WebServlet(urlPatterns = {"/tela-padrao-pg",
-        "/inserir-pg",
-        "/alterar-pg",
-        "/deletar-pg",
-        "/busca-pg"},
+@WebServlet(urlPatterns = {
+        "/ver-ig-produtos",
+        "/ver-ig-descricao",
+        "/inserir-ig",
+        "/alterar-ig",
+        "/deletar-ig",
+},
         name = "produtoGeladeira")
 public class ProdutoGeladeiraServlet extends HttpServlet {
-    private ProdutosGeladeiraDAO pgDao;
-    private GeladeiraDAO gelaDao;
-    private ProdutoDAO prodDao;
-    private UsuarioDAO usuarioDao;
-    private AssinaturaDAO assinaturaDao;
+    private ProdutosGeladeiraDAO igDAO;
+    private GeladeiraDAO geladeiraDAO;
+    private ProdutoDAO prodDAO;
+    private AssinaturaDAO assinaturaDAO;
     private Validacao validar;
 
-    // Caminhos das páginas
+    // caminho das pastas
+    private static final String jsp_ver_produto = "/assets/pages/ver-ig-produtos.jsp";
+    private static final String jsp_ver_descricao = "/assets/pages/ver-ig-descricao.jsp";
+    private static final String jsp_inserir = "/assets/pages/inserir-ig.jsp";
+    private static final String jsp_alterar = "/assets/pages/alterar-ig.jsp";
+    private static final String jsp_deletar = "/assets/pages/deletar-ig.jsp";
     private static final String jsp_login = "/assets/pages/login.jsp";
-    private static final String JSP_INSERIR = "/assets/pages/inserir-pg.jsp";
-    private static final String JSP_ALTERAR = "/assets/pages/alterar-pg.jsp";
-    private static final String JSP_DELETAR = "/assets/pages/deletar-pg.jsp";
-    private static final String URL_LISTA = "/tela-padrao-pg";
+
+    // caminhos do servlet
+    private static final String url_servlet_produto = "/ver-ig-produtos";
+    private static final String url_servlet_descricao = "/ver-ig-descricao";
 
     @Override
-    public void init() {
-        pgDao = new ProdutosGeladeiraDAO();
-        gelaDao = new GeladeiraDAO();
-        prodDao = new ProdutoDAO();
-        usuarioDao = new UsuarioDAO();
-        assinaturaDao = new AssinaturaDAO();
+    public void init(){
+        igDAO = new ProdutosGeladeiraDAO();
+        geladeiraDAO = new GeladeiraDAO();
+        prodDAO = new ProdutoDAO();
+        assinaturaDAO = new AssinaturaDAO();
         validar = new Validacao();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        if(session == null || session.getAttribute("usuario") == null){
+            req.getRequestDispatcher(jsp_login).forward(req, resp);
+            return;
+        }
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if(usuario == null){
+            voltaComErro(req, resp, "Usuário desconectado. Por favor faça login novamente.", jsp_login);
+            return;
+        }
+        switch (req.getServletPath()){
+            case "/ver-ig-produtos":{
+                // pegando o id da geladeira
+                String idGeladeiraTxt = req.getParameter("idGeladeira");
+                int idGeladeira;
+                try{
+                    idGeladeira = Integer.parseInt(idGeladeiraTxt);
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp, "Erro ao tentar ver essa geladeira. Por favor tente novamente.", jsp_ver_produto);
+                    return;
+                }
+                // garantindo que a geladeira é do usuario logado
+                Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), idGeladeira);
+                if (geladeira == null){
+                    voltaComErro(req, resp, "Geladeira não encontrada.", jsp_ver_produto);
+                    return;
+                }
+                List<ProdutosGeladeira> igLista = igDAO.buscarTodosProdutosGeladeira(idGeladeira);
+                req.setAttribute("geladeira", geladeira);
+                req.setAttribute("itensGeladeira", igLista);
+                req.getRequestDispatcher(jsp_ver_produto).forward(req, resp);
+                return;
+            }
+            case "/ver-ig-descricao":{
+                // pegando o id do produto
+                String idTxt = req.getParameter("idProdutoGeladeira");
+                int id;
+                try{
+                    id  = Integer.parseInt(idTxt);
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp, "Erro ao tentar ver esse produto. Por favor tente novamente.", jsp_ver_produto);
+                    return;
+                }
+                ProdutosGeladeira ig = igDAO.buscarProdutoGeladeiraPorId(id);
+                req.setAttribute("produto", ig);
+                req.getRequestDispatcher(jsp_ver_descricao).forward(req, resp);
+                return;
+            }
+            default:
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        // o usuario está logado?
-        Usuario usuario = usuarioLogado(req);
-        if (usuario == null) {
-            resp.sendRedirect(req.getContextPath() + JSP_LOGIN);
+        HttpSession session = req.getSession();
+        if(session == null || session.getAttribute("usuario") == null){
+            req.getRequestDispatcher(jsp_login).forward(req, resp);
             return;
         }
-
-        // qual ação?
-        switch (req.getServletPath()) {
-            case "/inserir-pg":
-                inserir(req, resp, usuario);
-                break;
-            case "alterar-pg":
-
-            default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
-    private void inserir(HttpServletRequest req, HttpServletResponse resp, Usuario usuario)
-            throws ServletException, IOException {
-
-        // dados do PRODUTO
-        String nome = textoLimpo(req.getParameter("nome"));
-        String descricao = textoLimpo(req.getParameter("descricao"));
-        String marca = textoLimpo(req.getParameter("marca"));
-        String unidadeMedida = textoLimpo(req.getParameter("unidadeMedida"));
-        String precoTxt = req.getParameter("preco");
-        String categoriaTxt = req.getParameter("categoria");
-        // dados do ITEM NA GELADEIRA
-        String idGeladeiraTxt = req.getParameter("idGeladeira");
-        String dtValidadeTxt = req.getParameter("dtValidade");
-        String loteTxt = req.getParameter("lote");
-        String quantidadeTxt = req.getParameter("quantidade");
-
-        // convertendo os dados
-        Double preco = lerDecimal(precoTxt);
-        Categoria categoria = lerCategoria(categoriaTxt);
-        Integer idGeladeira = lerInteiro(idGeladeiraTxt);
-        Integer quantidade = lerInteiro(quantidadeTxt);
-        LocalDate dtValidade = lerData(dtValidadeTxt);
-        // lote é opcional: vazio vira 0 ("sem lote")
-        Integer lote = (loteTxt == null || loteTxt.trim().isEmpty()) ? Integer.valueOf(0) : lerInteiro(loteTxt);
-
-        // validando
-        if (nome.isBlank() || marca.isBlank() || unidadeMedida.isBlank()
-                || preco == null || categoria == null || idGeladeira == null
-                || quantidade == null || dtValidade == null || lote == null) {
-            voltarComErro(req, resp, "Preencha todos os campos obrigatórios corretamente.");
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if(usuario == null){
+            voltaComErro(req, resp, "Usuário desconectado. Por favor faça login novamente.", jsp_login);
             return;
         }
+        switch (req.getServletPath()){
+            case "/inserir-ig":{
+                // pegando os dados do formurio
+                String nome = req.getParameter("nomeProduto");
+                String descricao = req.getParameter("descricao");
+                String precoTxt = req.getParameter("preco");
+                String categoriaTxt = req.getParameter("categoria");
+                String marca = req.getParameter("marca");
+                String unidadeMedida = req.getParameter("unidadeMedida");
 
+                //geladeira
+                String idGeladeiraTxt = req.getParameter("idGeladeira");
 
-        if (!validar.validarNomeProduto(nome)) {
-            voltarComErro(req, resp, "Nome do produto inválido.");
-            return;
-        }
-        if (!validar.validarPreco(preco)) {
-            voltarComErro(req, resp, "O preço deve ser maior que zero.");
-            return;
-        }
-        if (!validar.validarQuantidade(quantidade)) {
-            voltarComErro(req, resp, "A quantidade deve ser maior que zero.");
-            return;
-        }
-        if (!validar.validarValidade(dtValidade)) {
-            voltarComErro(req, resp, "A validade deve ser uma data futura.");
-            return;
-        }
-        if (lote < 0) {
-            voltarComErro(req, resp, "Lote inválido.");
-            return;
-        }
+                String dtValidadeTxt = req.getParameter("dtValidade");
+                String loteTxt = req.getParameter("lote");
+                String quantTxt = req.getParameter("quantidade");
 
+                // verificando se é nulo
+                if (nome == null){
+                    voltaComErro(req, resp, "O nome não pode ser vazio.", jsp_inserir);
+                    return;
+                }
+                if (precoTxt == null){
+                    voltaComErro(req, resp, "O preço não pode ser vazio.", jsp_inserir);
+                    return;
+                }
+                if (categoriaTxt == null){
+                    voltaComErro(req, resp, "A categoria não pode ser vazia.", jsp_inserir);
+                    return;
+                }
+                if (marca == null){
+                    voltaComErro(req, resp, "A marca não pode ser vazia.", jsp_inserir);
+                    return;
+                }
+                if (unidadeMedida == null){
+                    voltaComErro(req, resp, "A unidade de medida não pode ser vazia.", jsp_inserir);
+                    return;
+                }
+                if (dtValidadeTxt == null){
+                    voltaComErro(req, resp, "A data não pode ser vazia.", jsp_inserir);
+                    return;
+                }
+                if (quantTxt == null){
+                    voltaComErro(req, resp, "A quantidade não pode ser vazia.", jsp_inserir);
+                    return;
+                }
+                double preco;
+                try{
+                    preco = Double.parseDouble(precoTxt.trim().replace(',', '.'));
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
+                Categoria categoria;
+                try{
+                    categoria = Categoria.valueOf(categoriaTxt.trim().toUpperCase());
+                } catch (IllegalArgumentException n) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
+                LocalDate dataValidade;
+                try{
+                    dataValidade = LocalDate.parse(dtValidadeTxt.trim());
+                } catch (DateTimeParseException e) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
+                // lote é opcional: vazio vira 0 ("sem lote")
+                int lote;
+                try{
+                    lote = (loteTxt == null || loteTxt.isBlank()) ? 0 : Integer.parseInt(loteTxt.trim());
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
+                int quantidade;
+                try{
+                    quantidade = Integer.parseInt(quantTxt.trim());
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
+                int idGeladeira;
+                try{
+                    idGeladeira = Integer.parseInt(idGeladeiraTxt);
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
 
-        Geladeira geladeira = gelaDao.buscarUnicaGeladeira(usuario.getCpf(), idGeladeira);
-        if (geladeira == null) {
-            voltarComErro(req, resp, "Geladeira não encontrada.");
-            return;
-        }
+                boolean vNome = validar.validarNomeProduto(nome);
+                if (!vNome){
+                    voltaComErro(req, resp,"Formato do nome incorreto.", jsp_inserir);
+                    return;
+                }
 
-        // aplicando a regra de negocio
-        Assinatura assinatura = assinaturaDao.buscarAssinaturaUsuario(usuario.getCpf());
-        if (assinatura == null) {
-            voltarComErro(req, resp, "Escolha um plano antes de adicionar produtos.");
-            return;
-        }
-        int capacidade = TipoAssinatura.quantidadePorPlano(assinatura.getTipoAssinatura());
-        int totalAtual = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
-        if (capacidade > 0 && totalAtual + quantidade > capacidade) {
-            voltarComErro(req, resp, "Limite do seu plano: " + capacidade
-                    + " unidades por geladeira (já tem " + totalAtual + ").");
-            return;
-        }
+                boolean vPreco = validar.validarPreco(preco);
+                if (!vPreco){
+                    voltaComErro(req, resp,"Formato de preço incorreto.", jsp_inserir);
+                    return;
+                }
+                boolean vlote = validar.validarQuantidade(lote);
+                if (!vlote){
+                    voltaComErro(req, resp,"Lote inválido.", jsp_inserir);
+                    return;
+                }
+                boolean vQuant = validar.validarQuantidade(quantidade);
+                if (!vQuant){
+                    voltaComErro(req, resp,"Quantidade deve ser maior que zero", jsp_inserir);
+                    return;
+                }
+                boolean vValidade = validar.validarValidade(dataValidade);
+                if (!vValidade){
+                    voltaComErro(req, resp,"A data de validade não pode ser anterior a data de amanhã.", jsp_inserir);
+                    return;
+                }
 
+                Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), idGeladeira);
 
-        Produto produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
+                if (geladeira == null){
+                    voltaComErro(req, resp, "Geladeira não encontrada.", jsp_inserir);
+                    return;
+                }
 
-        ProdutosGeladeira pg = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
+                // regra de negocio: o plano limita a quantidade por geladeira
+                Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
+                if (assinatura == null){
+                    voltaComErro(req, resp, "Escolha um plano antes de adicionar produtos.", jsp_inserir);
+                    return;
+                }
+                int capacidade = TipoAssinatura.quantidadePorPlano(assinatura.getTipoAssinatura());
+                int totalAtual = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
+                if (capacidade > 0 && totalAtual + quantidade > capacidade){
+                    voltaComErro(req, resp, "Limite do seu plano: " + capacidade
+                            + " unidades por geladeira (já tem " + totalAtual + ").", jsp_inserir);
+                    return;
+                }
 
-        if (!gravarProdutoEItem(produto, pg)) {
-            voltarComErro(req, resp, "Não foi possível salvar o produto. Tente novamente.");
-            return;
-        }
+                Produto produto;
+                if (descricao == null || descricao.isBlank()){
+                    produto = new Produto(nome, preco, categoria, marca, unidadeMedida);
+                }else {
+                    produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
+                }
 
-        // atualizar o status da geladeira e gravar no banco
-        ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
-        gelaDao.atualizarStatus(geladeira);
+                if (prodDAO.inserirProduto(produto) == 1){
+                    ProdutosGeladeira itemg = new ProdutosGeladeira(0, geladeira, produto, dataValidade, lote, quantidade);
+                    if (igDAO.inserirProdutoGeladeira(itemg) == 1){
+                        // atualizando o status da geladeira
+                        ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
+                        geladeiraDAO.atualizarStatus(geladeira);
 
-        resp.sendRedirect(req.getContextPath() + URL_LISTA + "?idGeladeira=" + geladeira.getIdGeladeira());
-    }
-
-    // alterar
-    public void alterar(HttpServletRequest req, HttpServletResponse resp, Usuario usuario){
-        // pegando os dados do formulario
-        String idProdutoGeladeiraTxt = req.getParameter("idProdutoGeladeira");
-        int idPg = Integer.parseInt(idProdutoGeladeiraTxt);
-        ProdutosGeladeira pgAntigo = pgDao.buscarProdutoGeladeiraPorId(idPg);
-
-
-        // dados do PRODUTO
-        String nome = textoLimpo(req.getParameter("nome"));
-        String descricao = textoLimpo(req.getParameter("descricao"));
-        String marca = textoLimpo(req.getParameter("marca"));
-        String unidadeMedida = textoLimpo(req.getParameter("unidadeMedida"));
-        String precoTxt = req.getParameter("preco");
-        String categoriaTxt = req.getParameter("categoria");
-        // dados do ITEM NA GELADEIRA
-        String idGeladeiraTxt = req.getParameter("idGeladeira");
-        String dtValidadeTxt = req.getParameter("dtValidade");
-        String loteTxt = req.getParameter("lote");
-        String quantidadeTxt = req.getParameter("quantidade");
-
-        // convertendo os dados
-        Double preco = lerDecimal(precoTxt);
-        Categoria categoria = lerCategoria(categoriaTxt);
-        Integer idGeladeira = lerInteiro(idGeladeiraTxt);
-        Integer quantidade = lerInteiro(quantidadeTxt);
-        LocalDate dtValidade = lerData(dtValidadeTxt);
-        // lote é opcional: vazio vira 0 ("sem lote")
-        Integer lote = (loteTxt == null || loteTxt.trim().isEmpty()) ? Integer.valueOf(0) : lerInteiro(loteTxt);
-
-
-        Geladeira geladeira = gelaDao.buscarUnicaGeladeira(usuario.getCpf(), idGeladeira);
-        if (geladeira == null) {
-            voltarComErro(req, resp, "Geladeira não encontrada.");
-            return;
-        }
-
-
-        // validando
-        if (nome.isEmpty() || marca.isEmpty() || unidadeMedida.isEmpty()
-                || preco == null || categoria == null || idGeladeira == null
-                || quantidade == null || dtValidade == null || lote == null) {
-            voltarComErro(req, resp, "Preencha todos os campos obrigatórios corretamente.", );
-            return;
-        }
-
-
-        if (!validar.validarNomeProduto(nome)) {
-            voltarComErro(req, resp, "Nome do produto inválido.");
-            return;
-        }
-        if (!validar.validarPreco(preco)) {
-            voltarComErro(req, resp, "O preço deve ser maior que zero.");
-            return;
-        }
-        if (!validar.validarQuantidade(quantidade)) {
-            voltarComErro(req, resp, "A quantidade deve ser maior que zero.");
-            return;
-        }
-        if (!validar.validarValidade(dtValidade)) {
-            voltarComErro(req, resp, "A validade deve ser uma data futura.");
-            return;
-        }
-        if (lote < 0) {
-            voltarComErro(req, resp, "Lote inválido.");
-            return;
-        }
-
-        Produto produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
-
-        ProdutosGeladeira pg = new ProdutosGeladeira(0, geladeira, produto, dtValidade, lote, quantidade);
-
-    }
-
-    // ================= GRAVAR PRODUTO + ITEM =================
-    private boolean gravarProdutoEItem(Produto produto, ProdutosGeladeira pg) {
-        // grava o produto.
-        if (prodDao.inserirProduto(produto) != 1) {
-            return false;
-        }
-
-        // grava o item da geladeira
-        if (pgDao.inserirProdutoGeladeira(pg) == 1) {
-            return true;
-        }
-
-        // 2º falhou: desfaz o 1º
-        if (prodDao.removerProduto(produto) != 1) {
-            System.err.println("ATENÇÃO: produto órfão id=" + produto.getIdProdutos()
-                    + " (o item da geladeira falhou e o produto não pôde ser removido).");
-        }
-        return false;
-    }
-
-    private Usuario usuarioLogado(HttpServletRequest req) {
-        HttpSession session = req.getSession(false); // false = não cria sessão nova
-        if (session == null) {
-            return null;
-        }
-        String email = (String) session.getAttribute("usuarioEmail");
-        if (email == null) {
-            return null;
-        }
-        return usuarioDao.buscarUsuario(email);
-    }
-
-
-    private String textoLimpo(String texto) {
-        return texto == null ? "" : texto.trim();
-    }
-
-    private Integer lerInteiro(String texto) {
-        if (texto == null) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(texto.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-
-    private Double lerDecimal(String texto) {
-        if (texto == null) {
-            return null;
-        }
-        try {
-            double valor = Double.parseDouble(texto.trim().replace(',', '.'));
-            if (Double.isNaN(valor) || Double.isInfinite(valor)) {
-                return null;
+                        resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
+                        return;
+                    }
+                    else {
+                        if (prodDAO.removerProduto(produto) == 1){
+                            voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                            return;
+                        }
+                        else {
+                            System.err.println("produto ficou orfão!!");
+                            voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                            return;
+                        }
+                    }
+                }
+                else {
+                    voltaComErro(req, resp,"Erro ao adicionar produto na geladeira.", jsp_inserir);
+                    return;
+                }
             }
-            return valor;
-        } catch (NumberFormatException e) {
-            return null;
+
+
+            case "/alterar-ig":{
+                // pegando os dados do formurio
+                String idItemAntigoTxt = req.getParameter("idProdutoGeladeira");
+
+                String nome = req.getParameter("nomeProduto");
+                String descricao = req.getParameter("descricao");
+                String precoTxt = req.getParameter("preco");
+                String categoriaTxt = req.getParameter("categoria");
+                String marca = req.getParameter("marca");
+                String unidadeMedida = req.getParameter("unidadeMedida");
+
+
+                String dtValidadeTxt = req.getParameter("dtValidade");
+                String loteTxt = req.getParameter("lote");
+                String quantTxt = req.getParameter("quantidade");
+
+                // verificando se é nulo
+                if (nome == null){
+                    voltaComErro(req, resp, "O nome não pode ser vazio.", jsp_alterar);
+                    return;
+                }
+                if (precoTxt == null){
+                    voltaComErro(req, resp, "O preço não pode ser vazio.", jsp_alterar);
+                    return;
+                }
+                if (categoriaTxt == null){
+                    voltaComErro(req, resp, "A categoria não pode ser vazia.", jsp_alterar);
+                    return;
+                }
+                if (marca == null){
+                    voltaComErro(req, resp, "A marca não pode ser vazia.", jsp_alterar);
+                    return;
+                }
+                if (unidadeMedida == null){
+                    voltaComErro(req, resp, "A unidade de medida não pode ser vazia.", jsp_alterar);
+                    return;
+                }
+                if (dtValidadeTxt == null){
+                    voltaComErro(req, resp, "A data não pode ser vazia.", jsp_alterar);
+                    return;
+                }
+                if (quantTxt == null){
+                    voltaComErro(req, resp, "A quantidade não pode ser vazia.", jsp_alterar);
+                    return;
+                }
+                double preco;
+                try{
+                    preco = Double.parseDouble(precoTxt.trim().replace(',', '.'));
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+                Categoria categoria;
+                try{
+                    categoria = Categoria.valueOf(categoriaTxt.trim().toUpperCase());
+                } catch (IllegalArgumentException n) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+                LocalDate dataValidade;
+                try{
+                    dataValidade = LocalDate.parse(dtValidadeTxt.trim());
+                } catch (DateTimeParseException e) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+                // lote é opcional: vazio vira 0 ("sem lote")
+                int lote;
+                try{
+                    lote = (loteTxt == null || loteTxt.isBlank()) ? 0 : Integer.parseInt(loteTxt.trim());
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+                int quantidade;
+                try{
+                    quantidade = Integer.parseInt(quantTxt.trim());
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+
+                boolean vNome = validar.validarNomeProduto(nome);
+                if (!vNome){
+                    voltaComErro(req, resp,"Formato do nome incorreto.", jsp_alterar);
+                    return;
+                }
+
+                boolean vPreco = validar.validarPreco(preco);
+                if (!vPreco){
+                    voltaComErro(req, resp,"Formato de preço incorreto.", jsp_alterar);
+                    return;
+                }
+
+                if (lote < 0){
+                    voltaComErro(req, resp,"Lote inválido.", jsp_alterar);
+                    return;
+                }
+                boolean vQuant = validar.validarQuantidade(quantidade);
+                if (!vQuant){
+                    voltaComErro(req, resp,"Quantidade deve ser maior que zero", jsp_alterar);
+                    return;
+                }
+                boolean vValidade = validar.validarValidade(dataValidade);
+                if (!vValidade){
+                    voltaComErro(req, resp,"A data de validade não pode ser anterior a data de amanhã.", jsp_alterar);
+                    return;
+                }
+
+                int idItemAntigo;
+                try{
+                    idItemAntigo = Integer.parseInt(idItemAntigoTxt);
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+
+                Produto produtoNovo;
+                if (descricao == null || descricao.isBlank()){
+                    produtoNovo = new Produto(nome, preco, categoria, marca, unidadeMedida);
+                }else {
+                    produtoNovo = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
+                }
+
+
+
+                ProdutosGeladeira itemAntigo = igDAO.buscarProdutoGeladeiraPorId(idItemAntigo);
+                if (itemAntigo == null){
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+
+                Produto produtoAntigo = prodDAO.buscarprodutoPorId(itemAntigo.getProduto().getIdProdutos());
+                Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), itemAntigo.getGeladeira().getIdGeladeira());
+
+                if (produtoAntigo == null || geladeira == null){
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+
+                // regra de negocio: a quantidade antiga sai da conta antes de somar a nova
+                Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
+                if (assinatura == null){
+                    voltaComErro(req, resp, "Escolha um plano antes de alterar produtos.", jsp_alterar);
+                    return;
+                }
+                int capacidade = TipoAssinatura.quantidadePorPlano(assinatura.getTipoAssinatura());
+                int totalAtual = ArmazenamentoService.totalProdutosGeladeira(geladeira.getIdGeladeira());
+                if (capacidade > 0 && totalAtual - itemAntigo.getQuantidade() + quantidade > capacidade){
+                    voltaComErro(req, resp, "Limite do seu plano: " + capacidade
+                            + " unidades por geladeira (já tem " + totalAtual + ").", jsp_alterar);
+                    return;
+                }
+
+                if (prodDAO.alterarProduto(produtoAntigo, produtoNovo) == 1){
+                    Produto produtoJaAlterado = prodDAO.buscarprodutoPorId(produtoAntigo.getIdProdutos());
+                    ProdutosGeladeira itemNovo = new ProdutosGeladeira(0, geladeira, produtoJaAlterado, dataValidade, lote, quantidade);
+                    if (igDAO.alterarProdutoGeladeira(itemAntigo, itemNovo) == 1){
+                        // atualizando o status da geladeira
+                        ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
+                        geladeiraDAO.atualizarStatus(geladeira);
+
+                        resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
+                        return;
+                    }
+                    else {
+                        if (prodDAO.alterarProduto(produtoJaAlterado, produtoAntigo) == 1){
+                            voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                            return;
+                        }
+                        else {
+                            System.err.println("produto foi alterado mas o item na geladeira não!!!");
+                            voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                            return;
+                        }
+                    }
+                }else {
+                    voltaComErro(req, resp,"Erro ao alterar produto da geladeira.", jsp_alterar);
+                    return;
+                }
+            }
+
+
+            case "/deletar-ig":{
+               //pegando o id do itemgeladeira
+               String idTxt = req.getParameter("idProdutoGeladeira");
+               int id;
+               try {
+                   id = Integer.parseInt(idTxt);
+               } catch (NumberFormatException e) {
+                   voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                   return;
+               }
+               ProdutosGeladeira itemg = igDAO.buscarProdutoGeladeiraPorId(id);
+               if (itemg == null){
+                   voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                   return;
+               }
+               Produto produto = prodDAO.buscarprodutoPorId(itemg.getProduto().getIdProdutos());
+               Geladeira geladeira = geladeiraDAO.buscarUnicaGeladeira(usuario.getCpf(), itemg.getGeladeira().getIdGeladeira());
+
+               if(produto == null || geladeira == null){
+                   voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                   return;
+               }
+               // o item é removido primeiro porque ele referencia o produto
+               if (igDAO.deletarProdutoGeladeira(itemg) == 1){
+                   if (prodDAO.removerProduto(produto) != 1){
+                       System.err.println("produto ficou orfão!!!");
+                   }
+
+                   // atualizando o status da geladeira
+                   Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
+                   if (assinatura != null){
+                       ArmazenamentoService.calcularStatusGeladeira(geladeira, assinatura);
+                       geladeiraDAO.atualizarStatus(geladeira);
+                   }
+
+                   resp.sendRedirect(req.getContextPath() + url_servlet_produto + "?idGeladeira=" + geladeira.getIdGeladeira());
+                   return;
+               }else {
+                   voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                   return;
+               }
+
+            }
+            default:
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
-
-
-    private Categoria lerCategoria(String texto) {
-        if (texto == null) {
-            return null;
-        }
-        try {
-            return Categoria.valueOf(texto.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    private LocalDate lerData(String texto) {
-        if (texto == null) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(texto.trim());
-        } catch (DateTimeParseException e) {
-            return null;
-        }
-    }
-
-    // Volta para o formulário mostrando a mensagem.
-    private void voltarComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem, String pagina)
-            throws ServletException, IOException {
+    // voltando para a pagina com erro
+    public static void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem, String pagina)
+            throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
         req.getRequestDispatcher(pagina).forward(req, resp);
     }

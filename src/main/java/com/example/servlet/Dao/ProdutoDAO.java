@@ -17,7 +17,7 @@ public class ProdutoDAO {
 
         try {
             // insere as informações do produto
-            String comandoSql = "insert into produtos(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
+            String comandoSql = "insert into Produto(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // definindo parâmetros da instrução
@@ -50,7 +50,7 @@ public class ProdutoDAO {
 
         try {
             // altera as informações do produto
-            String comandoSql = "update produtos set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
+            String comandoSql = "update Produto set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // definido os parâmetros da instrução
@@ -82,7 +82,7 @@ public class ProdutoDAO {
 
         try {
             // altera as informações do produto
-            String comandoSql = "delete from produtos where id = ? ";
+            String comandoSql = "delete from Produto where id = ? ";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // definido os parâmetros da instrução
@@ -112,7 +112,7 @@ public class ProdutoDAO {
         ResultSet rset = null;
         Produto produto = null;
         try{
-            String comandoSql = "select * from produtos where id = ?;";
+            String comandoSql = "select * from Produto where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setInt(1, idPorduto);
@@ -150,7 +150,7 @@ public class ProdutoDAO {
         List<Produto> lista = new ArrayList<>();
         Produto produto = null;
         try{
-            String comandoSql = "select * from produtos;";
+            String comandoSql = "select * from Produto;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             rset = pstmt.executeQuery();
 

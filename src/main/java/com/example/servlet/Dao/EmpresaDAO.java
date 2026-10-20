@@ -174,7 +174,7 @@ public class EmpresaDAO {
         ResultSet rset = null; // declarando o Result Set
 
         try{
-            String comandoSql = "select * from empresa where cnpj = ?;";
+            String comandoSql = "select * from empresa where email = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
             pstmt.setString(1, email);

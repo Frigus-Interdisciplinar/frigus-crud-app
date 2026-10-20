@@ -21,6 +21,13 @@ public class Geladeira {
         this.tipo = tipo;
         this.nome = nome;
     }
+    // construtor para alterar a geladeira
+    public Geladeira(Usuario usuario, StatusArmazenamento status, String tipo, String nome) {
+        this.usuario = usuario;
+        this.status = status;
+        this.tipo = tipo;
+        this.nome = nome;
+    }
 
     // Construtor sem id e status e tipo
     public Geladeira(Usuario usuario, String nome) {

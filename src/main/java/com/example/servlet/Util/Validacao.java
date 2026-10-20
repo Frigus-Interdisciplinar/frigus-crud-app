@@ -1,6 +1,7 @@
 package com.example.servlet.Util;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Validacao {
     // =========== FORMATAR ===========
@@ -38,6 +39,9 @@ public class Validacao {
         }
         return cepPuro.toString();
     }
+
+
+
 
     // =========== FORMATAR ===========
 
