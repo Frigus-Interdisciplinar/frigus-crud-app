@@ -1,13 +1,12 @@
 package com.example.servlet.Controller;
 
+import com.example.servlet.Dao.AssinaturaDAO;
 import com.example.servlet.Dao.FrigorificosDAO;
 import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ProdutosFrigorificoDAO;
-import com.example.servlet.Model.Empresa;
-import com.example.servlet.Model.Frigorificos;
-import com.example.servlet.Model.Produto;
-import com.example.servlet.Model.ProdutosFrigorifico;
+import com.example.servlet.Model.*;
 import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Service.ArmazenamentoService;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,6 +31,7 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
     private FrigorificosDAO frigorificosDAO;
     private ProdutoDAO prodDAO;
     private Validacao validar;
+    private AssinaturaDAO assinaturaDAO;
 
     // caminho das pastas
     private static final String jsp_ver_produto = "/assets/pages/ver-if-produtos.jsp";
@@ -51,6 +51,7 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
         frigorificosDAO = new FrigorificosDAO();
         prodDAO = new ProdutoDAO();
         validar = new Validacao();
+        assinaturaDAO = new AssinaturaDAO();
     }
 
     @Override
@@ -244,6 +245,14 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
                 if (prodDAO.inserirProduto(produto) == 1){
                     ProdutosFrigorifico itemf = new ProdutosFrigorifico(0, frigorifico, produto, dataValidade, lote, quantidade);
                     if (ifDAO.inserirProdutoFrigorifico(itemf) == 1){
+                        // busca o plano da empresa
+                        Assinatura assinatura = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
+
+                        // recalcula o status no objeto (soma o ItemFrigorifico e compara com a capacidade)
+                        ArmazenamentoService.calcularStatusFrigorifico(frigorifico, assinatura);
+
+                        // grava o novo status no banco
+                        frigorificosDAO.atualizarStatus(frigorifico);
                         resp.sendRedirect(req.getContextPath() + url_servlet_produto);
                         return;
                     }
@@ -443,28 +452,22 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
                    return;
                }
                if (prodDAO.removerProduto(produto) == 1){
-                   if (frigorificosDAO.deletarFrigorifico(frigorifico) == 1) {
-                       if(ifDAO.deletarProdutoFrigorifico(itemf) == 1){
-                           resp.sendRedirect(req.getContextPath() + url_servlet_produto);
+                   if(ifDAO.deletarProdutoFrigorifico(itemf) == 1){
+                       resp.sendRedirect(req.getContextPath() + url_servlet_produto);
+                       return;
+                   }
+                   else {
+                       if (prodDAO.inserirProduto(produto) == 1){
+                           voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                            return;
                        }
                        else {
-                           if (prodDAO.removerProduto(produto) == 1 || frigorificosDAO.deletarFrigorifico(frigorifico) == 1){
-                               voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
-                               return;
-                           }
-                           else {
-                               System.err.println("produto e frigorifico ficaram orfaos!!!");
-                               voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
-                               return;
-                           }
+                           System.err.println("produto foi removido mas o item no frigorifico não!!!");
+                           voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                           return;
                        }
                    }
-                   else {
-                       System.err.println("frigorifico ficou orfão!!!");
-                       voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
-                       return;
-                   }
+
                }else {
                    voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                    return;
