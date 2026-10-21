@@ -17,31 +17,59 @@ public class ProdutosFrigorificoDAO {
     public int inserirProdutoFrigorifico(ProdutosFrigorifico itf){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
+        Produto produto = itf.getProduto();
 
         try{
-            String comandoSql = "insert into ItemFrigorifico (idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // insere o produto
+            String comandoSql = "insert into Produto(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
-            // setando os valores pra a instrução
-            pstmt.setInt(1, itf.getIdNotificacao());
-            pstmt.setInt(2, itf.getFrigorificos().getIdFrigorifico());
-            pstmt.setInt(3, itf.getProduto().getIdProdutos());
-            pstmt.setObject(4, itf.getDtValidade());
-            pstmt.setString(5, itf.getStatus().name());
-            pstmt.setInt(6, itf.getLote());
-            pstmt.setInt(7, itf.getQuantidade());
+            pstmt.setString(1, produto.getNome());
+            pstmt.setString(2, produto.getDescricao());
+            pstmt.setDouble(3, produto.getPreco());
+            pstmt.setString(4, produto.getCategoria().name());
+            pstmt.setString(5, produto.getMarca());
+            pstmt.setString(6, produto.getUnidadeMedida());
 
-            if (pstmt.executeUpdate() > 0){
-                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-                if (chaves.next()) itf.setIdProdutosFrigorifico(chaves.getInt(1));
-                return 1;
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0;
             }
+            ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+            if (chaves.next()) produto.setIdProdutos(chaves.getInt(1));
+
+            // insere o item usando o id do produto recém criado
+            String comandoSqlItem = "insert into ItemFrigorifico (idNotificacao, idFrigorifico, idProduto, dtValidade, status, lote, quantidade) values (?,?,?,?,?,?,?);";
+            PreparedStatement pstmtItem = conn.prepareStatement(comandoSqlItem, Statement.RETURN_GENERATED_KEYS);
+
+            // setando os valores pra a instrução
+            pstmtItem.setInt(1, itf.getIdNotificacao());
+            pstmtItem.setInt(2, itf.getFrigorificos().getIdFrigorifico());
+            pstmtItem.setInt(3, produto.getIdProdutos());
+            pstmtItem.setObject(4, itf.getDtValidade());
+            pstmtItem.setString(5, itf.getStatus().name());
+            pstmtItem.setInt(6, itf.getLote());
+            pstmtItem.setInt(7, itf.getQuantidade());
+
+            if (pstmtItem.executeUpdate() <= 0){
+                conn.rollback();
+                produto.setIdProdutos(0);
+                return 0;
+            }
+            chaves = pstmtItem.getGeneratedKeys();
+            if (chaves.next()) itf.setIdProdutosFrigorifico(chaves.getInt(1));
+
+            conn.commit();
+            return 1;
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            // o rollback torna esses ids falsos
+            produto.setIdProdutos(0);
+            itf.setIdProdutosFrigorifico(0);
             return -1;
         }
         finally {
@@ -57,29 +85,54 @@ public class ProdutosFrigorificoDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
+        // o item continua apontando para o mesmo produto, então o id vem do item antigo
+        int idProduto = pfAntigo.getProduto().getIdProdutos();
+        Produto produtoNovo = pfNovo.getProduto();
+
         try{
-            String comandoSql = "update ItemFrigorifico set idNotificacao = ?, idFrigorifico = ?, idProduto = ?, dtValidade = ?, status = ?, lote = ?, quantidade  =? where id = ?;";
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // altera as informações do produto
+            String comandoSql = "update Produto set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
-            // setando os valores pra a instrução
-            pstmt.setInt(1, pfNovo.getIdNotificacao());
-            pstmt.setInt(2, pfNovo.getFrigorificos().getIdFrigorifico());
-            pstmt.setInt(3, pfNovo.getProduto().getIdProdutos());
-            pstmt.setObject(4, pfNovo.getDtValidade());
-            pstmt.setString(5, pfNovo.getStatus().name());
-            pstmt.setInt(6, pfNovo.getLote());
-            pstmt.setInt(7, pfNovo.getQuantidade());
-            pstmt.setInt(8, pfAntigo.getIdProdutosFrigorifico());
+            pstmt.setString(1, produtoNovo.getNome());
+            pstmt.setString(2, produtoNovo.getDescricao());
+            pstmt.setDouble(3, produtoNovo.getPreco());
+            pstmt.setString(4, produtoNovo.getCategoria().name());
+            pstmt.setString(5, produtoNovo.getMarca());
+            pstmt.setString(6, produtoNovo.getUnidadeMedida());
+            pstmt.setInt(7, idProduto);
 
-            if (pstmt.executeUpdate() > 0){
-                return 1;
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0;
             }
+
+            String comandoSqlItem = "update ItemFrigorifico set idNotificacao = ?, idFrigorifico = ?, idProduto = ?, dtValidade = ?, status = ?, lote = ?, quantidade  =? where id = ?;";
+            PreparedStatement pstmtItem = conn.prepareStatement(comandoSqlItem);
+
+            // setando os valores pra a instrução
+            pstmtItem.setInt(1, pfNovo.getIdNotificacao());
+            pstmtItem.setInt(2, pfNovo.getFrigorificos().getIdFrigorifico());
+            pstmtItem.setInt(3, idProduto);
+            pstmtItem.setObject(4, pfNovo.getDtValidade());
+            pstmtItem.setString(5, pfNovo.getStatus().name());
+            pstmtItem.setInt(6, pfNovo.getLote());
+            pstmtItem.setInt(7, pfNovo.getQuantidade());
+            pstmtItem.setInt(8, pfAntigo.getIdProdutosFrigorifico());
+
+            if (pstmtItem.executeUpdate() <= 0){
+                conn.rollback();
+                return 0;
+            }
+
+            conn.commit();
+            return 1;
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -95,21 +148,37 @@ public class ProdutosFrigorificoDAO {
         Connection conn = conexao.conectar();
 
         try{
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // o item sai primeiro porque ele referencia o produto
             String comandoSql = "delete from ItemFrigorifico where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores pra a instrução
             pstmt.setInt(1, itf.getIdProdutosFrigorifico());
 
-            if (pstmt.executeUpdate() > 0){
-                return 1;
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0;
             }
+
+            comandoSql = "delete from Produto where id = ? ";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSql);
+
+            // definido os parâmetros da instrução
+            pstmtProduto.setInt(1, itf.getProduto().getIdProdutos());
+
+            if (pstmtProduto.executeUpdate() <= 0){
+                conn.rollback();
+                return 0;
+            }
+
+            conn.commit();
+            return 1;
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {

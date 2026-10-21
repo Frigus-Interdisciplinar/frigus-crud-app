@@ -2,7 +2,6 @@ package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.AssinaturaDAO;
 import com.example.servlet.Dao.FrigorificosDAO;
-import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ProdutosFrigorificoDAO;
 import com.example.servlet.Model.*;
 import com.example.servlet.Util.Enum.Categoria;
@@ -29,7 +28,6 @@ import java.util.List;
 public class ProdutoFrigorificoServlet extends HttpServlet {
     private ProdutosFrigorificoDAO ifDAO;
     private FrigorificosDAO frigorificosDAO;
-    private ProdutoDAO prodDAO;
     private Validacao validar;
     private AssinaturaDAO assinaturaDAO;
 
@@ -49,7 +47,6 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
     public void init(){
         ifDAO = new ProdutosFrigorificoDAO();
         frigorificosDAO = new FrigorificosDAO();
-        prodDAO = new ProdutoDAO();
         validar = new Validacao();
         assinaturaDAO = new AssinaturaDAO();
     }
@@ -242,31 +239,18 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
                     produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
                 }
 
-                if (prodDAO.inserirProduto(produto) == 1){
-                    ProdutosFrigorifico itemf = new ProdutosFrigorifico(0, frigorifico, produto, dataValidade, lote, quantidade);
-                    if (ifDAO.inserirProdutoFrigorifico(itemf) == 1){
-                        // busca o plano da empresa
-                        Assinatura assinatura = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
+                ProdutosFrigorifico itemf = new ProdutosFrigorifico(0, frigorifico, produto, dataValidade, lote, quantidade);
+                if (ifDAO.inserirProdutoFrigorifico(itemf) == 1){
+                    // busca o plano da empresa
+                    Assinatura assinatura = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
 
-                        // recalcula o status no objeto (soma o ItemFrigorifico e compara com a capacidade)
-                        ArmazenamentoService.calcularStatusFrigorifico(frigorifico, assinatura);
+                    // recalcula o status no objeto (soma o ItemFrigorifico e compara com a capacidade)
+                    ArmazenamentoService.calcularStatusFrigorifico(frigorifico, assinatura);
 
-                        // grava o novo status no banco
-                        frigorificosDAO.atualizarStatus(frigorifico);
-                        resp.sendRedirect(req.getContextPath() + url_servlet_produto);
-                        return;
-                    }
-                    else {
-                        if (prodDAO.removerProduto(produto) == 1){
-                            voltaComErro(req, resp,"Erro ao adicionar frigorífico.", jsp_inserir);
-                            return;
-                        }
-                        else {
-                            System.err.println("produto ficou orfão!!");
-                            voltaComErro(req, resp,"Erro ao adicionar frigorífico.", jsp_inserir);
-                            return;
-                        }
-                    }
+                    // grava o novo status no banco
+                    frigorificosDAO.atualizarStatus(frigorifico);
+                    resp.sendRedirect(req.getContextPath() + url_servlet_produto);
+                    return;
                 }
                 else {
                     voltaComErro(req, resp,"Erro ao adicionar frigorífico.", jsp_inserir);
@@ -405,28 +389,14 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
                     return;
                 }
 
-                Produto produtoAntigo = prodDAO.buscarprodutoPorId(itemAntigo.getProduto().getIdProdutos());
                 Frigorificos frigorifico = frigorificosDAO.buscarFrigorificoPorId(empresa.getCnpj(), itemAntigo.getFrigorificos().getIdFrigorifico());
 
-                if (prodDAO.alterarProduto(produtoAntigo, produtoNovo) == 1){
-                    Produto produtoJaAlterado = prodDAO.buscarprodutoPorId(produtoAntigo.getIdProdutos());
-                    ProdutosFrigorifico itemNovo = new ProdutosFrigorifico(0, frigorifico, produtoJaAlterado, dataValidade, lote, quantidade);
-                    if (ifDAO.alterarProdutoFrigorifico(itemAntigo, itemNovo) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet_produto);
-                        return;
-                    }
-                    else {
-                        if (prodDAO.alterarProduto(produtoJaAlterado, produtoAntigo) == 1){
-                            voltaComErro(req, resp,"Erro ao alterar frigorífico.", jsp_inserir);
-                            return;
-                        }
-                        else {
-                            System.err.println("produto foi alterado mas o item no frigorifico não!!!");
-                            voltaComErro(req, resp,"Erro ao alterar frigorífico.", jsp_inserir);
-                            return;
-                        }
-                    }
-                }else {
+                ProdutosFrigorifico itemNovo = new ProdutosFrigorifico(0, frigorifico, produtoNovo, dataValidade, lote, quantidade);
+                if (ifDAO.alterarProdutoFrigorifico(itemAntigo, itemNovo) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet_produto);
+                    return;
+                }
+                else {
                     voltaComErro(req, resp,"Erro ao alterar frigorífico.", jsp_inserir);
                     return;
                 }
@@ -444,31 +414,21 @@ public class ProdutoFrigorificoServlet extends HttpServlet {
                    return;
                }
                ProdutosFrigorifico itemf = ifDAO.buscarProdutoFrigorificoPorId(id);
-               Produto produto = prodDAO.buscarprodutoPorId(itemf.getProduto().getIdProdutos());
-               Frigorificos frigorifico = frigorificosDAO.buscarFrigorificoPorId(empresa.getCnpj(), itemf.getFrigorificos().getIdFrigorifico());
-
-               if(itemf == null || produto == null || frigorifico == null){
+               if (itemf == null){
                    voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                    return;
                }
-               if (prodDAO.removerProduto(produto) == 1){
-                   if(ifDAO.deletarProdutoFrigorifico(itemf) == 1){
-                       resp.sendRedirect(req.getContextPath() + url_servlet_produto);
-                       return;
-                   }
-                   else {
-                       if (prodDAO.inserirProduto(produto) == 1){
-                           voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
-                           return;
-                       }
-                       else {
-                           System.err.println("produto foi removido mas o item no frigorifico não!!!");
-                           voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
-                           return;
-                       }
-                   }
+               Frigorificos frigorifico = frigorificosDAO.buscarFrigorificoPorId(empresa.getCnpj(), itemf.getFrigorificos().getIdFrigorifico());
 
-               }else {
+               if(frigorifico == null){
+                   voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
+                   return;
+               }
+               if(ifDAO.deletarProdutoFrigorifico(itemf) == 1){
+                   resp.sendRedirect(req.getContextPath() + url_servlet_produto);
+                   return;
+               }
+               else {
                    voltaComErro(req, resp, "Erro ao deletar esse produto. Por favor tente novamente.", jsp_deletar);
                    return;
                }

@@ -144,22 +144,10 @@ public class FrigorificoServlet extends HttpServlet {
                 }
 
                 endereco = new Endereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
-                if(enderecoDAO.inserirEndereco(endereco) == 1){
-                    frigorifico = new Frigorificos(empresa, endereco, tipo, nomeFrigorifico);
-                    if (frigorificoDAO.inserirFrigorifico(frigorifico) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        if (enderecoDAO.deletarEndereco(endereco) == 1){
-                            voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
-                            return;
-                        }else {
-                            System.err.println("Endereço ficou orfão!");
-                            voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
-                            return;
-                        }
-                    }
+                frigorifico = new Frigorificos(empresa, endereco, tipo, nomeFrigorifico);
+                if (frigorificoDAO.inserirFrigorifico(frigorifico) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }
                 else{
                     voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
@@ -263,25 +251,13 @@ public class FrigorificoServlet extends HttpServlet {
 
                 Endereco enderecoNovo = new Endereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
 
-                if (enderecoDAO.alterarEndereco(enderecoAntigo, enderecoNovo) == 1){
-                    enderecoNovo.setIdEndereco(enderecoAntigo.getIdEndereco());
-                    Frigorificos frigorificoNovo = new Frigorificos(empresa, enderecoNovo, tipo, nomeFrigorifico);
-                    if (frigorificoDAO.alterarFrigorifico(frigorificoAntigo, frigorificoNovo) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        if (enderecoDAO.alterarEndereco(enderecoNovo, enderecoAntigo) == 1){
-                            voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
-                            return;
-                        }else {
-                            System.err.println("endereço alterado mas frigorifico não, isso é realmente preocupante");
-                            voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
-                            return;
-                        }
-                    }
-
-                }else {
+                enderecoNovo.setIdEndereco(enderecoAntigo.getIdEndereco());
+                Frigorificos frigorificoNovo = new Frigorificos(empresa, enderecoNovo, tipo, nomeFrigorifico);
+                if (frigorificoDAO.alterarFrigorifico(frigorificoAntigo, frigorificoNovo) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
+                }
+                else {
                     voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
                     return;
                 }
@@ -304,17 +280,13 @@ public class FrigorificoServlet extends HttpServlet {
                     return;
                 }
                 Frigorificos frigorifico = frigorificoDAO.buscarFrigorificoPorId(empresa.getCnpj(), id);
-                Endereco endereco = enderecoDAO.buscarEnderecoDeUmFrigorifico(empresa.getCnpj(), frigorifico.getIdFrigorifico());
-                if (enderecoDAO.deletarEndereco(endereco) == 1){
-                    if (frigorificoDAO.deletarFrigorifico(frigorifico) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        System.err.println("Frigorifico ficou orfao!!!");
-                        voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente", jsp_deletar);
-                        return;
-                    }
+                if (frigorifico == null){
+                    voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente", jsp_deletar);
+                    return;
+                }
+                if (frigorificoDAO.deletarFrigorifico(frigorifico) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }else {
                     voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente", jsp_deletar);
                     return;
