@@ -10,38 +10,6 @@ import java.util.List;
 
 public class ListaComprasDAO {
     // ================= USUARIO =================
-    //========== INSERIR LISTA DE COMPRA PARA O USUARIO ==========
-    public int inserirListaComprasUsuario(ListaCompras listaCompras){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexao com o banco
-
-        try{
-            String comandoSql = "insert into listaCompras (idUsuario, dtLista) values(?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
-            // setando os valores para a operação
-            pstmt.setString(1, listaCompras.getUsuario().getCpf());
-            pstmt.setObject(2, listaCompras.getDtLista());
-            // verificando se deu foi possivel executar
-            if (pstmt.executeUpdate() > 0 ){
-                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-                if (chaves.next()) listaCompras.setIdLista(chaves.getInt(1));
-                return 1;// deu certo
-            }
-            else{
-                return 0;// não foi possivel!!
-            }
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;// deu erro!!
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexao com o banco
-        }
-    }//========== INSERIR LISTA DE COMPRA PARA O USUARIO ==========
-
-
-
     //========== ALTERAR LISTA DE COMPRA PARA O USUARIO ==========
     public int alterarListaComprasUsuario(ListaCompras listaComprasAntiga, ListaCompras listaComprasNova){
         Conexao conexao = new Conexao();
@@ -201,38 +169,6 @@ public class ListaComprasDAO {
 
 
     // ================= EMPRESA =================
-    //========== INSERIR LISTA DE COMPRA PARA A EMPRESA ==========
-    public int inserirListaComprasEmpresa(ListaCompras listaCompras){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexao com o banco
-
-        try{
-            String comandoSql = "insert into listaCompras (idEmpresa, dtLista) values(?,?);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
-            // setando os valores para a operação
-            pstmt.setString(1, listaCompras.getEmpresa().getCnpj());
-            pstmt.setObject(2, listaCompras.getDtLista());
-            // verificando se deu foi possivel executar
-            if (pstmt.executeUpdate() > 0 ){
-                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-                if (chaves.next()) listaCompras.setIdLista(chaves.getInt(1));
-                return 1;// deu certo
-            }
-            else{
-                return 0;// não foi possivel!!
-            }
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;// deu erro!!
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexao com o banco
-        }
-    }//========== INSERIR LISTA DE COMPRA PARA A EMPRESA ==========
-
-
-
     //========== ALTERAR LISTA DE COMPRA PARA A EMPRESA ==========
     public int alterarListaComprasEmpresa(ListaCompras listaComprasAntiga, ListaCompras listaComprasNova){
         Conexao conexao = new Conexao();
@@ -396,19 +332,47 @@ public class ListaComprasDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try {
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // guarda os produtos da lista antes de apagar os itens que apontam para eles
+            String comandoSqlBusca = "select idProduto from ItemLista where idListaCompras = ?;";
+            PreparedStatement pstmtBusca = conn.prepareStatement(comandoSqlBusca);
+            pstmtBusca.setInt(1, listaCompras.getIdLista());
+            ResultSet rset = pstmtBusca.executeQuery();
+            List<Integer> idsProdutos = new ArrayList<>();
+            while (rset.next()) idsProdutos.add(rset.getInt("idProduto"));
+
+            String comandoSqlItens = "delete from ItemLista where idListaCompras = ?;";
+            PreparedStatement pstmtItens = conn.prepareStatement(comandoSqlItens);
+            pstmtItens.setInt(1, listaCompras.getIdLista());
+            pstmtItens.executeUpdate();// a lista pode estar vazia, por isso não exige linhas afetadas
+
+            String comandoSqlProduto = "delete from Produto where id = ? ";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto);
+            for (int idProduto : idsProdutos){
+                pstmtProduto.setInt(1, idProduto);
+                if (pstmtProduto.executeUpdate() <= 0){
+                    conn.rollback();
+                    return 0;// não foi possivel!!
+                }
+            }
+
             String comandoSql = "delete from listaCompras where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a operação;
             pstmt.setInt(1, listaCompras.getIdLista());
             // verificando se deu foi possivel executar
-            if (pstmt.executeUpdate() > 0) {
-                return 1;// deu certo
-            } else {
+            if (pstmt.executeUpdate() <= 0) {
+                conn.rollback();
                 return 0;// não foi possivel!!
             }
 
+            conn.commit();
+            return 1;// deu certo
+
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;// deu erro!!
         } finally {
             conexao.desconectar(conn);// fechando a conexao com o banco

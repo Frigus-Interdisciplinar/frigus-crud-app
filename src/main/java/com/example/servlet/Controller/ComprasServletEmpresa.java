@@ -30,7 +30,6 @@ public class ComprasServletEmpresa extends HttpServlet {
     private ListaComprasDAO listaDAO;
     private ProdutoListaDAO prodListaDAO;
     private EmpresaDAO empresaDAO;
-    private ProdutoDAO prodDAO;
     private Validacao validar;
 
     // caminho para o servlet logo após concluir alguma tarefa
@@ -52,7 +51,6 @@ public class ComprasServletEmpresa extends HttpServlet {
         listaDAO = new ListaComprasDAO();
         prodListaDAO = new ProdutoListaDAO();
         empresaDAO = new EmpresaDAO();
-        prodDAO = new ProdutoDAO();
         validar = new Validacao();
     }
 
@@ -222,38 +220,12 @@ public class ComprasServletEmpresa extends HttpServlet {
                     prod = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
                 }
 
-                if (prodDAO.inserirProduto(prod) == 1){
-                    compras = new ListaCompras(empresa, dtLista);
-                    if (listaDAO.inserirListaComprasEmpresa(compras) == 1){
-                        prodLista = new ProdutoLista(compras, prod, quantidade);
-                        if (prodListaDAO.adicionarProdutoListas(prodLista) == 1){
-                            resp.sendRedirect(req.getContextPath() + url_ver_compra);
-                            break;
-                        }else {
-                            if (prodDAO.removerProduto(prod) == 1 && listaDAO.deletarListaCompras(compras) == 1){
-                                voltaComErro(req, resp, "Não foi possível adicionar essa compra.", jsp_inserir_compra);
-                                break;
-                            }
-                            else {
-                                System.err.println("O produto ficou orfão ou a lista de compras ficou orfão");
-                                voltaComErro(req, resp, "Não foi possível adicionar essa compra.", jsp_inserir_compra);
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        if (prodDAO.removerProduto(prod) == 1){
-                            voltaComErro(req, resp, "Não foi possível adicionar essa compra.", jsp_inserir_compra);
-                            break;
-                        }
-                        else {
-                            System.err.println("O produto ficou orfão");
-                            voltaComErro(req, resp, "Não foi possível adicionar essa compra.", jsp_inserir_compra);
-                            break;
-                        }
-                    }
-                }
-                else {
+                compras = new ListaCompras(empresa, dtLista);
+                prodLista = new ProdutoLista(compras, prod, quantidade);
+                if (prodListaDAO.adicionarProdutoListas(prodLista) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
+                    break;
+                }else {
                     voltaComErro(req, resp, "Não foi possível adicionar essa compra.", jsp_inserir_compra);
                     break;
                 }
@@ -419,22 +391,10 @@ public class ComprasServletEmpresa extends HttpServlet {
                     produto = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
                 }
 
-                if (prodDAO.inserirProduto(produto) == 1){
-                    ProdutoLista prodLista = new ProdutoLista(compra, produto, quantidade);
-                    if (prodListaDAO.adicionarProdutoListas(prodLista) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_ver_compra);
-                        return;
-                    }
-                    else {
-                        if (prodDAO.removerProduto(produto) == 1){
-                            voltaComErro(req, resp, "Não foi possível adicionar esse produto a essa lista de compras.", jsp_inserir_item_lista);
-                            return;
-                        }else {
-                            System.err.println("Produto ficou orfao");
-                            voltaComErro(req, resp, "Não foi possível adicionar esse produto a essa lista de compras.", jsp_inserir_item_lista);
-                            return;
-                        }
-                    }
+                ProdutoLista prodLista = new ProdutoLista(compra, produto, quantidade);
+                if (prodListaDAO.adicionarProdutoListas(prodLista) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
+                    return;
                 }
                 else {
                     voltaComErro(req, resp, "Não foi possível adicionar esse produto a essa lista de compras. Por favor tente novamente", jsp_inserir_item_lista);
@@ -480,9 +440,6 @@ public class ComprasServletEmpresa extends HttpServlet {
                     voltaComErro(req, resp, "Erro ao alterar esse produto dessa compra. Por favor tente novamente.", jsp_alterar_item_lista);
                     return;
                 }
-
-                // pegando os dados do antigo produto do banco
-                Produto produtoAntigo = prodListaAntigo.getProduto();
 
 
                 // pegando os dados do novo produto do formulario
@@ -555,18 +512,10 @@ public class ComprasServletEmpresa extends HttpServlet {
                     produtoNovo = new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
                 }
 
-                if (prodDAO.alterarProduto(produtoAntigo, produtoNovo) == 1){
-
-                    prodListaNovo = new ProdutoLista(compra, produtoNovo, quantidade);
-                    if(prodListaDAO.alterarProdutoListas(prodListaNovo, prodListaAntigo) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_ver_compra);
-                        break;
-                    }
-                    else {
-                        System.err.println("O produto foi alterado mas o produto na lista nao");
-                        voltaComErro(req, resp, "Não foi possível alterar esse produto dessa lista!!!", jsp_alterar_item_lista);
-                        break;
-                    }
+                prodListaNovo = new ProdutoLista(compra, produtoNovo, quantidade);
+                if(prodListaDAO.alterarProdutoListas(prodListaAntigo, prodListaNovo) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
+                    break;
                 }
                 else {
                     voltaComErro(req, resp, "Não foi possível alterar esse produto dessa lista!!!", jsp_alterar_item_lista);
