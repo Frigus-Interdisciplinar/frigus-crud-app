@@ -16,27 +16,85 @@ public class IngredienteDAO {
     public int inserirIngrediente(Ingredientes ingrediente){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
+        Produto produto = ingrediente.getProduto();
+        Receita receita = ingrediente.getReceita();
 
         try{
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // insere o produto
+            String comandoSqlProduto = "insert into Produto(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto, Statement.RETURN_GENERATED_KEYS);
+            pstmtProduto.setString(1, produto.getNome());
+            pstmtProduto.setString(2, produto.getDescricao());
+            pstmtProduto.setDouble(3, produto.getPreco());
+            pstmtProduto.setString(4, produto.getCategoria().name());
+            pstmtProduto.setString(5, produto.getMarca());
+            pstmtProduto.setString(6, produto.getUnidadeMedida());
+
+            if (pstmtProduto.executeUpdate() <= 0){
+                conn.rollback();
+                return 0; // rejeitado!!
+            }
+            ResultSet chavesProduto = pstmtProduto.getGeneratedKeys();// adicionando a chave criada pelo banco
+            if (chavesProduto.next()) produto.setIdProdutos(chavesProduto.getInt(1));
+
+            // insere a receita, do usuário ou da empresa
+            String comandoSqlReceita;
+            if (receita.getUsuario() != null){
+                comandoSqlReceita = "insert into receita (idUsuario, nome, descricao, modoPreparo, dtReceita, foiFeita) values (?,?,?,?,?,?);";
+            }
+            else {
+                comandoSqlReceita = "insert into receita (idEmpresa, nome, descricao, modoPreparo, dtReceita, foiFeita) values (?,?,?,?,?,?);";
+            }
+            PreparedStatement pstmtReceita = conn.prepareStatement(comandoSqlReceita, Statement.RETURN_GENERATED_KEYS);
+            if (receita.getUsuario() != null){
+                pstmtReceita.setString(1, receita.getUsuario().getCpf());
+            }
+            else {
+                pstmtReceita.setString(1, receita.getEmpresa().getCnpj());
+            }
+            pstmtReceita.setString(2, receita.getNome());
+            pstmtReceita.setString(3, receita.getDescricao());
+            pstmtReceita.setString(4, receita.getModoPreparo());
+            pstmtReceita.setObject(5, receita.getDtReceita());
+            pstmtReceita.setBoolean(6, receita.isFoiFeita());
+
+            if (pstmtReceita.executeUpdate() <= 0){
+                conn.rollback();
+                produto.setIdProdutos(0);
+                return 0; // rejeitado!!
+            }
+            ResultSet chavesReceita = pstmtReceita.getGeneratedKeys();// adicionando a chave criada pelo banco
+            if (chavesReceita.next()) receita.setIdReceita(chavesReceita.getInt(1));
+
             String comandoSql = "insert into Ingrediente (idReceita, idProduto, quantidade) values (?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
-            pstmt.setInt(1, ingrediente.getReceita().getIdReceita());
-            pstmt.setInt(2, ingrediente.getProduto().getIdProdutos());
+            pstmt.setInt(1, receita.getIdReceita());
+            pstmt.setInt(2, produto.getIdProdutos());
             pstmt.setInt(3, ingrediente.getQuantidade());
 
-            if (pstmt.executeUpdate() > 0){
-                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-                if (chaves.next()) ingrediente.setIdIngredientes(chaves.getInt(1));
-                return 1; // verifica se deu certo
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
+                produto.setIdProdutos(0);
+                receita.setIdReceita(0);
                 return 0; // rejeitado!!
             }
+            ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+            if (chaves.next()) ingrediente.setIdIngredientes(chaves.getInt(1));
+
+            conn.commit();
+            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            // o rollback torna esses ids falsos
+            produto.setIdProdutos(0);
+            receita.setIdReceita(0);
+            ingrediente.setIdIngredientes(0);
             return -1;
         }
         finally {
@@ -52,25 +110,78 @@ public class IngredienteDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
+        // o ingrediente continua ligado ao mesmo produto e à mesma receita, então os ids vêm do antigo
+        int idProduto = ingredienteAntigo.getProduto().getIdProdutos();
+        int idReceita = ingredienteAntigo.getReceita().getIdReceita();
+        Produto produtoNovo = ingredienteNovo.getProduto();
+        Receita receitaNova = ingredienteNovo.getReceita();
+
         try{
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // altera as informações do produto
+            String comandoSqlProduto = "update Produto set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto);
+            pstmtProduto.setString(1, produtoNovo.getNome());
+            pstmtProduto.setString(2, produtoNovo.getDescricao());
+            pstmtProduto.setDouble(3, produtoNovo.getPreco());
+            pstmtProduto.setString(4, produtoNovo.getCategoria().name());
+            pstmtProduto.setString(5, produtoNovo.getMarca());
+            pstmtProduto.setString(6, produtoNovo.getUnidadeMedida());
+            pstmtProduto.setInt(7, idProduto);
+
+            if (pstmtProduto.executeUpdate() <= 0){
+                conn.rollback();
+                return 0; // rejeitado!!
+            }
+
+            // altera a receita, do usuário ou da empresa
+            String comandoSqlReceita;
+            if (receitaNova.getUsuario() != null){
+                comandoSqlReceita = "update receita set idUsuario = ?, nome = ?, descricao = ?, modoPreparo = ?, dtReceita = ?, foiFeita = ? where id = ? and idUsuario is not null;";
+            }
+            else {
+                comandoSqlReceita = "update receita set idEmpresa = ?, nome = ?, descricao = ?, modoPreparo = ?, dtReceita = ?, foiFeita = ? where id = ? and idEmpresa is not null;";
+            }
+            PreparedStatement pstmtReceita = conn.prepareStatement(comandoSqlReceita);
+            if (receitaNova.getUsuario() != null){
+                pstmtReceita.setString(1, receitaNova.getUsuario().getCpf());
+            }
+            else {
+                pstmtReceita.setString(1, receitaNova.getEmpresa().getCnpj());
+            }
+            pstmtReceita.setString(2, receitaNova.getNome());
+            pstmtReceita.setString(3, receitaNova.getDescricao());
+            pstmtReceita.setString(4, receitaNova.getModoPreparo());
+            pstmtReceita.setObject(5, receitaNova.getDtReceita());
+            pstmtReceita.setBoolean(6, receitaNova.isFoiFeita());
+            pstmtReceita.setInt(7, idReceita);
+
+            if (pstmtReceita.executeUpdate() <= 0){
+                conn.rollback();
+                return 0; // rejeitado!!
+            }
+
             String comandoSql = "update Ingrediente set idReceita = ?, idProduto = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
-            pstmt.setInt(1, ingredienteNovo.getReceita().getIdReceita());
-            pstmt.setInt(2, ingredienteNovo.getProduto().getIdProdutos());
+            pstmt.setInt(1, idReceita);
+            pstmt.setInt(2, idProduto);
             pstmt.setInt(3, ingredienteNovo.getQuantidade());
             pstmt.setInt(4, ingredienteAntigo.getIdIngredientes());
 
-            if (pstmt.executeUpdate() > 0){
-                return 1; // verifica se deu certo
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0; // rejeitado!!
             }
+
+            conn.commit();
+            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -86,21 +197,44 @@ public class IngredienteDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // o ingrediente sai primeiro porque ele referencia o produto e a receita
             String comandoSql = "delete from Ingrediente where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
             pstmt.setInt(1, ingrediente.getIdIngredientes());
 
-            if (pstmt.executeUpdate() > 0){
-                return 1; // verifica se deu certo
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0; // rejeitado!!
             }
+
+            String comandoSqlProduto = "delete from Produto where id = ? ";
+            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto);
+            pstmtProduto.setInt(1, ingrediente.getProduto().getIdProdutos());
+
+            if (pstmtProduto.executeUpdate() <= 0){
+                conn.rollback();
+                return 0; // rejeitado!!
+            }
+
+            String comandoSqlReceita = "delete from receita where id = ?";
+            PreparedStatement pstmtReceita = conn.prepareStatement(comandoSqlReceita);
+            pstmtReceita.setInt(1, ingrediente.getReceita().getIdReceita());
+
+            if (pstmtReceita.executeUpdate() <= 0){
+                conn.rollback();
+                return 0; // rejeitado!!
+            }
+
+            conn.commit();
+            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {

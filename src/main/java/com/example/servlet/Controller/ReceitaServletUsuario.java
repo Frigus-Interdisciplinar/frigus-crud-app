@@ -1,7 +1,6 @@
 package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.IngredienteDAO;
-import com.example.servlet.Dao.ProdutoDAO;
 import com.example.servlet.Dao.ReceitaDAO;
 import com.example.servlet.Dao.UsuarioDAO;
 import com.example.servlet.Model.*;
@@ -34,7 +33,6 @@ import java.util.List;
 public class ReceitaServletUsuario extends HttpServlet {
     private Validacao validar;
     private ReceitaDAO receitaDAO;
-    private ProdutoDAO prodDAO;
     private IngredienteDAO ingredienteDAO;
     private UsuarioDAO usuarioDAO;
 
@@ -56,7 +54,6 @@ public class ReceitaServletUsuario extends HttpServlet {
     public void init(){
         validar = new Validacao();
         receitaDAO = new ReceitaDAO();
-        prodDAO = new ProdutoDAO();
         ingredienteDAO =  new IngredienteDAO();
         usuarioDAO = new UsuarioDAO();
     }
@@ -247,39 +244,14 @@ public class ReceitaServletUsuario extends HttpServlet {
                 }
 
                 // inserindo no banco
-                if (prodDAO.inserirProduto(produto) == 1){
-                    if (receitaDAO.inserirReceitaUsuario(receita) == 1){
-                        ingrediente = new Ingredientes(
-                                receita,
-                                produto,
-                                quantidade
-                        );
-                        if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
-                            resp.sendRedirect(req.getContextPath() + url_servlet);
-                            return;
-                        }
-                        else {
-                            if (prodDAO.removerProduto(produto) == 1 && receitaDAO.deletarReceita(receita) == 1){
-                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente.", jsp_inserir_receita);
-                                return;
-                            }
-                            else{
-                                System.err.println("Produto ficou orfão e a receita também!!");
-                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                                return;
-                            }
-                        }
-                    }
-                    else {
-                        if (prodDAO.removerProduto(produto) == 1){
-                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                            return;
-                        }else {
-                            System.err.println("Produto ficou orfão!!");
-                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                            return;
-                        }
-                    }
+                ingrediente = new Ingredientes(
+                        receita,
+                        produto,
+                        quantidade
+                );
+                if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }
                 else {
                     voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
@@ -291,7 +263,7 @@ public class ReceitaServletUsuario extends HttpServlet {
 
             case "/alterar-receita-usuario":{
                 // pegando as informações do formulario
-                String nomeReceitaAntiga = req.getParameter("nomeReceita");
+                String idIngredienteTxt = req.getParameter("idIngrediente");
                 // produto
                 String nomeProd = req.getParameter("nomeProduto");
                 String descricaoProd = req.getParameter("descricaoProd");
@@ -393,9 +365,19 @@ public class ReceitaServletUsuario extends HttpServlet {
                 boolean foiFeita = Boolean.parseBoolean(foiFeitaTxt);
 
 
-                Receita receitaAntiga = ingredienteDAO.buscarReceita(nomeReceitaAntiga);
-                
-
+                // o ingrediente antigo traz os ids do produto e da receita que serão alterados
+                int idIngrediente;
+                try {
+                    idIngrediente = Integer.parseInt(idIngredienteTxt);
+                } catch (NumberFormatException e) {
+                    voltaComErro(req, resp, "Erro ao alterar essa receita. Por favor tente novamente.", jsp_alterar_receita);
+                    return;
+                }
+                Ingredientes ingredienteAntigo = ingredienteDAO.buscarIngrediente(idIngrediente);
+                if (ingredienteAntigo == null){
+                    voltaComErro(req, resp, "Erro ao alterar essa receita. Por favor tente novamente.", jsp_alterar_receita);
+                    return;
+                }
 
                 // criando o objeto produto, receita e ingrediente
                 Produto produto;
@@ -417,46 +399,20 @@ public class ReceitaServletUsuario extends HttpServlet {
                     receita = new Receita(usuario, nomeReceita, descricaoReceita, modoPreparo, dataReceita, foiFeita);
                 }
 
-                // inserindo no banco
-                if (prodDAO.inserirProduto(produto) == 1){
-                    if (receitaDAO.inserirReceitaUsuario(receita) == 1){
-                        ingrediente = new Ingredientes(
-                                receita,
-                                produto,
-                                quantidade
-                        );
-                        if (ingredienteDAO.inserirIngrediente(ingrediente) == 1){
-                            resp.sendRedirect(req.getContextPath() + url_servlet);
-                            return;
-                        }
-                        else {
-                            if (prodDAO.removerProduto(produto) == 1 && receitaDAO.deletarReceita(receita) == 1){
-                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente.", jsp_inserir_receita);
-                                return;
-                            }
-                            else{
-                                System.err.println("Produto ficou orfão e a receita também!!");
-                                voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                                return;
-                            }
-                        }
-                    }
-                    else {
-                        if (prodDAO.removerProduto(produto) == 1){
-                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                            return;
-                        }else {
-                            System.err.println("Produto ficou orfão!!");
-                            voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
-                            return;
-                        }
-                    }
-                }
-                else {
-                    voltaComErro(req, resp, "Erro ao adicionar essa receita. Por favor tente novamente", jsp_inserir_receita);
+                // alterando no banco
+                ingrediente = new Ingredientes(
+                        receita,
+                        produto,
+                        quantidade
+                );
+                if (ingredienteDAO.alterarIngrediente(ingredienteAntigo, ingrediente) == 1){
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
-            }
+                else {
+                    voltaComErro(req, resp, "Erro ao alterar essa receita. Por favor tente novamente", jsp_alterar_receita);
+                    return;
+                }
             }
         }
 
