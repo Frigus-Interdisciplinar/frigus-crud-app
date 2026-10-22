@@ -1,6 +1,7 @@
 package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.GeladeiraDAO;
+import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Geladeira;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.Categoria;
@@ -102,6 +103,7 @@ public class GeladeiraServlet extends HttpServlet {
 
         switch(action) {
             case "/inserir-geladeira": {
+
                 // ver se ele ja alcançou o limite de geladeiras cadastradas
                 int geladeirasExistentes = gelaDao.totalGeladeirasUsuario(usuario.getCpf());
                 if (geladeirasExistentes >= limitePlano){
