@@ -60,7 +60,6 @@ public class Main {
 //                "KG");
 //
 //        // instanciando o objeto produto dao para fazer as operações do crud
-        ProdutoDAO produtoDAO = new ProdutoDAO();
         //System.out.println(produtoDAO.inserirProduto(prod));
 //
 //        // criar o objeto para realizar os metodos de alterar e deletar
