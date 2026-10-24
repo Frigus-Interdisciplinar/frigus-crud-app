@@ -9,6 +9,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +36,7 @@ public class Planos extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_planos = "/WEB-INF/pages/planos.jsp";
+    private static final String jsp_planos_form = "/WEB-INF/pages/planos-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/planos";
@@ -280,6 +286,14 @@ public class Planos extends HttpServlet {
             }
         }
 
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Assinatura>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dono", (a, b) -> Ordenar.texto(
+                a.getUsuario() != null ? a.getUsuario().getNome() + " " + a.getUsuario().getSobrenome() : a.getEmpresa().getNome(),
+                b.getUsuario() != null ? b.getUsuario().getNome() + " " + b.getUsuario().getSobrenome() : b.getEmpresa().getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparingInt(Assinatura::getIdAssinatura));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(assinaturas, req.getParameter("ord"), "dono:asc", ordens));
+
         req.setAttribute("assinaturas", Paginacao.aplicar(req, assinaturas));
         req.setAttribute("totalGeral", todas.size());
         req.setAttribute("usuarios", usuarioDAO.buscarTodosUsuario());
@@ -287,13 +301,16 @@ public class Planos extends HttpServlet {
         req.setAttribute("planos", TipoAssinatura.values());
         req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
         req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
-        req.getRequestDispatcher(jsp_planos).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_planos_form : jsp_planos).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro 
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 }
