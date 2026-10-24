@@ -1,8 +1,13 @@
 package com.example.servlet.Controller;
 
+import com.example.servlet.Dao.AssinaturaDAO;
+import com.example.servlet.Dao.ResumoDAO;
 import com.example.servlet.Dao.UsuarioDAO;
+import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Usuario;
+import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,13 +17,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(urlPatterns = {
         "/admin/usuarios"},
         name = "usuarios")
 public class UsuarioServlet extends HttpServlet {
     private UsuarioDAO usuarioDAO;
+    private AssinaturaDAO assinaturaDAO;
+    private ResumoDAO resumoDAO;
     private Validacao validar;
 
     // caminho das paginas
@@ -30,6 +39,8 @@ public class UsuarioServlet extends HttpServlet {
     @Override
     public void init(){
         usuarioDAO = new UsuarioDAO();
+        assinaturaDAO = new AssinaturaDAO();
+        resumoDAO = new ResumoDAO();
         validar = new Validacao();
     }
 
@@ -61,8 +72,6 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = req.getSession();
         String action = req.getParameter("action");
-        // para onde voltar depois de dar certo
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
 
         if (action == null){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -77,6 +86,7 @@ public class UsuarioServlet extends HttpServlet {
                 String sobrenome = req.getParameter("sobrenome");
                 String email = req.getParameter("email");
                 String senha = req.getParameter("senha");
+                String planoTxt = req.getParameter("plano");
 
                 if(cpf == null || cpf.isBlank()){
                     voltaComErro(req, resp, "O cpf não pode ser vazio!!!");
@@ -96,6 +106,11 @@ public class UsuarioServlet extends HttpServlet {
                 }
                 if(senha == null || senha.isBlank()){
                     voltaComErro(req, resp, "A senha não pode ser vazia!!!");
+                    return;
+                }
+                TipoAssinatura plano = lerPlano(planoTxt);
+                if (plano == null){
+                    voltaComErro(req, resp, "Escolha o plano do usuário.");
                     return;
                 }
 
@@ -141,15 +156,22 @@ public class UsuarioServlet extends HttpServlet {
                         senhaHash
                 );
 
-                if (usuarioDAO.adicionarUsuario(usuario) == 1){
-                    session.setAttribute("sucesso", "Usuário cadastrado com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
-                    return;
-                }
-                else {
+                if (usuarioDAO.adicionarUsuario(usuario) != 1){
                     voltaComErro(req, resp, "Erro ao cadastrar o usuário. Esse cpf ou e-mail já pode estar cadastrado.");
                     return;
                 }
+
+                // todo usuario nasce com um plano
+                if (assinaturaDAO.inserirAssinatura(new Assinatura(usuario, plano)) != 1){
+                    // se o plano nao foi salvo o usuario nao fica pela metade
+                    usuarioDAO.deletarUsuario(usuario);
+                    voltaComErro(req, resp, "Erro ao cadastrar o plano do usuário. Por favor tente novamente.");
+                    return;
+                }
+
+                session.setAttribute("sucesso", "Usuário cadastrado com sucesso.");
+                resp.sendRedirect(req.getContextPath() + url_servlet);
+                return;
             }
 
 
@@ -161,6 +183,7 @@ public class UsuarioServlet extends HttpServlet {
                 String email = req.getParameter("email");
                 // a senha é opcional: vazia mantem a senha que ja esta no banco
                 String senha = req.getParameter("senha");
+                String planoTxt = req.getParameter("plano");
 
                 if(cpf == null || cpf.isBlank()){
                     voltaComErro(req, resp, "O cpf não pode ser vazio!!!");
@@ -176,6 +199,11 @@ public class UsuarioServlet extends HttpServlet {
                 }
                 if(email == null || email.isBlank()){
                     voltaComErro(req, resp, "O email não pode ser vazio!!!");
+                    return;
+                }
+                TipoAssinatura plano = lerPlano(planoTxt);
+                if (plano == null){
+                    voltaComErro(req, resp, "Escolha o plano do usuário.");
                     return;
                 }
 
@@ -224,15 +252,28 @@ public class UsuarioServlet extends HttpServlet {
                         senhaHash
                 );
 
-                if (usuarioDAO.alterarUsuario(usuarioAntigo, usuarioNovo) == 1){
-                    session.setAttribute("sucesso", "Usuário alterado com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
-                    return;
-                }
-                else {
+                if (usuarioDAO.alterarUsuario(usuarioAntigo, usuarioNovo) != 1){
                     voltaComErro(req, resp, "Erro ao alterar o usuário. Esse e-mail já pode estar cadastrado.");
                     return;
                 }
+
+                // o plano muda junto: troca o que existe ou cria se o usuario ainda nao tinha
+                Assinatura assinaturaAntiga = assinaturaDAO.buscarAssinaturaUsuario(usuarioAntigo.getCpf());
+                int funcionouPlano = 1;
+                if (assinaturaAntiga == null){
+                    funcionouPlano = assinaturaDAO.inserirAssinatura(new Assinatura(usuarioAntigo, plano));
+                }
+                else if (assinaturaAntiga.getTipoAssinatura() != plano){
+                    funcionouPlano = assinaturaDAO.alterarAssinatura(assinaturaAntiga, new Assinatura(usuarioAntigo, plano));
+                }
+                if (funcionouPlano != 1){
+                    voltaComErro(req, resp, "Os dados foram salvos, mas não foi possível trocar o plano.");
+                    return;
+                }
+
+                session.setAttribute("sucesso", "Usuário alterado com sucesso.");
+                resp.sendRedirect(req.getContextPath() + url_servlet);
+                return;
             }
 
 
@@ -253,7 +294,7 @@ public class UsuarioServlet extends HttpServlet {
 
                 if (usuarioDAO.deletarUsuario(usuario) == 1){
                     session.setAttribute("sucesso", "Usuário apagado com sucesso, junto com tudo que era dele.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
                 else {
@@ -266,24 +307,64 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
 
-    // carrega a lista e mostra a tela
+    // carrega a lista ( ja filtrada ), os totais de cada usuario e mostra a tela
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
-        List<Usuario> usuarios = usuarioDAO.buscarTodosUsuario();
-        req.setAttribute("usuarios", usuarios);
+        // filtros da tela
+        String busca = req.getParameter("busca");
+        String filtroPlano = req.getParameter("plano");
+
+        List<Usuario> todos = usuarioDAO.buscarTodosUsuario();
+        Map<String, String> planos = resumoDAO.buscarPlanosDosUsuarios();
+
+        List<Usuario> usuarios = new ArrayList<>();
+        for (Usuario usuario : todos){
+            String texto = (usuario.getNome() + " " + usuario.getSobrenome() + " " + usuario.getEmail() + " " + usuario.getCpf()).toLowerCase();
+            boolean achouBusca = busca == null || busca.isBlank() || texto.contains(busca.trim().toLowerCase());
+            boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(planos.get(usuario.getCpf()));
+            if (achouBusca && achouPlano){
+                usuarios.add(usuario);
+            }
+        }
+
+        // ver os detalhes ou editar um usuario ( vem no link da linha )
+        String verCpf = req.getParameter("ver");
+        String editarCpf = req.getParameter("editar");
+        if (verCpf != null && !verCpf.isBlank()){
+            req.setAttribute("registro", usuarioDAO.buscarUsuarioPorCpf(verCpf.trim()));
+            req.setAttribute("modo", "ver");
+        }
+        else if (editarCpf != null && !editarCpf.isBlank()){
+            req.setAttribute("registro", usuarioDAO.buscarUsuarioPorCpf(editarCpf.trim()));
+            req.setAttribute("modo", "editar");
+        }
+
+        req.setAttribute("usuarios", Paginacao.aplicar(req, usuarios));
+        req.setAttribute("totalGeral", todos.size());
+        req.setAttribute("filtroBusca", busca == null ? "" : busca);
+        req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
+        req.setAttribute("planosDosUsuarios", planos);
+        req.setAttribute("geladeirasPorUsuario", resumoDAO.contarGeladeirasPorUsuario());
+        req.setAttribute("receitasPorUsuario", resumoDAO.contarReceitasPorUsuario());
+        // o usuario so escolhe planos de pessoa fisica ( o Comercial é da empresa )
+        req.setAttribute("planos", new TipoAssinatura[]{TipoAssinatura.FREE, TipoAssinatura.PLUS, TipoAssinatura.FAMILIA});
         req.getRequestDispatcher(jsp_usuarios).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    // volta para a tela com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
-        if (retorno.equals(url_servlet)){
-            listar(req, resp);
-        }
-        else {
-            req.getRequestDispatcher(retorno).forward(req, resp);
+        listar(req, resp);
+    }
+
+    // transforma o texto do formulario no plano ( null se for invalido ou de empresa )
+    private TipoAssinatura lerPlano(String planoTxt){
+        try {
+            TipoAssinatura plano = TipoAssinatura.valueOf(planoTxt.trim().toUpperCase());
+            return plano == TipoAssinatura.COMERCIAL ? null : plano;
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return null;
         }
     }
 }

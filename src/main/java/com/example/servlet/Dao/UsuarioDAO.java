@@ -88,8 +88,7 @@ public class UsuarioDAO {
 
             // guarda os produtos dos itens do usuario antes de apagar ele
             String comandoSqlProdutos = "select ig.idProduto from ItemGeladeira ig join Geladeira g on g.id = ig.idGeladeira where g.idUsuario = ? " +
-                    "union select il.idProduto from ItemLista il join ListaCompras lc on lc.id = il.idListaCompras where lc.idUsuario = ? " +
-                    "union select i.idProduto from Ingrediente i join Receita r on r.id = i.idReceita where r.idUsuario = ?;";
+                    "union select il.idProduto from ItemLista il join ListaCompras lc on lc.id = il.idListaCompras where lc.idUsuario = ?;";
             List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, usuario.getCpf());
 
             String comandoSql = "delete from usuario where cpf = ?;";
