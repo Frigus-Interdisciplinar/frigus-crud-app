@@ -1,0 +1,76 @@
+/* layout do painel: so organiza as areas, sem cores */
+
+/* a pagina nao rola: o menu fica de um lado e o conteudo do outro */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* aside: menu lateral, rola sozinho se nao couber */
+body > nav:first-child {
+    flex: 0 0 200px;
+    box-sizing: border-box;
+    padding: 12px;
+    overflow-y: auto;
+    border-right: 1px solid #999;
+}
+body > nav:first-child ul { list-style: none; margin: 0 0 12px 0; padding: 0; }
+body > nav:first-child li a { display: block; padding: 4px 0; }
+body > nav:first-child a.ativo { font-weight: bold; }
+
+/* main: o conteudo rola dentro da propria area, a pagina continua parada */
+main {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 16px;
+    overflow-y: auto;
+}
+main h1 { margin: 0 0 4px 0; }
+main header p { margin: 0 0 12px 0; }
+main section { margin-bottom: 12px; }
+main h2 { font-size: 18px; margin: 0 0 8px 0; }
+main h3 { font-size: 15px; margin: 12px 0 4px 0; }
+
+/* formularios e filtros ocupam pouco espaco */
+main label { display: inline-block; margin: 0 12px 6px 0; }
+main label input[type="radio"] { margin-right: 4px; }
+#filtros form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px 0; }
+
+/* secoes de adicionar ficam recolhidas ate clicar no titulo */
+details.adicionar {
+    margin-bottom: 12px;
+    border: 1px solid #999;
+    padding: 6px 10px;
+}
+details.adicionar > summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* lista: so a tabela rola para os lados se for larga */
+#lista { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #999; padding: 4px 8px; text-align: left; vertical-align: top; }
+td form { display: inline; }
+
+/* navegacao entre as paginas da lista */
+nav.paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+}
+nav.paginacao span { color: #888; }
+
+/* detalhes: itens um por linha */
+dl { margin: 0 0 8px 0; }
+dt { font-weight: bold; }
+dd { margin: 0 0 4px 0; }
