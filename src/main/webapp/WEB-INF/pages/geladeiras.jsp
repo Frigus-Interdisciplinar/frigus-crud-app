@@ -15,6 +15,9 @@
     <header>
         <h1>Geladeiras</h1>
         <p>Geladeiras de todos os usuários, com ocupação e validades.</p>
+        <p>
+        <a href="${pageContext.request.contextPath}/admin/geladeiras?novo">Adicionar geladeira</a>
+        </p>
     </header>
 
     <c:if test="${not empty erro}">
@@ -24,71 +27,6 @@
         <div class="sucesso"><c:out value="${sucesso}"/></div>
     </c:if>
 
-    <%-- detalhes de uma geladeira ( link "Ver" da linha ) --%>
-    <c:if test="${modo == 'ver' and not empty registro}">
-        <section id="detalhes">
-            <h2>Detalhes da geladeira</h2>
-            <dl>
-                <dt>Nome</dt><dd><c:out value="${registro.nome}"/></dd>
-                <dt>Tipo</dt><dd><c:out value="${registro.tipo}"/></dd>
-                <dt>Usuário dono</dt><dd><c:out value="${registro.usuario.nome} ${registro.usuario.sobrenome} (${registro.usuario.email})"/></dd>
-                <dt>Status</dt><dd><c:out value="${registro.status}"/></dd>
-                <dt>Produtos</dt><dd>${empty ocupacao[registro.idGeladeira] ? 0 : ocupacao[registro.idGeladeira][0]}</dd>
-                <dt>Itens guardados</dt><dd>${empty ocupacao[registro.idGeladeira] ? 0 : ocupacao[registro.idGeladeira][1]}</dd>
-                <dt>Vencidos</dt><dd>${empty ocupacao[registro.idGeladeira] ? 0 : ocupacao[registro.idGeladeira][2]}</dd>
-                <dt>A vencer em 7 dias</dt><dd>${empty ocupacao[registro.idGeladeira] ? 0 : ocupacao[registro.idGeladeira][3]}</dd>
-            </dl>
-            <p>
-                <a href="${pageContext.request.contextPath}/admin/produtos?armazenamento=geladeira&idGeladeira=${registro.idGeladeira}">Ver os produtos dessa geladeira</a>
-                <a href="${pageContext.request.contextPath}/admin/geladeiras?editar=${registro.idGeladeira}">Editar</a>
-                <a href="${pageContext.request.contextPath}/admin/geladeiras">Fechar</a>
-            </p>
-        </section>
-    </c:if>
-
-    <%-- editar uma geladeira ( link "Editar" da linha ) --%>
-    <c:if test="${modo == 'editar' and not empty registro}">
-        <section id="editar">
-            <h2>Editar geladeira</h2>
-            <form method="post" action="${pageContext.request.contextPath}/admin/geladeiras">
-                <input type="hidden" name="action" value="alterar">
-                <input type="hidden" name="idGeladeira" value="${registro.idGeladeira}">
-                <label>Usuário dono
-                    <select name="cpf" required>
-                        <c:forEach items="${usuarios}" var="u">
-                            <option value="${u.cpf}" ${registro.usuario.cpf == u.cpf ? 'selected' : ''}><c:out value="${u.nome} ${u.sobrenome} · ${u.email}"/></option>
-                        </c:forEach>
-                    </select>
-                </label>
-                <label>Nome <input type="text" name="nome" value="${registro.nome}" required maxlength="50"></label>
-                <label>Tipo <input type="text" name="tipo" value="${registro.tipo}" required maxlength="20"></label>
-                <button type="submit">Salvar alterações</button>
-                <a href="${pageContext.request.contextPath}/admin/geladeiras">Cancelar</a>
-            </form>
-        </section>
-    </c:if>
-
-    <%-- adicionar uma geladeira --%>
-    <details class="adicionar" id="adicionar">
-        <summary>Adicionar geladeira</summary>
-        <p>Informe o usuário dono e os dados da geladeira.</p>
-        <form method="post" action="${pageContext.request.contextPath}/admin/geladeiras">
-            <input type="hidden" name="action" value="inserir">
-            <label>Usuário dono
-                <select name="cpf" required>
-                    <option value="">Selecione</option>
-                    <c:forEach items="${usuarios}" var="u">
-                        <option value="${u.cpf}"><c:out value="${u.nome} ${u.sobrenome} · ${u.email}"/></option>
-                    </c:forEach>
-                </select>
-            </label>
-            <label>Nome <input type="text" name="nome" required maxlength="50" placeholder="Ex.: Cozinha"></label>
-            <label>Tipo <input type="text" name="tipo" required maxlength="20" placeholder="Ex.: Duplex frost free"></label>
-            <button type="submit">Adicionar geladeira</button>
-        </form>
-    </details>
-
-    <%-- filtros da lista --%>
     <section id="filtros">
         <h2>Filtros</h2>
         <form method="get" action="${pageContext.request.contextPath}/admin/geladeiras">
@@ -118,12 +56,21 @@
                     <option value="sem" ${filtroAlerta == 'sem' ? 'selected' : ''}>Sem alertas</option>
                 </select>
             </label>
+            <label>Ordenar por
+                <select name="ord">
+                    <option value="dono:asc" ${filtroOrd == 'dono:asc' ? 'selected' : ''}>Ordenar por nome do usuário de A a Z</option>
+                    <option value="dono:desc" ${filtroOrd == 'dono:desc' ? 'selected' : ''}>Ordenar por nome do usuário de Z a A</option>
+                    <option value="nome:asc" ${filtroOrd == 'nome:asc' ? 'selected' : ''}>Ordenar por nome da geladeira de A a Z</option>
+                    <option value="nome:desc" ${filtroOrd == 'nome:desc' ? 'selected' : ''}>Ordenar por nome da geladeira de Z a A</option>
+                    <option value="novo:asc" ${filtroOrd == 'novo:asc' ? 'selected' : ''}>Ordenar da inserção mais antiga</option>
+                    <option value="novo:desc" ${filtroOrd == 'novo:desc' ? 'selected' : ''}>Ordenar da inserção mais recente</option>
+                </select>
+            </label>
             <button type="submit">Filtrar</button>
             <a href="${pageContext.request.contextPath}/admin/geladeiras">Limpar filtros</a>
         </form>
     </section>
 
-    <%-- lista --%>
     <section id="lista">
         <p>${totalFiltrado} de ${totalGeral} geladeiras</p>
         <c:choose>

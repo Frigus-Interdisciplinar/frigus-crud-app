@@ -16,6 +16,7 @@ import com.example.servlet.Util.Enum.StatusProduto;
 import com.example.servlet.Util.Service.ArmazenamentoService;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,6 +27,10 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,6 +50,7 @@ public class ProdutoServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_produtos = "/WEB-INF/pages/produtos.jsp";
+    private static final String jsp_produtos_form = "/WEB-INF/pages/produtos-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/produtos";
@@ -475,21 +481,13 @@ public class ProdutoServlet extends HttpServlet {
             }
         }
 
-        // ordem da lista ( padrão: validade mais proxima primeiro )
-        Comparator<Map<String, Object>> porDias = Comparator.comparingLong(l -> (Long) l.get("dias"));
-        Comparator<Map<String, Object>> porNome = Comparator.comparing(l -> ((Produto) l.get("produto")).getNome().toLowerCase());
-        if ("dias:desc".equals(fOrd)){
-            linhas.sort(porDias.reversed());
-        }
-        else if ("nome:asc".equals(fOrd)){
-            linhas.sort(porNome);
-        }
-        else if ("nome:desc".equals(fOrd)){
-            linhas.sort(porNome.reversed());
-        }
-        else {
-            linhas.sort(porDias);
-        }
+        // ordem da lista ( vem do select "Ordenar por" ), a inserção usa o id do produto ( ele é novo a cada item )
+        Map<String, Comparator<Map<String, Object>>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dias", Comparator.comparingLong(l -> (Long) l.get("dias")));
+        Ordenar.campo(ordens, "dono", (x, y) -> Ordenar.texto((String) x.get("dono"), (String) y.get("dono")));
+        Ordenar.campo(ordens, "nome", (x, y) -> Ordenar.texto(((Produto) x.get("produto")).getNome(), ((Produto) y.get("produto")).getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparingInt(l -> ((Produto) l.get("produto")).getIdProdutos()));
+        String ordemUsada = Ordenar.ordenar(linhas, fOrd, "dias:asc", ordens);
 
         // ver os detalhes ou editar um item ( vem no link da linha ), ele sai da lista que ja foi carregada
         String ver = req.getParameter("ver");
@@ -517,15 +515,18 @@ public class ProdutoServlet extends HttpServlet {
         req.setAttribute("filtroCat", fCat == null ? "" : fCat);
         req.setAttribute("filtroStatus", fStatus == null ? "" : fStatus);
         req.setAttribute("filtroVal", fVal == null ? "" : fVal);
-        req.setAttribute("filtroOrd", fOrd == null ? "" : fOrd);
-        req.getRequestDispatcher(jsp_produtos).forward(req, resp);
+        req.setAttribute("filtroOrd", ordemUsada);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_produtos_form : jsp_produtos).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 
     // proteção contra formato errado nos tipos diferentes de string

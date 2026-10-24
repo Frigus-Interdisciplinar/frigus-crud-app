@@ -9,6 +9,7 @@ import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public class UsuarioServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_usuarios = "/WEB-INF/pages/usuarios.jsp";
+    private static final String jsp_usuarios_form = "/WEB-INF/pages/usuarios-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/usuarios";
@@ -339,6 +345,12 @@ public class UsuarioServlet extends HttpServlet {
             req.setAttribute("modo", "editar");
         }
 
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Usuario>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "nome", (a, b) -> Ordenar.texto(a.getNome() + " " + a.getSobrenome(), b.getNome() + " " + b.getSobrenome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparing(Usuario::getDtCadastro, Comparator.nullsFirst(Comparator.naturalOrder())));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(usuarios, req.getParameter("ord"), "nome:asc", ordens));
+
         req.setAttribute("usuarios", Paginacao.aplicar(req, usuarios));
         req.setAttribute("totalGeral", todos.size());
         req.setAttribute("filtroBusca", busca == null ? "" : busca);
@@ -348,14 +360,17 @@ public class UsuarioServlet extends HttpServlet {
         req.setAttribute("receitasPorUsuario", resumoDAO.contarReceitasPorUsuario());
         // o usuario so escolhe planos de pessoa fisica ( o Comercial é da empresa )
         req.setAttribute("planos", new TipoAssinatura[]{TipoAssinatura.FREE, TipoAssinatura.PLUS, TipoAssinatura.FAMILIA});
-        req.getRequestDispatcher(jsp_usuarios).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_usuarios_form : jsp_usuarios).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 
     // transforma o texto do formulario no plano ( null se for invalido ou de empresa )

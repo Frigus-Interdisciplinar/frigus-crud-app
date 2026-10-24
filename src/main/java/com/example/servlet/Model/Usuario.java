@@ -7,6 +7,7 @@ public class Usuario {
     private String sobrenome;
     private String email;
     private String senha;
+    private java.time.LocalDate dtCadastro;
 
     // Construtor vazio
     public Usuario() {
@@ -74,6 +75,12 @@ public class Usuario {
                 '}';
     }
 
+    // data em que a conta foi cadastrada ( o banco preenche sozinho )
+    public java.time.LocalDate getDtCadastro() {
+        return dtCadastro;
+    }
 
-
+    public void setDtCadastro(java.time.LocalDate dtCadastro) {
+        this.dtCadastro = dtCadastro;
+    }
 }

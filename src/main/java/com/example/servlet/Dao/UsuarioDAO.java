@@ -173,6 +173,7 @@ public class UsuarioDAO {
                         rset.getString("email"),
                         rset.getString("senha")
                 );
+                usuario.setDtCadastro(rset.getObject("dtCadastro", java.time.LocalDate.class));
                 lista.add(usuario);
             }
         }catch (SQLException sqle){

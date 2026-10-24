@@ -12,6 +12,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.Categoria;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +22,10 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +46,7 @@ public class ComprasServlet extends HttpServlet {
 
     // caminhos das paginas
     private static final String jsp_compras = "/WEB-INF/pages/compras.jsp";
+    private static final String jsp_compras_form = "/WEB-INF/pages/compras-form.jsp";
 
     @Override
     public void init(){
@@ -454,6 +460,13 @@ public class ComprasServlet extends HttpServlet {
         }
 
         req.setAttribute("compras", todasCompras);
+        // ordem da lista ( vem do select "Ordenar por" ), o dono de cada item é o dono da lista de compras
+        Map<String, Comparator<ProdutoLista>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dono", (a, b) -> Ordenar.texto(donoDaLista(a.getListaCompras()), donoDaLista(b.getListaCompras())));
+        Ordenar.campo(ordens, "nome", (a, b) -> Ordenar.texto(a.getProduto().getNome(), b.getProduto().getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparingInt(ProdutoLista::getIdProdutoLista));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(itensLista, req.getParameter("ord"), "dono:asc", ordens));
+
         req.setAttribute("itensLista", Paginacao.aplicar(req, itensLista));
         req.setAttribute("totalGeral", todosItens.size());
         req.setAttribute("usuarios", usuarioDAO.buscarTodosUsuario());
@@ -462,14 +475,28 @@ public class ComprasServlet extends HttpServlet {
         req.setAttribute("filtroItem", filtroItem == null ? "" : filtroItem);
         req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
         req.setAttribute("filtroCategoria", filtroCategoria == null ? "" : filtroCategoria);
-        req.getRequestDispatcher(jsp_compras).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        if (req.getParameter("novoItem") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novoItem");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_compras_form : jsp_compras).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro 
+    // nome do dono da lista de compras ( usuario ou empresa )
+    private static String donoDaLista(ListaCompras compra){
+        if (compra.getUsuario() != null){
+            return compra.getUsuario().getNome() + " " + compra.getUsuario().getSobrenome();
+        }
+        return compra.getEmpresa() != null ? compra.getEmpresa().getNome() : "";
+    }
+
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
     throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_ver_compra));
     }
     // proteção contra formato errado nos tipos diferentes de string
     private static Double lerDouble(String txt) {

@@ -9,6 +9,7 @@ import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +40,7 @@ public class GeladeiraServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_geladeiras = "/WEB-INF/pages/geladeiras.jsp";
+    private static final String jsp_geladeiras_form = "/WEB-INF/pages/geladeiras-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/geladeiras";
@@ -275,6 +281,13 @@ public class GeladeiraServlet extends HttpServlet {
             }
         }
 
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Geladeira>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dono", (a, b) -> Ordenar.texto(a.getUsuario().getNome() + " " + a.getUsuario().getSobrenome(), b.getUsuario().getNome() + " " + b.getUsuario().getSobrenome()));
+        Ordenar.campo(ordens, "nome", (a, b) -> Ordenar.texto(a.getNome(), b.getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparingInt(Geladeira::getIdGeladeira));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(geladeiras, req.getParameter("ord"), "dono:asc", ordens));
+
         req.setAttribute("geladeiras", Paginacao.aplicar(req, geladeiras));
         req.setAttribute("totalGeral", todas.size());
         req.setAttribute("ocupacao", ocupacao);
@@ -287,13 +300,16 @@ public class GeladeiraServlet extends HttpServlet {
         req.setAttribute("filtroUsuario", filtroUsuario == null ? "" : filtroUsuario);
         req.setAttribute("filtroStatus", filtroStatus == null ? "" : filtroStatus);
         req.setAttribute("filtroAlerta", filtroAlerta == null ? "" : filtroAlerta);
-        req.getRequestDispatcher(jsp_geladeiras).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_geladeiras_form : jsp_geladeiras).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 }
