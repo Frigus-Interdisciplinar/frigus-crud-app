@@ -156,7 +156,7 @@ public class GeladeiraDAO {
         List<Geladeira> listaGeladeira = new ArrayList<>();
 
         try{
-            String comandoSql = "select g.*, u.nome as nomeUsuario, u.sobrenome from geladeira g join usuario u on u.cpf = g.idUsuario order by g.id;";
+            String comandoSql = "select g.*, u.nome as nomeUsuario, u.sobrenome, u.email from geladeira g join usuario u on u.cpf = g.idUsuario order by g.id;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             rset = pstmt.executeQuery();
             while (rset.next()){
@@ -165,6 +165,7 @@ public class GeladeiraDAO {
                 usuario.setCpf(rset.getString("idUsuario"));
                 usuario.setNome(rset.getString("nomeUsuario"));
                 usuario.setSobrenome(rset.getString("sobrenome"));
+                usuario.setEmail(rset.getString("email"));
 
                 // criando o objeto geladeira
                 Geladeira geladeira = new Geladeira(
