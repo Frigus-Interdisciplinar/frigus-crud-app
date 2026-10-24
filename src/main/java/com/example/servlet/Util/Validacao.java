@@ -167,11 +167,11 @@ public class Validacao {
 //        return valor == null;
 //    }
 
-    // vendo se a senha tem 8 digitos
+    // vendo se a senha tem de 8 a 15 digitos
     // e se a senha é forte ( tem letra maiuscula e caracter especial )
 
     public  boolean validarSenha(String senha){
-        if (senha.length() != 8){
+        if (senha.length() < 8 || senha.length() > 15){
             return false;
         }else {
             return senha.matches(".*[A-Z].*") && senha.matches(".*[^a-zA-Z0-9].*");
