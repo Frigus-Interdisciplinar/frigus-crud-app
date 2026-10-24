@@ -1,8 +1,13 @@
 package com.example.servlet.Controller;
 
+import com.example.servlet.Dao.AssinaturaDAO;
 import com.example.servlet.Dao.EmpresaDAO;
+import com.example.servlet.Dao.ResumoDAO;
+import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Empresa;
+import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,13 +17,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(urlPatterns = {
         "/admin/empresas"},
         name = "empresas")
 public class EmpresaServlet extends HttpServlet {
     private EmpresaDAO empresaDAO;
+    private AssinaturaDAO assinaturaDAO;
+    private ResumoDAO resumoDAO;
     private Validacao validar;
 
     // caminho das paginas
@@ -30,6 +39,8 @@ public class EmpresaServlet extends HttpServlet {
     @Override
     public void init(){
         empresaDAO = new EmpresaDAO();
+        assinaturaDAO = new AssinaturaDAO();
+        resumoDAO = new ResumoDAO();
         validar = new Validacao();
     }
 
@@ -57,8 +68,6 @@ public class EmpresaServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = req.getSession();
         String action = req.getParameter("action");
-        // para onde voltar depois de dar certo
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
 
         if (action == null){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -72,6 +81,7 @@ public class EmpresaServlet extends HttpServlet {
                 String nome = req.getParameter("nome");
                 String email = req.getParameter("email");
                 String senha = req.getParameter("senha");
+                String planoTxt = req.getParameter("plano");
 
                 if(cnpj == null || cnpj.isBlank()){
                     voltaComErro(req, resp, "O cnpj não pode ser vazio!!!");
@@ -87,6 +97,10 @@ public class EmpresaServlet extends HttpServlet {
                 }
                 if(senha == null || senha.isBlank()){
                     voltaComErro(req, resp, "A senha não pode ser vazia!!!");
+                    return;
+                }
+                if (!"COMERCIAL".equals(planoTxt)){
+                    voltaComErro(req, resp, "Escolha o plano da empresa.");
                     return;
                 }
 
@@ -126,15 +140,22 @@ public class EmpresaServlet extends HttpServlet {
                         senhaHash
                 );
 
-                if (empresaDAO.cadastrarEmpresa(empresa) == 1){
-                    session.setAttribute("sucesso", "Empresa cadastrada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
-                    return;
-                }
-                else {
+                if (empresaDAO.cadastrarEmpresa(empresa) != 1){
                     voltaComErro(req, resp, "Erro ao cadastrar a empresa. Esse cnpj já pode estar cadastrado.");
                     return;
                 }
+
+                // toda empresa nasce com um plano
+                if (assinaturaDAO.inserirAssinatura(new Assinatura(empresa, TipoAssinatura.COMERCIAL)) != 1){
+                    // se o plano nao foi salvo a empresa nao fica pela metade
+                    empresaDAO.excluirEmpresa(empresa);
+                    voltaComErro(req, resp, "Erro ao cadastrar o plano da empresa. Por favor tente novamente.");
+                    return;
+                }
+
+                session.setAttribute("sucesso", "Empresa cadastrada com sucesso.");
+                resp.sendRedirect(req.getContextPath() + url_servlet);
+                return;
             }
 
 
@@ -200,7 +221,7 @@ public class EmpresaServlet extends HttpServlet {
 
                 if (empresaDAO.alterarEmpresa(empresaAntiga, empresaNova) == 1){
                     session.setAttribute("sucesso", "Empresa alterada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
                 else {
@@ -227,7 +248,7 @@ public class EmpresaServlet extends HttpServlet {
 
                 if (empresaDAO.excluirEmpresa(empresa) == 1){
                     session.setAttribute("sucesso", "Empresa apagada com sucesso, junto com tudo que era dela.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
                 else {
@@ -240,24 +261,52 @@ public class EmpresaServlet extends HttpServlet {
         }
     }
 
-    // carrega a lista e mostra a tela
+    // carrega a lista ( ja filtrada ), os totais de cada empresa e mostra a tela
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
-        List<Empresa> empresas = empresaDAO.buscarTodasEmpresa();
-        req.setAttribute("empresas", empresas);
+        // filtros da tela
+        String busca = req.getParameter("busca");
+        String filtroPlano = req.getParameter("plano");
+
+        List<Empresa> todas = empresaDAO.buscarTodasEmpresa();
+        Map<String, String> planos = resumoDAO.buscarPlanosDasEmpresas();
+
+        List<Empresa> empresas = new ArrayList<>();
+        for (Empresa empresa : todas){
+            String texto = (empresa.getNome() + " " + empresa.getEmail() + " " + empresa.getCnpj()).toLowerCase();
+            boolean achouBusca = busca == null || busca.isBlank() || texto.contains(busca.trim().toLowerCase());
+            boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(planos.get(empresa.getCnpj()));
+            if (achouBusca && achouPlano){
+                empresas.add(empresa);
+            }
+        }
+
+        // ver os detalhes ou editar uma empresa ( vem no link da linha )
+        String verCnpj = req.getParameter("ver");
+        String editarCnpj = req.getParameter("editar");
+        if (verCnpj != null && !verCnpj.isBlank()){
+            req.setAttribute("registro", empresaDAO.buscarEmpresaPorCnpj(verCnpj.trim()));
+            req.setAttribute("modo", "ver");
+        }
+        else if (editarCnpj != null && !editarCnpj.isBlank()){
+            req.setAttribute("registro", empresaDAO.buscarEmpresaPorCnpj(editarCnpj.trim()));
+            req.setAttribute("modo", "editar");
+        }
+
+        req.setAttribute("empresas", Paginacao.aplicar(req, empresas));
+        req.setAttribute("totalGeral", todas.size());
+        req.setAttribute("filtroBusca", busca == null ? "" : busca);
+        req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
+        req.setAttribute("planosDasEmpresas", planos);
+        req.setAttribute("frigorificosPorEmpresa", resumoDAO.contarFrigorificosPorEmpresa());
+        req.setAttribute("receitasPorEmpresa", resumoDAO.contarReceitasPorEmpresa());
         req.getRequestDispatcher(jsp_empresas).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    // volta para a tela com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
-        if (retorno.equals(url_servlet)){
-            listar(req, resp);
-        }
-        else {
-            req.getRequestDispatcher(retorno).forward(req, resp);
-        }
+        listar(req, resp);
     }
 }

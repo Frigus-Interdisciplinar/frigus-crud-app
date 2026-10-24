@@ -89,8 +89,7 @@ public class EmpresaDAO {
 
             // guarda os produtos dos itens da empresa antes de apagar ela
             String comandoSqlProdutos = "select itf.idProduto from ItemFrigorifico itf join Frigorifico f on f.id = itf.idFrigorifico where f.idEmpresa = ? " +
-                    "union select il.idProduto from ItemLista il join ListaCompras lc on lc.id = il.idListaCompras where lc.idEmpresa = ? " +
-                    "union select i.idProduto from Ingrediente i join Receita r on r.id = i.idReceita where r.idEmpresa = ?;";
+                    "union select il.idProduto from ItemLista il join ListaCompras lc on lc.id = il.idListaCompras where lc.idEmpresa = ?;";
             List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, empresa.getCnpj());
 
             // guarda os enderecos dos frigorificos da empresa
