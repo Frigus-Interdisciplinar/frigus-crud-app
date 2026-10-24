@@ -12,6 +12,7 @@ import com.example.servlet.Model.Receita;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +22,10 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -41,6 +46,7 @@ public class ReceitaServlet extends HttpServlet {
 
     // caminhos das paginas
     private static final String jsp_receitas = "/WEB-INF/pages/receitas.jsp";
+    private static final String jsp_receitas_form = "/WEB-INF/pages/receitas-form.jsp";
 
     @Override
     public void init(){
@@ -394,7 +400,6 @@ public class ReceitaServlet extends HttpServlet {
         // filtros da tela
         String filtroReceita = req.getParameter("receita");
         String filtroDono = req.getParameter("dono");
-        String filtroOrd = req.getParameter("ord");
 
         List<Receita> todas = receitaDAO.buscarTodasReceita();
 
@@ -410,21 +415,12 @@ public class ReceitaServlet extends HttpServlet {
             }
         }
 
-        // ordem da lista ( padrão: nome de A a Z )
-        Comparator<Receita> porNome = Comparator.comparing(r -> r.getNome().toLowerCase());
-        Comparator<Receita> porData = Comparator.comparing(Receita::getDtReceita);
-        if ("nome:desc".equals(filtroOrd)){
-            receitas.sort(porNome.reversed());
-        }
-        else if ("criada:desc".equals(filtroOrd)){
-            receitas.sort(porData.reversed());
-        }
-        else if ("criada:asc".equals(filtroOrd)){
-            receitas.sort(porData);
-        }
-        else {
-            receitas.sort(porNome);
-        }
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Receita>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dono", (x, y) -> Ordenar.texto(donoDaReceita(x), donoDaReceita(y)));
+        Ordenar.campo(ordens, "nome", (x, y) -> Ordenar.texto(x.getNome(), y.getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparing(Receita::getDtReceita).thenComparingInt(Receita::getIdReceita));
+        String filtroOrd = Ordenar.ordenar(receitas, req.getParameter("ord"), "nome:asc", ordens);
 
         // ver os detalhes ou editar uma receita ( vem no link da linha ), ela sai da lista que ja foi carregada
         String ver = req.getParameter("ver");
@@ -449,15 +445,26 @@ public class ReceitaServlet extends HttpServlet {
         req.setAttribute("produtos", ingredienteDAO.buscarTodosProdutos());
         req.setAttribute("filtroReceita", filtroReceita == null ? "" : filtroReceita);
         req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
-        req.setAttribute("filtroOrd", filtroOrd == null ? "" : filtroOrd);
-        req.getRequestDispatcher(jsp_receitas).forward(req, resp);
+        req.setAttribute("filtroOrd", filtroOrd);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_receitas_form : jsp_receitas).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // nome do dono da receita ( usuario ou empresa )
+    private static String donoDaReceita(Receita receita){
+        if (receita.getUsuario() != null){
+            return receita.getUsuario().getNome() + " " + receita.getUsuario().getSobrenome();
+        }
+        return receita.getEmpresa() != null ? receita.getEmpresa().getNome() : "";
+    }
+
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 
     // proteção contra formato errado nos tipos diferentes de string
