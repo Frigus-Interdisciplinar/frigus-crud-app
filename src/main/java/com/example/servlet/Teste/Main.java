@@ -21,6 +21,23 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
+        // testando a validacao da senha ( minimo 8, uma maiuscula e um caracter especial ) e o tamanho do hash
+        Validacao validarSenhaTeste = new Validacao();
+        String[] senhasTeste = {
+                "Abcde#1",                  // 7 -> invalida
+                "Abcdef#1",                 // 8 -> valida
+                "Abcdefg#1",                // 9 -> valida
+                "Abcdefghijklm#1",          // 15 -> valida
+                "abcdef#1",                 // sem maiuscula -> invalida
+                "Abcdefg1",                 // sem especial -> invalida
+                "Abcdefghijklmn#1"          // 16 -> invalida
+        };
+        for (String senhaTeste : senhasTeste) {
+            boolean valida = validarSenhaTeste.validarSenha(senhaTeste);
+            String hashTeste = com.example.servlet.Util.Hash.bcrypt(senhaTeste);
+            System.out.println("senha com " + senhaTeste.length() + " caracteres -> valida: " + valida + " | hash com " + hashTeste.length() + " caracteres");
+        }
+
 //        // testando a conexao
 //        Conexao conexao = new Conexao();
 //        Connection conn = conexao.conectar();
