@@ -193,8 +193,8 @@ public class ProdutosFrigorificoDAO {
 
     // ========= BUSCAR =========
 
-    // LISTA DE TODOS OS PRODUTOS
-    public List<ProdutosFrigorifico> buscarProdutoFrigorificos(String cnpj){
+    // LISTA DE TODOS OS PRODUTOS DE TODOS OS FRIGORIFICOS ( COM O NOME DO FRIGORIFICO E DA EMPRESA )
+    public List<ProdutosFrigorifico> buscarTodosProdutosFrigorifico(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar(); // abrindo a conexão com o banco
 
@@ -205,14 +205,13 @@ public class ProdutosFrigorificoDAO {
             String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
                     "        if.id as idProdutoFrigorifico, if.idNotificacao, if.dtValidade, if.lote, if.status, if.quantidade as quantidadeProduto, " +
                     "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status as statusFrigorifico, f.tipo, " +
-                    "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
+                    "        e.nome as nomeEmpresa " +
                     "from Produto p " +
                     "join ItemFrigorifico if on p.id = if.idProduto " +
                     "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join endereco en on f.idEndereco = en.id " +
-                    "where f.idEmpresa = ?;";
+                    "join empresa e on e.cnpj = f.idEmpresa " +
+                    "order by if.id;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery(); // executa a consulta SQL
 
             // armazena os valores em um list<>
@@ -227,20 +226,17 @@ public class ProdutosFrigorificoDAO {
                         rset.getString("unidademedida")
                 );
 
-                // criando o objeto endereco com id vindo do result set
-                Endereco endereco = new Endereco();
-                endereco.setIdEndereco(rset.getInt("idendereco"));
-
                 // criando o objeto empresa com id vindo do result set
                 Empresa empresa = new Empresa();
                 empresa.setCnpj(rset.getString("cnpj"));
+                empresa.setNome(rset.getString("nomeEmpresa"));
 
                 // criando o objeto frigorifico com o ID vindo do ResultSet
                 Frigorificos frigorifico = new Frigorificos(
                         rset.getInt("idFrigorifico"),
                         empresa,
                         StatusArmazenamento.valueOf(rset.getString("statusFrigorifico")),
-                        endereco,
+                        new Endereco(),
                         rset.getString("tipo"),
                         rset.getString("nomeFrigorifico")
                 );
@@ -265,164 +261,7 @@ public class ProdutosFrigorificoDAO {
             conexao.desconectar(conn); // fechando a conexão
         }
         return lista;
-    } // LISTA DE TODOS OS PRODUTOS
-
-
-
-
-
-    // BUSCAR PRODUTOS NA TABELA produtoFrigorificos PELO LOTE
-    public List<ProdutosFrigorifico> buscarProdutosFrigorificosPeloLote(int lote){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        List<ProdutosFrigorifico> lista = new ArrayList<>();
-        ResultSet rset = null;
-
-        try{
-            String comandoSql = "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
-                    "        if.id as idProdutoFrigorifico, if.idNotificacao, if.dtValidade, if.lote, if.status, if.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status as statusFrigorifico, f.tipo, " +
-                    "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
-                    "from Produto p " +
-                    "join ItemFrigorifico if on p.id = if.idProduto " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join endereco en on f.idEndereco = en.id " +
-                    "where if.lote = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setInt(1, lote);
-            rset = pstmt.executeQuery();
-
-            while (rset.next()){
-                Produto produto = new Produto(
-                        rset.getInt("idProduto"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
-                        rset.getDouble("preco"),
-                        Categoria.valueOf(rset.getString("categoria")),
-                        rset.getString("marca"),
-                        rset.getString("unidademedida")
-                );
-
-                // criando o objeto endereco com id vindo do result set
-                Endereco endereco = new Endereco();
-                endereco.setIdEndereco(rset.getInt("idendereco"));
-
-                // criando o objeto empresa com id vindo do result set
-                Empresa empresa = new Empresa();
-                empresa.setCnpj(rset.getString("cnpj"));
-
-                // criando o objeto frigorifico com o ID vindo do ResultSet
-                Frigorificos frigorifico = new Frigorificos(
-                        rset.getInt("idFrigorifico"),
-                        empresa,
-                        StatusArmazenamento.valueOf(rset.getString("statusFrigorifico")),
-                        endereco,
-                        rset.getString("tipo"),
-                        rset.getString("nomeFrigorifico")
-                );
-                // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
-                ProdutosFrigorifico itf = new ProdutosFrigorifico(
-                        rset.getInt("idProdutoFrigorifico"),
-                        rset.getInt("idNotificacao"),
-                        frigorifico,
-                        produto,
-                        rset.getObject("dtValidade", LocalDate.class),
-                        StatusProduto.valueOf(rset.getString("status")),
-                        rset.getInt("lote"),
-                        rset.getInt("quantidadeProduto")
-                );
-                lista.add(itf);
-            }
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-        }
-        finally {
-            conexao.desconectar(conn);
-        }
-        return lista;
-    } // BUSCAR PRODUTOS NA TABELA produtoFrigorificos PELO LOTE
-
-
-
-
-
-    // BUSCAR PRODUTOS PELA DATA DE VALIDADE
-    public List<ProdutosFrigorifico> buscarProdutosFrigorificoPorValidade(LocalDate dtValidade){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        List<ProdutosFrigorifico> lista = new ArrayList<>();
-        ResultSet rset = null;
-
-        try{
-            String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
-                    "        if.id as idProdutoFrigorifico, if.idNotificacao, if.dtValidade, if.lote, if.status, if.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status as statusFrigorifico, f.tipo, " +
-                    "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
-                    "from Produto p " +
-                    "join ItemFrigorifico if on p.id = if.idProduto " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join endereco en on f.idEndereco = en.id " +
-                    "where if.DtValidade = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando valores para o comando
-            pstmt.setObject(1, dtValidade);
-            rset = pstmt.executeQuery();
-
-            while(rset.next()){
-                Produto produto = new Produto(
-                        rset.getInt("idProduto"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
-                        rset.getDouble("preco"),
-                        Categoria.valueOf(rset.getString("categoria")),
-                        rset.getString("marca"),
-                        rset.getString("unidademedida")
-                );
-
-                // criando o objeto endereco com id vindo do result set
-                Endereco endereco = new Endereco();
-                endereco.setIdEndereco(rset.getInt("idendereco"));
-
-                // criando o objeto empresa com id vindo do result set
-                Empresa empresa = new Empresa();
-                empresa.setCnpj(rset.getString("cnpj"));
-
-                // criando o objeto frigorifico com o ID vindo do ResultSet
-                Frigorificos frigorifico = new Frigorificos(
-                        rset.getInt("idFrigorifico"),
-                        empresa,
-                        StatusArmazenamento.valueOf(rset.getString("statusFrigorifico")),
-                        endereco,
-                        rset.getString("tipo"),
-                        rset.getString("nomeFrigorifico")
-                );
-                // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
-                ProdutosFrigorifico itf = new ProdutosFrigorifico(
-                        rset.getInt("idProdutoFrigorifico"),
-                        rset.getInt("idNotificacao"),
-                        frigorifico,
-                        produto,
-                        rset.getObject("dtValidade", LocalDate.class),
-                        StatusProduto.valueOf(rset.getString("status")),
-                        rset.getInt("lote"),
-                        rset.getInt("quantidadeProduto")
-                );
-                lista.add(itf);
-            }
-
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-        }
-        finally {
-            conexao.desconectar(conn);
-        }
-        return lista;
-    }// BUSCAR PRODUTOS PELA DATA DE VALIDADE
-
+    } // LISTA DE TODOS OS PRODUTOS DE TODOS OS FRIGORIFICOS ( COM O NOME DO FRIGORIFICO E DA EMPRESA )
 
 
 
@@ -502,164 +341,8 @@ public class ProdutosFrigorificoDAO {
 
 
 
-
-
-    // BUSCAR 1 PRODUTO NA TABELA produtoFrigorificos PELO NOME
-    public ProdutosFrigorifico buscarProdutoFrigorificoPeloNome(String nomeProduto){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        ResultSet rset = null;
-        ProdutosFrigorifico itf = null;
-
-        try{
-            String comandoSql =  "select p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
-                    "        if.id as idProdutoFrigorifico, if.idNotificacao, if.dtValidade, if.lote, if.status, if.quantidade as quantidadeProduto, " +
-                    "        f.id as idFrigorifico, f.idEmpresa as cnpj, f.nome as nomeFrigorifico, f.status as statusFrigorifico, f.tipo, " +
-                    "         en.id as idEndereco, en.rua, en.bairro, en.cidade, en.uf, en.pais, en.cep, en.numero, en.nomeUnidade " +
-                    "from Produto p " +
-                    "join ItemFrigorifico if on p.id = if.idProduto " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join endereco en on f.idEndereco = en.id " +
-                    "where lower(p.nome) like ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, "%" + nomeProduto.toLowerCase() + "%");// setando os parâmetros da instrução
-            rset = pstmt.executeQuery();
-            if (rset.next()){
-                Produto produto = new Produto(
-                        rset.getInt("idProduto"),
-                        rset.getString("nome"),
-                        rset.getString("descricao"),
-                        rset.getDouble("preco"),
-                        Categoria.valueOf(rset.getString("categoria")),
-                        rset.getString("marca"),
-                        rset.getString("unidademedida")
-                );
-
-                // criando o objeto endereco com id vindo do result set
-                Endereco endereco = new Endereco();
-                endereco.setIdEndereco(rset.getInt("idendereco"));
-
-                // criando o objeto empresa com id vindo do result set
-                Empresa empresa = new Empresa();
-                empresa.setCnpj(rset.getString("cnpj"));
-
-                // criando o objeto frigorifico com o ID vindo do ResultSet
-                Frigorificos frigorifico = new Frigorificos(
-                        rset.getInt("idFrigorifico"),
-                        empresa,
-                        StatusArmazenamento.valueOf(rset.getString("statusFrigorifico")),
-                        endereco,
-                        rset.getString("tipo"),
-                        rset.getString("nomeFrigorifico")
-                );
-                // criando o objeto Produto no frigorifico com o ID vindo do ResultSet
-                itf = new ProdutosFrigorifico(
-                        rset.getInt("idProdutoFrigorifico"),
-                        rset.getInt("idNotificacao"),
-                        frigorifico,
-                        produto,
-                        rset.getObject("dtValidade", LocalDate.class),
-                        StatusProduto.valueOf(rset.getString("status")),
-                        rset.getInt("lote"),
-                        rset.getInt("quantidadeProduto")
-                );
-            }
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-        }
-        finally {
-            conexao.desconectar(conn);
-        }
-        return itf;
-    }// BUSCAR 1 PRODUTO NA TABELA produtoFrigorificos PELO NOME
-
-
-    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
-    public List<ProdutosFrigorifico> produtosPertoValidade(String cnpj){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexão do o banco
-
-        ResultSet rset = null;
-        List<ProdutosFrigorifico> lista = new ArrayList<>();
-
-        try {
-            String comandoSql = "select p.nome as produto, f.nome as frigorifico, if.quantidade, if.status, (if.dtValidade - current_date) as tempoRestante " +
-                    "from ItemFrigorifico if " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join Produto p on if.idProduto = p.id " +
-                    "where f.idEmpresa = ? " +
-                    "order by if.dtValidade " +
-                    "limit 5;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para a operação
-            pstmt.setString(1, cnpj);
-
-            rset = pstmt.executeQuery();
-            while (rset.next()){
-                Produto p = new Produto();
-                p.setNome(rset.getString("produto"));
-
-                Frigorificos f = new Frigorificos();
-                f.setNome(rset.getString("frigorifico"));
-
-                ProdutosFrigorifico itf = new ProdutosFrigorifico();
-                itf.setProduto(p);
-                itf.setFrigorificos(f);
-                itf.setQuantidade(rset.getInt("quantidade"));
-                itf.setStatus(StatusProduto.valueOf(rset.getString("status")));
-                itf.setTempoRestante(rset.getInt("tempoRestante"));
-                lista.add(itf);
-            }
-
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-        }finally {
-            conexao.desconectar(conn);// fechado a conexão com o banco
-        }
-        return lista;
-    }
-    // BUSCAR OS 5 PRIMEIROS PRODUTOS QUE ESTÃO PRESTES A VENECER OU JÁ VENCERAM
-
-
-
-
-    // TOTAL DE PRODUTOS VENCIDOS
-    public int totalProdutosVencidos(String cnpj){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexão do o banco
-
-        ResultSet rset = null;
-        int total = 0;
-
-        try {
-            String comandoSql = "select count(*) as total " +
-                    "from ItemFrigorifico if " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join Produto p on if.idProduto = p.id " +
-                    "where f.idEmpresa = ? and if.status = 'VENCIDO';";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para a operação
-            pstmt.setString(1, cnpj);
-
-            rset = pstmt.executeQuery();
-            if (rset.next()) total = rset.getInt("total");
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-        }finally {
-            conexao.desconectar(conn);// fechado a conexão com o banco
-        }
-        return total;
-    }
-    // TOTAL DE PRODUTOS VENCIDOS
-
-
-
     // TOTAL DE PRODUTOS ARMAZENADOS
-    public int totalProdutosArmazenados(String cnpj){
+    public int totalProdutosArmazenados(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexão do o banco
 
@@ -667,17 +350,13 @@ public class ProdutosFrigorificoDAO {
         int total = 0;
 
         try {
-            String comandoSql = "select count(*) as total " +
-                    "from ItemFrigorifico if " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join Produto p on if.idProduto = p.id " +
-                    "where f.idEmpresa = ?;";
+            String comandoSql = "select count(*) as total from ItemFrigorifico;";
+
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para a operação
-            pstmt.setString(1, cnpj);
 
             rset = pstmt.executeQuery();
             if (rset.next()) total = rset.getInt("total");
+
 
         }catch (SQLException sqle){
             sqle.printStackTrace();
@@ -688,35 +367,4 @@ public class ProdutosFrigorificoDAO {
     }
     // TOTAL DE PRODUTOS ARMAZENADOS
 
-
-
-    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
-    public int totalProdutosProximoVencimento(String cnpj){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexão do o banco
-
-        ResultSet rset = null;
-        int total = 0;
-
-        try {
-            String comandoSql = "select count(*) as total " +
-                    "from ItemFrigorifico if " +
-                    "join Frigorifico f on if.idFrigorifico = f.id " +
-                    "join Produto p on if.idProduto = p.id " +
-                    "where f.idEmpresa = ? and if.status in ('ATENCAO', 'PROXIMO_VENCIMENTO');";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para a operação
-            pstmt.setString(1, cnpj);
-
-            rset = pstmt.executeQuery();
-            if (rset.next()) total = rset.getInt("total");
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-        }finally {
-            conexao.desconectar(conn);// fechado a conexão com o banco
-        }
-        return total;
-    }
-    // TOTAL DE PRODUTOS PROXIMOS DO VENCIMENTO
 }
