@@ -22,14 +22,16 @@ CREATE TABLE Usuario(
 	nome        varchar(20)  not null,
 	Sobrenome   varchar(60)  not null,
 	email       varchar(320) not null     unique,
-	senha       varchar(60)  not null
+	senha       varchar(60)  not null,
+	dtCadastro  date         not null     default current_date
 );
 
 CREATE TABLE Empresa(
 	cnpj        varchar(14)  primary key,
 	nome        varchar(80)  not null,
 	email       varchar(320) not null,
-	senha       varchar(60)  not null     unique
+	senha       varchar(60)  not null     unique,
+	dtCadastro  date         not null     default current_date
 );
 
 CREATE TABLE MarcaParceira(

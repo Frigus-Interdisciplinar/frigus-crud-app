@@ -181,6 +181,7 @@ public class EmpresaDAO {
                         rset.getString("email"),
                         rset.getString("senha")
                 );
+                empresa.setDtCadastro(rset.getObject("dtCadastro", java.time.LocalDate.class));
                 lista.add(empresa);
             }
 
