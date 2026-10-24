@@ -1,11 +1,9 @@
 package com.example.servlet.Controller;
 
 import com.example.servlet.Dao.GeladeiraDAO;
-import com.example.servlet.Model.Empresa;
+import com.example.servlet.Dao.UsuarioDAO;
 import com.example.servlet.Model.Geladeira;
 import com.example.servlet.Model.Usuario;
-import com.example.servlet.Util.Enum.Categoria;
-import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,31 +16,27 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(urlPatterns = {
-        "/ver-geladeira",
-        "/inserir-geladeira",
-        "/alterar-geladeira",
-        "/deletar-geladeira"},
-        name = "/GeladeiraServlet")
+        "/admin/geladeiras"},
+        name = "geladeiras")
 public class GeladeiraServlet extends HttpServlet {
     private GeladeiraDAO gelaDao;
-    private String action;
+    private UsuarioDAO usuarioDAO;
+    private Validacao validar;
 
 
     // caminho das paginas
-    private static final String jsp_ver_geladeira = "/assets/pages/ver-geladeira.jsp";
-    private static final String jsp_inserir_geladeira = "/assets/pages/inserir-geladeira.jsp";
-    private static final String jsp_alterar_geladeira = "/assets/pages/alterar-geladeira.jsp";
-    private static final String jsp_deletar_geladeira = "/assets/pages/deletar-geladeira.jsp";
-    private static final String jsp_login = "/assets/pages/login.jsp";
+    private static final String jsp_geladeiras = "/WEB-INF/pages/geladeiras.jsp";
 
     // caminho para o servlet
-    private static final String url_servlet = "/ver-geladeira";
+    private static final String url_servlet = "/admin/geladeiras";
 
 
 
     @Override
     public void init(){
         gelaDao = new GeladeiraDAO();
+        usuarioDAO = new UsuarioDAO();
+        validar = new Validacao();
     }
 
 
@@ -50,20 +44,16 @@ public class GeladeiraServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        String path = req.getServletPath();
-
-        if (session == null || session.getAttribute("usuario") == null){
-            resp.sendRedirect(req.getContextPath() + jsp_login);
+        // inserir, alterar e deletar só por POST
+        if (req.getParameter("action") != null){
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
+        String path = req.getServletPath();
 
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
         switch(path) {
-            case "/ver-geladeira": {
-                List<Geladeira> todasGeladeira = gelaDao.buscarTodasGeladeira(usuario.getCpf());
-                req.setAttribute("geladeiras", todasGeladeira);
-                req.getRequestDispatcher(jsp_ver_geladeira).forward(req, resp);
+            case "/admin/geladeiras": {
+                listar(req, resp);
                 break;
             }
             default:
@@ -75,103 +65,136 @@ public class GeladeiraServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
-        Validacao validar = new Validacao();
         HttpSession session = req.getSession();
-        action = req.getParameter("action");
-        //resatando o usuario da session
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Categoria plano = (Categoria) session.getAttribute("plano");
+        String action = req.getParameter("action");
+        // para onde voltar depois de dar certo
+        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
 
-        // se a sessao expirou tem que fazer login
-        if (usuario == null || plano == null) {
-            resp.sendRedirect(req.getContextPath() + jsp_login);
-            return;
-        }
-
-        int limitePlano;
-        if (plano.name().equals(TipoAssinatura.FREE)){
-            limitePlano = 1;
-        }
-        else if (plano.name().equals(TipoAssinatura.PLUS) || plano.name().equals(TipoAssinatura.FAMILIA)){
-            limitePlano = 3;
-        }
-        else {
-            System.err.println("nao era para chegar aqui!!!");
-            voltaComErro(req, resp, "Erro ao cadastrar a geladeira. Por favor tente novamente.", jsp_inserir_geladeira);
+        if (action == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         switch(action) {
-            case "/inserir-geladeira": {
-
-                // ver se ele ja alcançou o limite de geladeiras cadastradas
-                int geladeirasExistentes = gelaDao.totalGeladeirasUsuario(usuario.getCpf());
-                if (geladeirasExistentes >= limitePlano){
-                    voltaComErro(req, resp, "Você atingiu o limite de geladeiras do seu plano.", jsp_ver_geladeira);
-                    return;
-                }
-
+            case "inserir": {
                 // pegando os valores do formulario
+                String cpf = req.getParameter("cpf");
                 String tipo = req.getParameter("tipo");
                 String nome = req.getParameter("nome");
-                // validando o nome
-                boolean vNome = validar.validarNome(nome);
-                if (!vNome){
-                    resp.sendRedirect(req.getContextPath() + jsp_inserir_geladeira);
+
+                if (cpf == null || cpf.isBlank()){
+                    voltaComErro(req, resp, "Escolha o usuário dono da geladeira.");
                     return;
                 }
+                if (nome == null || nome.isBlank()){
+                    voltaComErro(req, resp, "O nome da geladeira não pode ser vazio.");
+                    return;
+                }
+                // validando o nome
+                boolean vNome = validar.validarNomeProduto(nome);
+                if (!vNome || nome.length() > 50){
+                    voltaComErro(req, resp, "Nome da geladeira inválido. No máximo 50 caracteres.");
+                    return;
+                }
+                // o dono tem que existir
+                Usuario usuario = usuarioDAO.buscarUsuarioPorCpf(cpf.trim());
+                if (usuario == null){
+                    voltaComErro(req, resp, "Usuário não encontrado.");
+                    return;
+                }
+                // o tipo é opcional: vazio usa o padrão do banco
+                if (tipo == null || tipo.isBlank()){
+                    tipo = "Geladeira";
+                }
+
+                // o admin não tem limite de geladeiras por plano
                 Geladeira geladeira = new Geladeira(
                         usuario,
-                        tipo,
-                        nome
+                        tipo.trim(),
+                        nome.trim()
                 );
                 int funcionou = gelaDao.inserirGeladeira(geladeira);
 
                 if (funcionou == 1){
-                    // salvando a geladeira entre as requisições
-                    session.setAttribute("geladeira", geladeira);
-                    resp.sendRedirect(req.getContextPath() + url_servlet);
-                    break;
+                    session.setAttribute("sucesso", "Geladeira cadastrada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + retorno);
+                    return;
                 }else {
-                    resp.sendRedirect(req.getContextPath() + jsp_inserir_geladeira);
-                    break;
+                    voltaComErro(req, resp, "Erro ao cadastrar a geladeira. Por favor tente novamente.");
+                    return;
                 }
             }
-            case "/alterar-geladeira":{
+            case "alterar":{
                 String idTxt = req.getParameter("idGeladeira");
-                int id = Integer.parseInt(idTxt);
-                Geladeira geldeiraAntiga = gelaDao.buscarUnicaGeladeira(usuario.getCpf(), id);
-
+                String cpf = req.getParameter("cpf");
                 String tipo = req.getParameter("tipo");
                 String nome = req.getParameter("nome");
 
-                if (tipo == null){
-                    voltaComErro(req, resp, "O tipo da geladeira não pode ser vazio.", jsp_alterar_geladeira);
+                int id;
+                try{
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao alterar essa geladeira. Por favor tente novamente.");
                     return;
                 }
-                if (nome == null){
-                    voltaComErro(req, resp, "O nome da geladeira não pode ser vazio.", jsp_alterar_geladeira);
+                Geladeira geldeiraAntiga = gelaDao.buscarUnicaGeladeira(id);
+                if (geldeiraAntiga == null){
+                    voltaComErro(req, resp, "Geladeira não encontrada.");
                     return;
                 }
 
-                Geladeira geladeiraNova = new Geladeira(usuario, geldeiraAntiga.getStatus(), tipo, nome);
+                if (cpf == null || cpf.isBlank()){
+                    voltaComErro(req, resp, "Escolha o usuário dono da geladeira.");
+                    return;
+                }
+                if (tipo == null || tipo.isBlank()){
+                    voltaComErro(req, resp, "O tipo da geladeira não pode ser vazio.");
+                    return;
+                }
+                if (nome == null || nome.isBlank()){
+                    voltaComErro(req, resp, "O nome da geladeira não pode ser vazio.");
+                    return;
+                }
+                boolean vNome = validar.validarNomeProduto(nome);
+                if (!vNome || nome.length() > 50){
+                    voltaComErro(req, resp, "Nome da geladeira inválido. No máximo 50 caracteres.");
+                    return;
+                }
+                // o novo dono tem que existir
+                Usuario usuario = usuarioDAO.buscarUsuarioPorCpf(cpf.trim());
+                if (usuario == null){
+                    voltaComErro(req, resp, "Usuário não encontrado.");
+                    return;
+                }
+
+                Geladeira geladeiraNova = new Geladeira(usuario, geldeiraAntiga.getStatus(), tipo.trim(), nome.trim());
 
                 if (gelaDao.alterarGeradeira(geldeiraAntiga, geladeiraNova) == 1){
-                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    session.setAttribute("sucesso", "Geladeira alterada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + retorno);
                     return;
                 }else {
-                    voltaComErro(req, resp, "Erro ao alterar essa geladeira. Por favor tente novamente", jsp_alterar_geladeira);
+                    voltaComErro(req, resp, "Erro ao alterar essa geladeira. Por favor tente novamente");
+                    return;
                 }
             }
-            case "/deletar-geladeira":{
+            case "deletar":{
                 String idTxt = req.getParameter("idGeladeira");
-                int id = Integer.parseInt(idTxt);
-                if(gelaDao.deletarGeladeira(usuario.getCpf(), id) == 1){
-                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                int id;
+                try{
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao deletar essa geladeira. Por favor tente novamente.");
+                    return;
+                }
+                if(gelaDao.deletarGeladeira(id) == 1){
+                    session.setAttribute("sucesso", "Geladeira apagada com sucesso, junto com os itens dela.");
+                    resp.sendRedirect(req.getContextPath() + retorno);
                     return;
                 }
                 else {
-                    voltaComErro(req, resp, "Erro ao deletar essa geladeira. Por favor tente novamente.", jsp_deletar_geladeira);
+                    voltaComErro(req, resp, "Erro ao deletar essa geladeira. Por favor tente novamente.");
+                    return;
                 }
             }
             default:{
@@ -179,10 +202,27 @@ public class GeladeiraServlet extends HttpServlet {
             }
         }
     }
-    // voltando para a pagina com erro
-    public static void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem, String pagina)
+
+    // carrega as listas e mostra a tela
+    private void listar(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException{
+        List<Geladeira> todasGeladeira = gelaDao.buscarTodasGeladeira();
+        List<Usuario> usuarios = usuarioDAO.buscarTodosUsuario();
+        req.setAttribute("geladeiras", todasGeladeira);
+        req.setAttribute("usuarios", usuarios);
+        req.getRequestDispatcher(jsp_geladeiras).forward(req, resp);
+    }
+
+    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        req.getRequestDispatcher(pagina).forward(req, resp);
+        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
+        if (retorno.equals(url_servlet)){
+            listar(req, resp);
+        }
+        else {
+            req.getRequestDispatcher(retorno).forward(req, resp);
+        }
     }
 }
