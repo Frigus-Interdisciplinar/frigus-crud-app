@@ -7,63 +7,37 @@ import com.example.servlet.Util.Conexao;
 import com.example.servlet.Util.Enum.Categoria;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class IngredienteDAO {
+    // o ingrediente é um produto que ja existe usado numa receita ( ele nao cria nem apaga o produto )
+
     // ========== INSERIR ==========
-    public int inserirIngrediente(Ingredientes ingrediente){
+    public int adicionarIngrediente(Ingredientes ingrediente){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
-        Produto produto = ingrediente.getProduto();
 
         try{
-            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
-
-            // insere o produto
-            String comandoSqlProduto = "insert into Produto(nome, descricao, preco, categoria, marca, unidademedida) values (?,?,?,?,?,?);";
-            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto, Statement.RETURN_GENERATED_KEYS);
-            pstmtProduto.setString(1, produto.getNome());
-            pstmtProduto.setString(2, produto.getDescricao());
-            pstmtProduto.setDouble(3, produto.getPreco());
-            pstmtProduto.setString(4, produto.getCategoria().name());
-            pstmtProduto.setString(5, produto.getMarca());
-            pstmtProduto.setString(6, produto.getUnidadeMedida());
-
-            if (pstmtProduto.executeUpdate() <= 0){
-                conn.rollback();
-                return 0; // rejeitado!!
-            }
-            ResultSet chavesProduto = pstmtProduto.getGeneratedKeys();// adicionando a chave criada pelo banco
-            if (chavesProduto.next()) produto.setIdProdutos(chavesProduto.getInt(1));
-
-            // a receita ja existe, o ingrediente só aponta para ela
             String comandoSql = "insert into Ingrediente (idReceita, idProduto, quantidade) values (?,?,?);";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
 
             // setando os valores para a operação
             pstmt.setInt(1, ingrediente.getReceita().getIdReceita());
-            pstmt.setInt(2, produto.getIdProdutos());
+            pstmt.setInt(2, ingrediente.getProduto().getIdProdutos());
             pstmt.setInt(3, ingrediente.getQuantidade());
 
-            if (pstmt.executeUpdate() <= 0){
-                conn.rollback();
-                produto.setIdProdutos(0);
+            if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) ingrediente.setIdIngredientes(chaves.getInt(1));
+                return 1; // verifica se deu certo
+            }
+            else {
                 return 0; // rejeitado!!
             }
-            ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
-            if (chaves.next()) ingrediente.setIdIngredientes(chaves.getInt(1));
-
-            conn.commit();
-            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
-            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            // o rollback torna esses ids falsos
-            produto.setIdProdutos(0);
-            ingrediente.setIdIngredientes(0);
             return -1;
         }
         finally {
@@ -79,49 +53,24 @@ public class IngredienteDAO {
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
-        // o ingrediente continua ligado ao mesmo produto, então o id vem do antigo
-        int idProduto = ingredienteAntigo.getProduto().getIdProdutos();
-        Produto produtoNovo = ingredienteNovo.getProduto();
-
         try{
-            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
-
-            // altera as informações do produto
-            String comandoSqlProduto = "update Produto set nome = ?, descricao = ?, preco = ?, categoria = ?, marca = ?, unidademedida = ? where id = ?;";
-            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto);
-            pstmtProduto.setString(1, produtoNovo.getNome());
-            pstmtProduto.setString(2, produtoNovo.getDescricao());
-            pstmtProduto.setDouble(3, produtoNovo.getPreco());
-            pstmtProduto.setString(4, produtoNovo.getCategoria().name());
-            pstmtProduto.setString(5, produtoNovo.getMarca());
-            pstmtProduto.setString(6, produtoNovo.getUnidadeMedida());
-            pstmtProduto.setInt(7, idProduto);
-
-            if (pstmtProduto.executeUpdate() <= 0){
-                conn.rollback();
-                return 0; // rejeitado!!
-            }
-
-            String comandoSql = "update Ingrediente set idReceita = ?, idProduto = ?, quantidade = ? where id = ?;";
+            String comandoSql = "update Ingrediente set idProduto = ?, quantidade = ? where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
-            pstmt.setInt(1, ingredienteNovo.getReceita().getIdReceita());
-            pstmt.setInt(2, idProduto);
-            pstmt.setInt(3, ingredienteNovo.getQuantidade());
-            pstmt.setInt(4, ingredienteAntigo.getIdIngredientes());
+            pstmt.setInt(1, ingredienteNovo.getProduto().getIdProdutos());
+            pstmt.setInt(2, ingredienteNovo.getQuantidade());
+            pstmt.setInt(3, ingredienteAntigo.getIdIngredientes());
 
-            if (pstmt.executeUpdate() <= 0){
-                conn.rollback();
+            if (pstmt.executeUpdate() > 0){
+                return 1; // verifica se deu certo
+            }
+            else {
                 return 0; // rejeitado!!
             }
-
-            conn.commit();
-            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
-            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -137,35 +86,22 @@ public class IngredienteDAO {
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         try{
-            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
-
-            // o ingrediente sai primeiro porque ele referencia o produto
+            // so o ingrediente sai da receita, o produto continua existindo
             String comandoSql = "delete from Ingrediente where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
             // setando os valores para a operação
             pstmt.setInt(1, ingrediente.getIdIngredientes());
 
-            if (pstmt.executeUpdate() <= 0){
-                conn.rollback();
+            if (pstmt.executeUpdate() > 0){
+                return 1; // verifica se deu certo
+            }
+            else {
                 return 0; // rejeitado!!
             }
-
-            String comandoSqlProduto = "delete from Produto where id = ? ";
-            PreparedStatement pstmtProduto = conn.prepareStatement(comandoSqlProduto);
-            pstmtProduto.setInt(1, ingrediente.getProduto().getIdProdutos());
-
-            if (pstmtProduto.executeUpdate() <= 0){
-                conn.rollback();
-                return 0; // rejeitado!!
-            }
-
-            conn.commit();
-            return 1; // verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
-            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -177,7 +113,7 @@ public class IngredienteDAO {
 
     // ========== BUSCAR ==========
 
-    // ============= BUSCAR 1 INGREDIENTE(PRODUTO) POR ID =============
+    // ============= BUSCAR 1 INGREDIENTE POR ID =============
     public Ingredientes buscarIngrediente(int idIngrediente){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
@@ -186,25 +122,7 @@ public class IngredienteDAO {
         Ingredientes ingrediente = null;
 
         try {
-            String comandoSql = "SELECT " +
-                    "i.id AS idIngrediente, " +
-                    "i.quantidade AS quantidadeIngrediente, " +
-
-                    "p.id AS idProduto, " +
-                    "p.nome AS nomeProduto, " +
-                    "p.descricao AS descricaoProduto, " +
-                    "p.preco, " +
-                    "p.categoria, " +
-                    "p.marca, " +
-                    "p.unidadeMedida, " +
-
-                    "r.id AS idReceita, " +
-                    "r.nome AS nomeReceita, " +
-                    "r.descricao AS descricaoReceita, " +
-                    "r.modoPreparo, " +
-                    "r.dtReceita, " +
-                    "r.foiFeita "  +
-                    " from Ingrediente i join Produto p on p.id = i.idProduto join receita r on r.id = i.idReceita where i.id = ?;";
+            String comandoSql = "select * from Ingrediente where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando o id
             pstmt.setInt(1, idIngrediente);
@@ -212,30 +130,17 @@ public class IngredienteDAO {
 
             if (rset.next()){
                 // criando o objeto receita
-                Receita receita = new Receita(
-                        rset.getInt("idReceita"),
-                        rset.getString("nomeReceita"),
-                        rset.getString("descricaoReceita"),
-                        rset.getString("modoPreparo"),
-                        rset.getObject("dtReceita", LocalDate.class),
-                        rset.getBoolean("foiFeita")
-                );
+                Receita receita = new Receita();
+                receita.setIdReceita(rset.getInt("idReceita"));
                 // criando o objeto Produto
-                Produto produto = new Produto(
-                        rset.getInt("idProduto"),
-                        rset.getString("nomeProduto"),
-                        rset.getString("descricaoProduto"),
-                        rset.getDouble("preco"),
-                        Categoria.valueOf(rset.getString("categoria")),
-                        rset.getString("marca"),
-                        rset.getString("unidadeMedida")
-                );
+                Produto produto = new Produto();
+                produto.setIdProdutos(rset.getInt("idProduto"));
                 // criando o objeto ingrediente
                 ingrediente = new Ingredientes(
-                        rset.getInt("idIngrediente"),
+                        rset.getInt("id"),
                         receita,
                         produto,
-                        rset.getInt("quantidadeIngrediente")
+                        rset.getInt("quantidade")
                 );
             }
         }catch (SQLException sqle){
@@ -244,11 +149,11 @@ public class IngredienteDAO {
             conexao.desconectar(conn);// fechando a conexao com o banco
         }
         return ingrediente;
-    }// ============= BUSCAR 1 INGREDIENTE(PRODUTO) POR ID =============
+    }// ============= BUSCAR 1 INGREDIENTE POR ID =============
 
 
-    // ============= BUSCAR TODOS OS INGREDIENTES DE TODAS AS RECEITAS =============
-    public List<Ingredientes> buscarTodosIngrediente(){
+    // ============= BUSCAR OS INGREDIENTES DE UMA RECEITA =============
+    public List<Ingredientes> buscarIngredientesDaReceita(int idReceita){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -256,54 +161,32 @@ public class IngredienteDAO {
         List<Ingredientes> lista = new ArrayList<>();
 
         try{
-            String comandoSql = "SELECT " +
-                    "i.id AS idIngrediente, " +
-                    "i.quantidade AS quantidadeIngrediente, " +
-
-                    "p.id AS idProduto, " +
-                    "p.nome AS nomeProduto, " +
-                    "p.descricao AS descricaoProduto, " +
-                    "p.preco, " +
-                    "p.categoria, " +
-                    "p.marca, " +
-                    "p.unidadeMedida, " +
-
-                    "r.id AS idReceita, " +
-                    "r.nome AS nomeReceita, " +
-                    "r.descricao AS descricaoReceita, " +
-                    "r.modoPreparo, " +
-                    "r.dtReceita, " +
-                    "r.foiFeita " +
-
-                    "FROM Ingrediente i " +
-                    "JOIN Produto p ON p.id = i.idProduto " +
-                    "JOIN receita r ON r.id = i.idReceita " +
-                    "ORDER BY i.id;";
+            String comandoSql = "select i.id as idIngrediente, i.quantidade as quantidadeIngrediente, " +
+                    "p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida " +
+                    "from Ingrediente i " +
+                    "join Produto p on p.id = i.idProduto " +
+                    "where i.idReceita = ? " +
+                    "order by i.id;";
 
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // setando o id da receita
+            pstmt.setInt(1, idReceita);
             rset = pstmt.executeQuery();
 
             while (rset.next()){
                 // criando o objeto produto
                 Produto produto = new Produto(
                         rset.getInt("idProduto"),
-                        rset.getString("nomeProduto"),
-                        rset.getString("descricaoProduto"),
+                        rset.getString("nome"),
+                        rset.getString("descricao"),
                         rset.getDouble("preco"),
                         Categoria.valueOf(rset.getString("categoria")),
                         rset.getString("marca"),
                         rset.getString("unidadeMedida")
                 );
-
-                // criando o objeto receita
-                Receita receita = new Receita(
-                        rset.getInt("idReceita"),
-                        rset.getString("nomeReceita"),
-                        rset.getString("descricaoReceita"),
-                        rset.getString("modoPreparo"),
-                        rset.getObject("dtReceita", LocalDate.class),
-                        rset.getBoolean("foiFeita")
-                );
+                // criando a receita so com o id
+                Receita receita = new Receita();
+                receita.setIdReceita(idReceita);
                 // criando o objeto ingrediente
                 Ingredientes ingrediente = new Ingredientes(
                         rset.getInt("idIngrediente"),
@@ -319,5 +202,39 @@ public class IngredienteDAO {
             conexao.desconectar(conn);// fechando a conexao com o banco
         }
         return lista;
-    }// ============= BUSCAR TODOS OS INGREDIENTES DE TODAS AS RECEITAS =============
+    }// ============= BUSCAR OS INGREDIENTES DE UMA RECEITA =============
+
+
+    // ============= BUSCAR OS PRODUTOS QUE PODEM VIRAR INGREDIENTE =============
+    public List<Produto> buscarTodosProdutos(){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();// abrindo a conexao com o banco
+
+        ResultSet rset = null;
+        List<Produto> lista = new ArrayList<>();
+
+        try{
+            String comandoSql = "select * from Produto order by nome, marca, id;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()){
+                Produto produto = new Produto(
+                        rset.getInt("id"),
+                        rset.getString("nome"),
+                        rset.getString("descricao"),
+                        rset.getDouble("preco"),
+                        Categoria.valueOf(rset.getString("categoria")),
+                        rset.getString("marca"),
+                        rset.getString("unidadeMedida")
+                );
+                lista.add(produto);
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return lista;
+    }// ============= BUSCAR OS PRODUTOS QUE PODEM VIRAR INGREDIENTE =============
 }

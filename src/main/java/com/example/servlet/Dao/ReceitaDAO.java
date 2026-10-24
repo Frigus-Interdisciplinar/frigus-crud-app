@@ -101,13 +101,8 @@ public class ReceitaDAO {
         Connection conn = conexao.conectar();
 
         try{
-            // apagar a receita apaga os ingredientes pelo ON DELETE CASCADE, mas os produtos ficariam soltos
-            // por isso tudo acontece na mesma transação
+            // apagar a receita apaga os ingredientes pelo ON DELETE CASCADE, os produtos continuam existindo
             conn.setAutoCommit(false); // nada é salvo de verdade até o commit
-
-            // guarda os produtos dos ingredientes antes de apagar a receita
-            String comandoSqlProdutos = "select idProduto from Ingrediente where idReceita = ?;";
-            List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, receita.getIdReceita());
 
             String comandoSql = "delete from receita where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
@@ -117,9 +112,6 @@ public class ReceitaDAO {
                 conn.rollback();
                 return 0;// não deu certo
             }
-
-            // apaga os produtos que sobraram sem ninguém usando
-            ProdutosGeladeiraDAO.apagarProdutosOrfaos(conn, idsProdutos);
 
             conn.commit();
             return 1;// deu certo
