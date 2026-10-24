@@ -5,6 +5,16 @@ CREATE SCHEMA public;
 */
 /*
 -- Criacao das tabelas
+
+create table SuperAdmin(
+	id 			serial 		 primary key,
+	nome        varchar(20)  not null,
+	email       varchar(320) not null     unique,
+	senha       varchar(16)  not null
+);
+
+
+
 CREATE TABLE Usuario(
 	cpf         varchar(11)  primary key,
 	nome        varchar(20)  not null,
@@ -319,6 +329,11 @@ alter table ItemFrigorifico
 ALTER TABLE Endereco
 ADD CONSTRAINT chk_cep_formato
 CHECK (cep ~ '^\d{8}$');
+
+alter table SuperAdmin
+	add constraint chk_email_formato
+	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+
 
 
 -- =====================================================================
