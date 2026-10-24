@@ -10,6 +10,7 @@ import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.ProdutoLista;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,7 +21,10 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(urlPatterns = {
         "/admin/compras"},
@@ -70,8 +74,6 @@ public class ComprasServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = req.getSession();
         String action = req.getParameter("action");
-        // para onde voltar depois de dar certo
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_ver_compra);
 
         if (action == null){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -109,7 +111,7 @@ public class ComprasServlet extends HttpServlet {
 
                 if (listaDAO.inserirListaCompras(compras) == 1){
                     session.setAttribute("sucesso", "Lista de compras cadastrada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     break;
                 }else {
                     voltaComErro(req, resp, "Não foi possível adicionar essa compra.");
@@ -157,7 +159,7 @@ public class ComprasServlet extends HttpServlet {
 
                 if (listaDAO.alterarListaCompras(compraAntiga, compraNova) == 1){
                     session.setAttribute("sucesso", "Lista de compras alterada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     break;
                 }
                 else {
@@ -183,7 +185,7 @@ public class ComprasServlet extends HttpServlet {
 
                 if (listaDAO.deletarListaCompras(compra) == 1){
                     session.setAttribute("sucesso", "Lista de compras apagada com sucesso, junto com os itens dela.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     break;
                 }
                 else {
@@ -222,7 +224,7 @@ public class ComprasServlet extends HttpServlet {
                 ProdutoLista prodLista = new ProdutoLista(compra, produto, quantidade);
                 if (prodListaDAO.adicionarProdutoListas(prodLista) == 1){
                     session.setAttribute("sucesso", "Item cadastrado na lista de compras com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     return;
                 }
                 else {
@@ -275,7 +277,7 @@ public class ComprasServlet extends HttpServlet {
                 ProdutoLista prodListaNovo = new ProdutoLista(compra, produtoNovo, quantidade);
                 if(prodListaDAO.alterarProdutoListas(prodListaAntigo, prodListaNovo) == 1){
                     session.setAttribute("sucesso", "Item da lista de compras alterado com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     break;
                 }
                 else {
@@ -300,7 +302,7 @@ public class ComprasServlet extends HttpServlet {
                 }
                 if(prodListaDAO.deletarProdutoListas(prodLista) == 1){
                     session.setAttribute("sucesso", "Item da lista de compras apagado com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_ver_compra);
                     break;
                 }
                 else{
@@ -386,32 +388,88 @@ public class ComprasServlet extends HttpServlet {
         return new Produto(nome, descricao, preco, categoria, marca, unidadeMedida);
     }
 
-    // carrega as listas e mostra a tela
+    // carrega as listas ( ja filtradas ) e mostra a tela
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
+        // filtros da tela
+        String filtroItem = req.getParameter("item");
+        String filtroDono = req.getParameter("dono");
+        String filtroCategoria = req.getParameter("categoria");
+
         List<ListaCompras> todasCompras = listaDAO.buscarTodasListaCompras();
-        List<ProdutoLista> itensLista = prodListaDAO.buscarTodosProdutoLista();
-        List<Usuario> usuarios = usuarioDAO.buscarTodosUsuario();
-        List<Empresa> empresas = empresaDAO.buscarTodasEmpresa();
+        List<ProdutoLista> todosItens = prodListaDAO.buscarTodosProdutoLista();
+
+        // o item so traz o id da lista, o dono vem da lista de compras
+        Map<Integer, ListaCompras> comprasPorId = new HashMap<>();
+        for (ListaCompras compra : todasCompras){
+            comprasPorId.put(compra.getIdLista(), compra);
+        }
+
+        List<ProdutoLista> itensLista = new ArrayList<>();
+        for (ProdutoLista item : todosItens){
+            ListaCompras compra = comprasPorId.get(item.getListaCompras().getIdLista());
+            String dono = "";
+            if (compra != null){
+                dono = compra.getUsuario() != null
+                        ? compra.getUsuario().getNome() + " " + compra.getUsuario().getSobrenome()
+                        : compra.getEmpresa().getNome();
+                // o item passa a mostrar o dono da lista
+                item.setListaCompras(compra);
+            }
+            boolean achouItem = filtroItem == null || filtroItem.isBlank() || item.getProduto().getNome().toLowerCase().contains(filtroItem.trim().toLowerCase());
+            boolean achouDono = filtroDono == null || filtroDono.isBlank() || dono.toLowerCase().contains(filtroDono.trim().toLowerCase());
+            boolean achouCategoria = filtroCategoria == null || filtroCategoria.isBlank() || filtroCategoria.equals(item.getProduto().getCategoria().name());
+            if (achouItem && achouDono && achouCategoria){
+                itensLista.add(item);
+            }
+        }
+
+        // ver os detalhes ou editar uma lista, ou editar um item ( vem no link da linha )
+        String ver = req.getParameter("ver");
+        String editar = req.getParameter("editar");
+        String editarItem = req.getParameter("editarItem");
+        String idEscolhido = (ver != null && !ver.isBlank()) ? ver.trim() : (editar != null && !editar.isBlank() ? editar.trim() : null);
+        if (idEscolhido != null){
+            for (ListaCompras compra : todasCompras){
+                if (String.valueOf(compra.getIdLista()).equals(idEscolhido)){
+                    req.setAttribute("registro", compra);
+                    req.setAttribute("modo", ver != null && !ver.isBlank() ? "ver" : "editar");
+                    List<ProdutoLista> itensDaLista = new ArrayList<>();
+                    for (ProdutoLista item : todosItens){
+                        if (item.getListaCompras().getIdLista() == compra.getIdLista()){
+                            itensDaLista.add(item);
+                        }
+                    }
+                    req.setAttribute("itensDaLista", itensDaLista);
+                }
+            }
+        }
+        else if (editarItem != null && !editarItem.isBlank()){
+            for (ProdutoLista item : todosItens){
+                if (String.valueOf(item.getIdProdutoLista()).equals(editarItem.trim())){
+                    req.setAttribute("registroItem", item);
+                    req.setAttribute("modo", "editarItem");
+                }
+            }
+        }
+
         req.setAttribute("compras", todasCompras);
-        req.setAttribute("itensLista", itensLista);
-        req.setAttribute("usuarios", usuarios);
-        req.setAttribute("empresas", empresas);
+        req.setAttribute("itensLista", Paginacao.aplicar(req, itensLista));
+        req.setAttribute("totalGeral", todosItens.size());
+        req.setAttribute("usuarios", usuarioDAO.buscarTodosUsuario());
+        req.setAttribute("empresas", empresaDAO.buscarTodasEmpresa());
         req.setAttribute("categorias", Categoria.values());
+        req.setAttribute("filtroItem", filtroItem == null ? "" : filtroItem);
+        req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
+        req.setAttribute("filtroCategoria", filtroCategoria == null ? "" : filtroCategoria);
         req.getRequestDispatcher(jsp_compras).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    // volta para a tela de onde veio com uma mensagem de erro 
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
     throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_ver_compra);
-        if (retorno.equals(url_ver_compra)){
-            listar(req, resp);
-        }
-        else {
-            req.getRequestDispatcher(retorno).forward(req, resp);
-        }
+        listar(req, resp);
     }
     // proteção contra formato errado nos tipos diferentes de string
     private static Double lerDouble(String txt) {
