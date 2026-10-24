@@ -7,6 +7,7 @@ import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(urlPatterns = {
@@ -69,8 +71,6 @@ public class Planos extends HttpServlet {
             throws ServletException, IOException {
         String action = req.getParameter("action");
         HttpSession session = req.getSession();
-        // para onde voltar depois de dar certo
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
 
         if (action == null){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,7 +127,7 @@ public class Planos extends HttpServlet {
 
                 if (assinaturaDAO.inserirAssinatura(assinatura) == 1) {
                     session.setAttribute("sucesso", "Assinatura cadastrada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 } else {
                     voltaComErro(req, resp, "Erro ao cadastrar a assinatura. Por favor tente novamente.");
@@ -203,7 +203,7 @@ public class Planos extends HttpServlet {
                 int funcionou = assinaturaDAO.alterarAssinatura(assinaturaAntiga, assinaturaNova);
                 if (funcionou == 1){
                     session.setAttribute("sucesso", "Assinatura alterada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
                 else {
@@ -232,7 +232,7 @@ public class Planos extends HttpServlet {
                 int funcionou = assinaturaDAO.deletarAssinatura(assinatura);
                 if(funcionou == 1){
                     session.setAttribute("sucesso", "Assinatura apagada com sucesso.");
-                    resp.sendRedirect(req.getContextPath() + retorno);
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
                 else {
@@ -247,29 +247,53 @@ public class Planos extends HttpServlet {
 
     }
 
-    // carrega as listas e mostra a tela ( aqui só existem as assinaturas, os planos vêm do enum )
+    // carrega as assinaturas ( ja filtradas ) e mostra a tela, os planos vêm do enum
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
-        List<Assinatura> assinaturas = assinaturaDAO.buscarTodasAssinatura();
-        List<Usuario> usuarios = usuarioDAO.buscarTodosUsuario();
-        List<Empresa> empresas = empresaDAO.buscarTodasEmpresa();
-        req.setAttribute("assinaturas", assinaturas);
-        req.setAttribute("usuarios", usuarios);
-        req.setAttribute("empresas", empresas);
+        // filtros da tela
+        String filtroDono = req.getParameter("dono");
+        String filtroPlano = req.getParameter("plano");
+
+        List<Assinatura> todas = assinaturaDAO.buscarTodasAssinatura();
+        List<Assinatura> assinaturas = new ArrayList<>();
+        for (Assinatura assinatura : todas){
+            String dono = assinatura.getUsuario() != null
+                    ? assinatura.getUsuario().getNome() + " " + assinatura.getUsuario().getSobrenome() + " " + assinatura.getUsuario().getCpf()
+                    : assinatura.getEmpresa().getNome() + " " + assinatura.getEmpresa().getCnpj();
+            boolean achouDono = filtroDono == null || filtroDono.isBlank() || dono.toLowerCase().contains(filtroDono.trim().toLowerCase());
+            boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(assinatura.getTipoAssinatura().name());
+            if (achouDono && achouPlano){
+                assinaturas.add(assinatura);
+            }
+        }
+
+        // ver os detalhes ou editar uma assinatura ( vem no link da linha )
+        String ver = req.getParameter("ver");
+        String editar = req.getParameter("editar");
+        String idEscolhido = (ver != null && !ver.isBlank()) ? ver.trim() : (editar != null && !editar.isBlank() ? editar.trim() : null);
+        if (idEscolhido != null){
+            for (Assinatura assinatura : todas){
+                if (String.valueOf(assinatura.getIdAssinatura()).equals(idEscolhido)){
+                    req.setAttribute("registro", assinatura);
+                    req.setAttribute("modo", ver != null && !ver.isBlank() ? "ver" : "editar");
+                }
+            }
+        }
+
+        req.setAttribute("assinaturas", Paginacao.aplicar(req, assinaturas));
+        req.setAttribute("totalGeral", todas.size());
+        req.setAttribute("usuarios", usuarioDAO.buscarTodosUsuario());
+        req.setAttribute("empresas", empresaDAO.buscarTodasEmpresa());
         req.setAttribute("planos", TipoAssinatura.values());
+        req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
+        req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
         req.getRequestDispatcher(jsp_planos).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    // volta para a tela de onde veio com uma mensagem de erro 
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
-        if (retorno.equals(url_servlet)){
-            listar(req, resp);
-        }
-        else {
-            req.getRequestDispatcher(retorno).forward(req, resp);
-        }
+        listar(req, resp);
     }
 }
