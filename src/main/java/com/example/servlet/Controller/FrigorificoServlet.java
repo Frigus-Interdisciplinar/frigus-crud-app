@@ -8,6 +8,7 @@ import com.example.servlet.Model.Endereco;
 import com.example.servlet.Model.Frigorificos;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public class FrigorificoServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_frigorificos = "/WEB-INF/pages/frigorificos.jsp";
+    private static final String jsp_frigorificos_form = "/WEB-INF/pages/frigorificos-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/frigorificos";
@@ -296,6 +302,13 @@ public class FrigorificoServlet extends HttpServlet {
             }
         }
 
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Frigorificos>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "dono", (a, b) -> Ordenar.texto(a.getEmpresa().getNome(), b.getEmpresa().getNome()));
+        Ordenar.campo(ordens, "nome", (a, b) -> Ordenar.texto(a.getNome(), b.getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparingInt(Frigorificos::getIdFrigorifico));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(frigorificos, req.getParameter("ord"), "dono:asc", ordens));
+
         req.setAttribute("frigorificos", Paginacao.aplicar(req, frigorificos));
         req.setAttribute("totalGeral", todos.size());
         req.setAttribute("ocupacao", ocupacao);
@@ -307,13 +320,16 @@ public class FrigorificoServlet extends HttpServlet {
         req.setAttribute("filtroCidade", filtroCidade == null ? "" : filtroCidade);
         req.setAttribute("filtroUf", filtroUf == null ? "" : filtroUf);
         req.setAttribute("filtroTipo", filtroTipo == null ? "" : filtroTipo);
-        req.getRequestDispatcher(jsp_frigorificos).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_frigorificos_form : jsp_frigorificos).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 }
