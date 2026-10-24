@@ -108,23 +108,36 @@ public class GeladeiraDAO {
 
 
     // ========= DELETAR ==========
-    public int deletarGeladeira(String cpf, int id){
+    public int deletarGeladeira(int id){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "delete from geladeira where idUsuario = ? and id = ?";
+            // apagar a geladeira apaga os itens dela pelo ON DELETE CASCADE, mas os produtos ficariam soltos
+            // por isso tudo acontece na mesma transação
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // guarda os produtos dos itens antes de apagar a geladeira
+            String comandoSqlProdutos = "select idProduto from ItemGeladeira where idGeladeira = ?;";
+            List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, id);
+
+            String comandoSql = "delete from geladeira where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cpf);
-            pstmt.setInt(2, id);
-            if (pstmt.executeUpdate() > 0){
-                return 1;
-            }else {
+            pstmt.setInt(1, id);
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0;
             }
 
+            // apaga os produtos que sobraram sem ninguém usando
+            ProdutosGeladeiraDAO.apagarProdutosOrfaos(conn, idsProdutos);
+
+            conn.commit();
+            return 1;
+
         }catch (SQLException sql){
             sql.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -134,8 +147,8 @@ public class GeladeiraDAO {
     // ========= DELETAR ==========
 
 
-    // ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
-    public List<Geladeira> buscarTodasGeladeira(String cpf){
+    // ==============BUSCAR TODAS AS GELADEIRAS ( COM O NOME DO DONO ) ===============
+    public List<Geladeira> buscarTodasGeladeira(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
 
@@ -143,15 +156,16 @@ public class GeladeiraDAO {
         List<Geladeira> listaGeladeira = new ArrayList<>();
 
         try{
-            String comandoSql = "select * from geladeira where idUsuario = ?;";
+            String comandoSql = "select g.*, u.nome as nomeUsuario, u.sobrenome, u.email from geladeira g join usuario u on u.cpf = g.idUsuario order by g.id;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando o valor do id da empresa
-            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
             while (rset.next()){
                 // criando o objeto usuario
                 Usuario usuario = new Usuario();
                 usuario.setCpf(rset.getString("idUsuario"));
+                usuario.setNome(rset.getString("nomeUsuario"));
+                usuario.setSobrenome(rset.getString("sobrenome"));
+                usuario.setEmail(rset.getString("email"));
 
                 // criando o objeto geladeira
                 Geladeira geladeira = new Geladeira(
@@ -169,14 +183,14 @@ public class GeladeiraDAO {
             conexao.desconectar(conn);// fechando a conexao
         }
         return listaGeladeira;
-    }// ==============BUSCAR TODAS AS GELADEIRAS PELO ID DO USUARIO ===============
+    }// ==============BUSCAR TODAS AS GELADEIRAS ( COM O NOME DO DONO ) ===============
 
 
 
 
 
-    // ==============BUSCAR UMA GELADEIRA PELO ID DO USUARIO E PELO ID DA GELADEIRA ===============
-    public Geladeira buscarUnicaGeladeira(String cpf, int idGeladeira){
+    // ==============BUSCAR UMA GELADEIRA PELO ID DA GELADEIRA ===============
+    public Geladeira buscarUnicaGeladeira(int idGeladeira){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao
 
@@ -184,11 +198,10 @@ public class GeladeiraDAO {
         Geladeira geladeira = null;
 
         try{
-            String comandoSql = "select * from geladeira where idUsuario = ? and id = ?;";
+            String comandoSql = "select * from geladeira where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando o valor do id da empresa
-            pstmt.setString(1, cpf);
-            pstmt.setInt(2, idGeladeira);
+            // setando o valor do id da geladeira
+            pstmt.setInt(1, idGeladeira);
             rset = pstmt.executeQuery();
             while (rset.next()){
                 // criando o objeto usuario
@@ -211,18 +224,17 @@ public class GeladeiraDAO {
             conexao.desconectar(conn);// fechando a conexao
         }
         return geladeira;
-    }// ==============BUSCAR UMA GELADEIRA PELO ID DO USUARIO E PELO ID DA GELADEIRA ===============
+    }// ==============BUSCAR UMA GELADEIRA PELO ID DA GELADEIRA ===============
 
     // TOTAL DE GELADEIRAS
-    public int totalGeladeirasUsuario(String cpf){
+    public int totalGeladeiras(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
         int total = 0;
         ResultSet rset = null;
         try {
-            String comandoSql = "select count(*) as total from geladeira where idUsuario = ?;";
+            String comandoSql = "select count(*) as total from geladeira;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cpf);
             rset = pstmt.executeQuery();
 
             if(rset.next()) total = rset.getInt("total");

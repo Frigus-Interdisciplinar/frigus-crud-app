@@ -151,9 +151,9 @@ public class Validacao {
 //    }
 
 
-    // validar nome
+    // validar nome ( aceita acentos, como o nome do produto )
     public boolean validarNome(String nome){
-        return nome.matches("[A-Za-z ]+");
+        return nome.matches("[A-Za-zÀ-ÖØ-öø-ÿ ]+");
     }
 
     // validar nome do produto
@@ -167,11 +167,11 @@ public class Validacao {
 //        return valor == null;
 //    }
 
-    // vendo se a senha tem 8 digitos
+    // vendo se a senha tem de 8 a 15 digitos
     // e se a senha é forte ( tem letra maiuscula e caracter especial )
 
     public  boolean validarSenha(String senha){
-        if (senha.length() != 8){
+        if (senha.length() < 8 || senha.length() > 15){
             return false;
         }else {
             return senha.matches(".*[A-Z].*") && senha.matches(".*[^a-zA-Z0-9].*");
@@ -204,6 +204,21 @@ public class Validacao {
         LocalDate minimo = hoje.minusMonths(6);
         LocalDate maximo = hoje.plusMonths(6);
         return !data.isBefore(minimo) && !data.isAfter(maximo);
+    }
+
+    // o dono do registro é o usuario OU a empresa, nunca os dois e nunca nenhum
+    public boolean validarDono(String cpf, String cnpj){
+        boolean temCpf = cpf != null && !cpf.isBlank();
+        boolean temCnpj = cnpj != null && !cnpj.isBlank();
+        return temCpf != temCnpj;
+    }
+
+    // para onde voltar depois de uma operação ( só aceita telas do painel, senão usa a padrao )
+    public String definirRetorno(String retorno, String padrao){
+        if (retorno != null && retorno.matches("/admin/(teste-banco|visao-geral|configuracoes)")){
+            return retorno;
+        }
+        return padrao;
     }
     // =========== VALIDAR ===========
 }

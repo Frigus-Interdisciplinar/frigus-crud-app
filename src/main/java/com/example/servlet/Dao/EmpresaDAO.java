@@ -1,13 +1,14 @@
 package com.example.servlet.Dao;
 
 import com.example.servlet.Model.Empresa;
-import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmpresaDAO {
     // INSERIR
@@ -75,87 +76,46 @@ public class EmpresaDAO {
     }// ==============ALTERAR===============
 
 
-    //============== ALTERAR E-MAIL =============
-    public int alterarEmailEmpresa(Empresa empresa, String email){
-        Conexao conexao = new Conexao(); // abrindo a conexão
-        Connection conn = conexao.conectar();
-
-        try{
-            String comandoSql = "update empresa set email = ? where cnpj = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para o comando
-            pstmt.setString(1, email);
-            pstmt.setString(2, empresa.getCnpj());
-
-            if (pstmt.executeUpdate() > 0){
-                 return 1;// verifica se deu certo
-            }
-            else{
-                return 0;// não deu certo
-            }
-        }
-        catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexão
-        }
-    }// ==============ALTERAR E-MAIL===============
-
-
-
-
-    // ================ ALTERAR SENHA ================
-    public int alterarSenhaEmpresa(Empresa empresa, String senha){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();// abrindo a conexao com o banco
-
-        try{
-            String comandoSql = "update empresa set senha = ? where cnpj = ?;";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // setando os valores para a execução
-            pstmt.setString(1, senha);
-            pstmt.setString(2, empresa.getCnpj());
-
-            if (pstmt.executeUpdate() > 0){
-                return 1; // inseriu as informações no banco
-            }
-            else{
-                return 0; // não foi possível adicionar
-            }
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-            return -1;
-        }
-        finally {
-            conexao.desconectar(conn);// fechando a conexao com o banco
-        }
-    }// ================ ALTERAR SENHA ================
-
-
 
     //==============DELETAR=============
-    public int excluirEmpresa(String email){
+    public int excluirEmpresa(Empresa empresa){
         Conexao conexao = new Conexao(); // abrindo a conexão
         Connection conn = conexao.conectar();
 
         try{
-            String comandoSql = "delete from empresa where email = ?;";
+            // apagar a empresa apaga tudo dela pelo ON DELETE CASCADE, mas os produtos e os enderecos ficariam soltos
+            // por isso tudo acontece na mesma transação
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // guarda os produtos dos itens da empresa antes de apagar ela
+            String comandoSqlProdutos = "select itf.idProduto from ItemFrigorifico itf join Frigorifico f on f.id = itf.idFrigorifico where f.idEmpresa = ? " +
+                    "union select il.idProduto from ItemLista il join ListaCompras lc on lc.id = il.idListaCompras where lc.idEmpresa = ?;";
+            List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, empresa.getCnpj());
+
+            // guarda os enderecos dos frigorificos da empresa
+            String comandoSqlEnderecos = "select idEndereco from Frigorifico where idEmpresa = ?;";
+            List<Integer> idsEnderecos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlEnderecos, empresa.getCnpj());
+
+            String comandoSql = "delete from empresa where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para o comando
-            pstmt.setString(1, email);
+            pstmt.setString(1, empresa.getCnpj());
 
-            if (pstmt.executeUpdate() > 0){
-                return 1;// verifica se deu certo
-            }
-            else{
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
                 return 0;// não deu certo
             }
+
+            // apaga o que sobrou sem ninguém usando
+            ProdutosGeladeiraDAO.apagarProdutosOrfaos(conn, idsProdutos);
+            EnderecoDAO.apagarEnderecos(conn, idsEnderecos);
+
+            conn.commit();
+            return 1;// verifica se deu certo
         }
         catch (SQLException sqle){
             sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             return -1;
         }
         finally {
@@ -165,8 +125,8 @@ public class EmpresaDAO {
 
 
 
-    // ================ BUSCAR ================
-    public Empresa buscarEmpresa(String email){
+    // ================ BUSCAR UMA EMPRESA PELO CNPJ ================
+    public Empresa buscarEmpresaPorCnpj(String cnpj){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -174,10 +134,10 @@ public class EmpresaDAO {
         ResultSet rset = null; // declarando o Result Set
 
         try{
-            String comandoSql = "select * from empresa where email = ?;";
+            String comandoSql = "select * from empresa where cnpj = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
             // setando os valores para a execução
-            pstmt.setString(1, email);
+            pstmt.setString(1, cnpj);
             rset = pstmt.executeQuery();
 
             if (rset.next()){
@@ -197,5 +157,66 @@ public class EmpresaDAO {
             conexao.desconectar(conn);
         }
         return empresa;
-    }// ================ BUSCAR ================
+    }// ================ BUSCAR UMA EMPRESA PELO CNPJ ================
+
+
+
+    // ================ BUSCAR TODAS AS EMPRESAS ================
+    public List<Empresa> buscarTodasEmpresa(){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        List<Empresa> lista = new ArrayList<>();
+        ResultSet rset = null; // declarando o Result Set
+
+        try{
+            String comandoSql = "select * from empresa order by nome;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()){
+                Empresa empresa = new Empresa(
+                        rset.getString("cnpj"),
+                        rset.getString("nome"),
+                        rset.getString("email"),
+                        rset.getString("senha")
+                );
+                lista.add(empresa);
+            }
+
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return lista;
+    }// ================ BUSCAR TODAS AS EMPRESAS ================
+
+
+
+    // ================ TOTAL DE EMPRESAS ================
+    public int totalEmpresas(){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        ResultSet rset = null;
+        int total = 0;
+
+        try{
+            String comandoSql = "select count(*) as total from empresa;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
+
+            if (rset.next()) total = rset.getInt("total");
+
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+        return total;
+    }// ================ TOTAL DE EMPRESAS ================
 }

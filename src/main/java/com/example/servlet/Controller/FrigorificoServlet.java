@@ -1,11 +1,12 @@
 package com.example.servlet.Controller;
 
-import com.example.servlet.Dao.EnderecoDAO;
+import com.example.servlet.Dao.EmpresaDAO;
 import com.example.servlet.Dao.FrigorificosDAO;
+import com.example.servlet.Dao.ResumoDAO;
 import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Endereco;
 import com.example.servlet.Model.Frigorificos;
-import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,47 +16,49 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 @WebServlet(urlPatterns = {
-        "/ver-frigorifico",
-        "/inserir-frigorifico",
-        "/alterar-frigorifico",
-        "/deletar-frigorifico",
-}, name = "/ver-frigorifico")
+        "/admin/frigorificos"},
+        name = "frigorificos")
 public class FrigorificoServlet extends HttpServlet {
     private FrigorificosDAO frigorificoDAO;
-    private EnderecoDAO enderecoDAO;
+    private EmpresaDAO empresaDAO;
+    private ResumoDAO resumoDAO;
+    private Validacao validar;
 
-    // caminho das pastas
-    private static final String jsp_login = "/assets/pages/login.jsp";
-    private static final String jsp_ver = "/assets/pages/ver-frigorifico.jsp";
-    private static final String jsp_inserir = "/assets/pages/inserir-frigorifico.jsp";
-    private static final String jsp_alterar = "/assets/pages/alterar-frigorifico.jsp";
-    private static final String jsp_deletar = "/assets/pages/deletar-frigorifico.jsp";
+    // caminho das paginas
+    private static final String jsp_frigorificos = "/WEB-INF/pages/frigorificos.jsp";
 
     // caminho para o servlet
-    private static final String url_servlet = "/ver-frigorifico";
+    private static final String url_servlet = "/admin/frigorificos";
+
+    // as siglas dos estados para o campo UF
+    private static final String[] ufs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA",
+            "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"};
 
     @Override
     public void init(){
         frigorificoDAO = new FrigorificosDAO();
-        enderecoDAO = new EnderecoDAO();
+        empresaDAO = new EmpresaDAO();
+        resumoDAO = new ResumoDAO();
+        validar = new Validacao();
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        if (session == null || session.getAttribute("empresa") == null){
-            resp.sendRedirect(req.getContextPath() + jsp_login);
+        // inserir, alterar e deletar só por POST
+        if (req.getParameter("action") != null){
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
-        Empresa empresa = (Empresa) session.getAttribute("empresa");
+
         switch (req.getServletPath()){
-            case "/ver-frigorifico":{
-                List<Frigorificos> frigorificos = frigorificoDAO.buscarTodosFrigorifico(empresa.getCnpj());
-                req.setAttribute("frigorificos", frigorificos);
-                req.getRequestDispatcher(jsp_ver).forward(req, resp);
+            case "/admin/frigorificos":{
+                listar(req, resp);
                 break;
             }
             default:
@@ -67,25 +70,21 @@ public class FrigorificoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Validacao validar = new Validacao();
         HttpSession session = req.getSession();
-        switch (req.getServletPath()){
-            case "/inserir-frigorifico":{
-                Empresa empresa = (Empresa) session.getAttribute("empresa");
-                Categoria plano = (Categoria) session.getAttribute("plano");
+        String action = req.getParameter("action");
 
-                if(empresa == null || plano == null){
-                    resp.sendRedirect(req.getContextPath() + jsp_login);
-                    return;
-                }
+        if (action == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
-                Frigorificos frigorifico;
-                Endereco endereco;
+        switch (action){
+            case "inserir":{
                 // pegando as informações do formulario
 
                 // frigorifico
+                String cnpj = req.getParameter("cnpj");
                 String tipo = req.getParameter("tipo");
-                String nomeFrigorifico = req.getParameter("nomeFrigorifico");
                 // endereço
                 String rua = req.getParameter("rua");
                 String bairro = req.getParameter("bairro");
@@ -96,93 +95,40 @@ public class FrigorificoServlet extends HttpServlet {
                 String numero = req.getParameter("numero");
                 String nomeUnidade = req.getParameter("nomeUnidade");
 
-
-                if(tipo == null){
-                    voltaComErro(req, resp, "O tipo de frigorífico não pode ser vazio.", jsp_inserir);
+                // o nome do frigorifico é o nome da unidade
+                String erroCampos = validarCampos(cnpj, tipo, nomeUnidade, rua, bairro, cidade, uf, cep, numero, pais);
+                if (erroCampos != null){
+                    voltaComErro(req, resp, erroCampos);
                     return;
                 }
-                if(nomeFrigorifico == null){
-                    voltaComErro(req, resp, "O nome do frigorífico não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(rua == null){
-                    voltaComErro(req, resp, "A rua não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(bairro == null){
-                    voltaComErro(req, resp, "O bairro não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(cidade == null){
-                    voltaComErro(req, resp, "A cidade não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(uf == null){
-                    voltaComErro(req, resp, "A UF não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(pais == null){
-                    voltaComErro(req, resp, "O país não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(cep == null){
-                    voltaComErro(req, resp, "O cep não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(numero == null){
-                    voltaComErro(req, resp, "O número não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(nomeUnidade == null){
-                    voltaComErro(req, resp, "O número não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                boolean vcep = validar.validarCep(cep);
-                if(!vcep){
-                    voltaComErro(req, resp, "Formato do cep incorreto", jsp_inserir);
+                // a empresa dona tem que existir
+                Empresa empresa = empresaDAO.buscarEmpresaPorCnpj(validar.formatarCnpj(cnpj.trim()));
+                if (empresa == null){
+                    voltaComErro(req, resp, "Empresa não encontrada.");
                     return;
                 }
 
-                endereco = new Endereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
-                if(enderecoDAO.inserirEndereco(endereco) == 1){
-                    frigorifico = new Frigorificos(empresa, endereco, tipo, nomeFrigorifico);
-                    if (frigorificoDAO.inserirFrigorifico(frigorifico) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        if (enderecoDAO.deletarEndereco(endereco) == 1){
-                            voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
-                            return;
-                        }else {
-                            System.err.println("Endereço ficou orfão!");
-                            voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
-                            return;
-                        }
-                    }
+                // o admin não tem limite de frigorificos por plano
+                Endereco endereco = montarEndereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
+                Frigorificos frigorifico = new Frigorificos(empresa, endereco, tipo.trim(), nomeUnidade.trim());
+                if (frigorificoDAO.inserirFrigorifico(frigorifico) == 1){
+                    session.setAttribute("sucesso", "Frigorífico cadastrado com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }
                 else{
-                    voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.", jsp_inserir);
+                    voltaComErro(req, resp, "Erro ao adicionar frigorifico. Por favor tente novamente.");
                     return;
                 }
             }
 
-            case "/alterar-frigorifico":{
-                Empresa empresa = (Empresa) session.getAttribute("empresa");
-                Categoria plano = (Categoria) session.getAttribute("plano");
-
-                if(empresa == null || plano == null){
-                    resp.sendRedirect(req.getContextPath() + jsp_login);
-                    return;
-                }
-
-
+            case "alterar":{
                 // pegando as informações do formulario
 
                 // frigorifico
                 String idTxt = req.getParameter("idFrigorifico");
+                String cnpj = req.getParameter("cnpj");
                 String tipo = req.getParameter("tipo");
-                String nomeFrigorifico = req.getParameter("nomeFrigorifico");
                 // endereço
                 String rua = req.getParameter("rua");
                 String bairro = req.getParameter("bairro");
@@ -196,127 +142,64 @@ public class FrigorificoServlet extends HttpServlet {
                 // convertendo
                 int id;
                 try{
-                    id = Integer.parseInt(idTxt);
-                } catch (NumberFormatException e) {
-                    voltaComErro(req, resp, "Erro ao alterar esse frigorífico. Por favor tente novamente.", jsp_inserir);
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao alterar esse frigorífico. Por favor tente novamente.");
                     return;
                 }
 
-                if(tipo == null){
-                    voltaComErro(req, resp, "O tipo de frigorífico não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(nomeFrigorifico == null){
-                    voltaComErro(req, resp, "O nome do frigorífico não pode ser vazio.", jsp_inserir);
+                String erroCampos = validarCampos(cnpj, tipo, nomeUnidade, rua, bairro, cidade, uf, cep, numero, pais);
+                if (erroCampos != null){
+                    voltaComErro(req, resp, erroCampos);
                     return;
                 }
 
-
-                if(rua == null){
-                    voltaComErro(req, resp, "A rua não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(bairro == null){
-                    voltaComErro(req, resp, "O bairro não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(cidade == null){
-                    voltaComErro(req, resp, "A cidade não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(uf == null){
-                    voltaComErro(req, resp, "A UF não pode ser vazia.", jsp_inserir);
-                    return;
-                }
-                if(pais == null){
-                    voltaComErro(req, resp, "O país não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(cep == null){
-                    voltaComErro(req, resp, "O cep não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(numero == null){
-                    voltaComErro(req, resp, "O número não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                if(nomeUnidade == null){
-                    voltaComErro(req, resp, "O número não pode ser vazio.", jsp_inserir);
-                    return;
-                }
-                boolean vcep = validar.validarCep(cep);
-                if(!vcep){
-                    voltaComErro(req, resp, "Formato do cep incorreto", jsp_inserir);
-                    return;
-                }
-
-                Frigorificos frigorificoAntigo = frigorificoDAO.buscarFrigorificoPorId(empresa.getCnpj(), id);
+                Frigorificos frigorificoAntigo = frigorificoDAO.buscarFrigorificoPorId(id);
                 if (frigorificoAntigo == null) {
-                    voltaComErro(req, resp, "Frigorífico não encontrado.", jsp_alterar);
+                    voltaComErro(req, resp, "Frigorífico não encontrado.");
                     return;
                 }
-                Endereco enderecoAntigo = enderecoDAO.buscarEnderecoDeUmFrigorifico(empresa.getCnpj(), frigorificoAntigo.getIdFrigorifico());
-                if (enderecoAntigo == null) {
-                    voltaComErro(req, resp, "Endereço do frigorífico não encontrado.", jsp_alterar);
+                // a nova empresa dona tem que existir
+                Empresa empresa = empresaDAO.buscarEmpresaPorCnpj(validar.formatarCnpj(cnpj.trim()));
+                if (empresa == null){
+                    voltaComErro(req, resp, "Empresa não encontrada.");
                     return;
                 }
 
-                Endereco enderecoNovo = new Endereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
-
-                if (enderecoDAO.alterarEndereco(enderecoAntigo, enderecoNovo) == 1){
-                    enderecoNovo.setIdEndereco(enderecoAntigo.getIdEndereco());
-                    Frigorificos frigorificoNovo = new Frigorificos(empresa, enderecoNovo, tipo, nomeFrigorifico);
-                    if (frigorificoDAO.alterarFrigorifico(frigorificoAntigo, frigorificoNovo) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        if (enderecoDAO.alterarEndereco(enderecoNovo, enderecoAntigo) == 1){
-                            voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
-                            return;
-                        }else {
-                            System.err.println("endereço alterado mas frigorifico não, isso é realmente preocupante");
-                            voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
-                            return;
-                        }
-                    }
-
-                }else {
-                    voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.", jsp_alterar);
+                // o frigorifico continua com o mesmo endereço, so os dados dele mudam
+                Endereco enderecoNovo = montarEndereco(rua, bairro, cidade, uf, pais, cep, numero, nomeUnidade);
+                enderecoNovo.setIdEndereco(frigorificoAntigo.getEndereco().getIdEndereco());
+                Frigorificos frigorificoNovo = new Frigorificos(empresa, enderecoNovo, tipo.trim(), nomeUnidade.trim());
+                if (frigorificoDAO.alterarFrigorifico(frigorificoAntigo, frigorificoNovo) == 1){
+                    session.setAttribute("sucesso", "Frigorífico alterado com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
+                }
+                else {
+                    voltaComErro(req, resp, "Erro ao alterar esse frigorifico. Por favor tente novamente.");
                     return;
                 }
             }
-            case "/deletar-frigorifico":{
-                Empresa empresa = (Empresa) session.getAttribute("empresa");
-                Categoria plano = (Categoria) session.getAttribute("plano");
-
-                if(empresa == null || plano == null){
-                    resp.sendRedirect(req.getContextPath() + jsp_login);
-                    return;
-                }
-
+            case "deletar":{
                 String idTxt = req.getParameter("idFrigorifico");
                 int id;
                 try{
-                    id = Integer.parseInt(idTxt);
-                } catch (NumberFormatException e) {
-                    voltaComErro(req, resp, "Erro ao deletar esse frigorífico.", jsp_deletar);
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao deletar esse frigorífico.");
                     return;
                 }
-                Frigorificos frigorifico = frigorificoDAO.buscarFrigorificoPorId(empresa.getCnpj(), id);
-                Endereco endereco = enderecoDAO.buscarEnderecoDeUmFrigorifico(empresa.getCnpj(), frigorifico.getIdFrigorifico());
-                if (enderecoDAO.deletarEndereco(endereco) == 1){
-                    if (frigorificoDAO.deletarFrigorifico(frigorifico) == 1){
-                        resp.sendRedirect(req.getContextPath() + url_servlet);
-                        return;
-                    }
-                    else {
-                        System.err.println("Frigorifico ficou orfao!!!");
-                        voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente", jsp_deletar);
-                        return;
-                    }
+                Frigorificos frigorifico = frigorificoDAO.buscarFrigorificoPorId(id);
+                if (frigorifico == null){
+                    voltaComErro(req, resp, "Frigorífico não encontrado.");
+                    return;
+                }
+                if (frigorificoDAO.deletarFrigorifico(frigorifico) == 1){
+                    session.setAttribute("sucesso", "Frigorífico apagado com sucesso, junto com o endereço e os itens dele.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }else {
-                    voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente", jsp_deletar);
+                    voltaComErro(req, resp, "Erro ao deletar esse frigorífico. Por favor tente novamente");
                     return;
                 }
             }
@@ -325,10 +208,112 @@ public class FrigorificoServlet extends HttpServlet {
         }
 
     }
-    // voltando para a pagina com erro
-    public static void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem, String pagina)
+
+    // confere os campos do frigorifico e do endereço, devolve a mensagem de erro ou null se esta tudo certo
+    private String validarCampos(String cnpj, String tipo, String nomeUnidade, String rua, String bairro, String cidade, String uf, String cep, String numero, String pais){
+        if(cnpj == null || cnpj.isBlank()){
+            return "Escolha a empresa dona do frigorífico.";
+        }
+        if(tipo == null || tipo.isBlank() || tipo.length() > 20){
+            return "O tipo de frigorífico não pode ser vazio e tem no máximo 20 caracteres.";
+        }
+        if(nomeUnidade == null || nomeUnidade.isBlank() || nomeUnidade.length() > 50){
+            return "O nome da unidade não pode ser vazio e tem no máximo 50 caracteres.";
+        }
+        if(rua == null || rua.isBlank()){
+            return "A rua não pode ser vazia.";
+        }
+        if(bairro == null || bairro.isBlank()){
+            return "O bairro não pode ser vazio.";
+        }
+        if(cidade == null || cidade.isBlank()){
+            return "A cidade não pode ser vazia.";
+        }
+        if(uf == null || uf.trim().length() != 2){
+            return "A UF deve ter 2 letras.";
+        }
+        if(cep == null || cep.isBlank()){
+            return "O cep não pode ser vazio.";
+        }
+        if(numero == null || numero.isBlank()){
+            return "O número não pode ser vazio.";
+        }
+        boolean vcep = validar.validarCep(validar.formatarCep(cep.trim()));
+        if(!vcep){
+            return "Formato do cep incorreto";
+        }
+        boolean vNome = validar.validarNomeProduto(nomeUnidade);
+        if(!vNome){
+            return "Nome da unidade inválido.";
+        }
+        return null;
+    }
+
+    // monta o endereço com os campos do formulario ( já validados ), o país em branco vira Brasil
+    private Endereco montarEndereco(String rua, String bairro, String cidade, String uf, String pais, String cep, String numero, String nomeUnidade){
+        String paisFinal = (pais == null || pais.isBlank()) ? "Brasil" : pais.trim();
+        return new Endereco(rua.trim(), bairro.trim(), cidade.trim(), uf.trim().toUpperCase(), paisFinal, validar.formatarCep(cep.trim()), numero.trim(), nomeUnidade.trim());
+    }
+
+    // carrega a lista ( ja filtrada ), a ocupação de cada frigorifico e mostra a tela
+    private void listar(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException{
+        // filtros da tela
+        String filtroNome = req.getParameter("nome");
+        String filtroCidade = req.getParameter("cidade");
+        String filtroUf = req.getParameter("uf");
+        String filtroTipo = req.getParameter("tipo");
+
+        List<Frigorificos> todos = frigorificoDAO.buscarTodosFrigorifico();
+        Map<Integer, int[]> ocupacao = resumoDAO.buscarOcupacaoFrigorificos();
+
+        TreeSet<String> cidades = new TreeSet<>();
+        TreeSet<String> tipos = new TreeSet<>();
+        List<Frigorificos> frigorificos = new ArrayList<>();
+        for (Frigorificos frigorifico : todos){
+            cidades.add(frigorifico.getEndereco().getCidade());
+            tipos.add(frigorifico.getTipo());
+
+            boolean achouNome = filtroNome == null || filtroNome.isBlank() || frigorifico.getNome().toLowerCase().contains(filtroNome.trim().toLowerCase());
+            boolean achouCidade = filtroCidade == null || filtroCidade.isBlank() || filtroCidade.equals(frigorifico.getEndereco().getCidade());
+            boolean achouUf = filtroUf == null || filtroUf.isBlank() || filtroUf.equals(frigorifico.getEndereco().getUf());
+            boolean achouTipo = filtroTipo == null || filtroTipo.isBlank() || filtroTipo.equals(frigorifico.getTipo());
+            if (achouNome && achouCidade && achouUf && achouTipo){
+                frigorificos.add(frigorifico);
+            }
+        }
+
+        // ver os detalhes ou editar um frigorifico ( vem no link da linha ), ele sai da lista que ja foi carregada
+        String ver = req.getParameter("ver");
+        String editar = req.getParameter("editar");
+        String idEscolhido = (ver != null && !ver.isBlank()) ? ver.trim() : (editar != null && !editar.isBlank() ? editar.trim() : null);
+        if (idEscolhido != null){
+            for (Frigorificos frigorifico : todos){
+                if (String.valueOf(frigorifico.getIdFrigorifico()).equals(idEscolhido)){
+                    req.setAttribute("registro", frigorifico);
+                    req.setAttribute("modo", ver != null && !ver.isBlank() ? "ver" : "editar");
+                }
+            }
+        }
+
+        req.setAttribute("frigorificos", Paginacao.aplicar(req, frigorificos));
+        req.setAttribute("totalGeral", todos.size());
+        req.setAttribute("ocupacao", ocupacao);
+        req.setAttribute("cidades", cidades);
+        req.setAttribute("tipos", tipos);
+        req.setAttribute("ufs", ufs);
+        req.setAttribute("empresas", empresaDAO.buscarTodasEmpresa());
+        req.setAttribute("filtroNome", filtroNome == null ? "" : filtroNome);
+        req.setAttribute("filtroCidade", filtroCidade == null ? "" : filtroCidade);
+        req.setAttribute("filtroUf", filtroUf == null ? "" : filtroUf);
+        req.setAttribute("filtroTipo", filtroTipo == null ? "" : filtroTipo);
+        req.getRequestDispatcher(jsp_frigorificos).forward(req, resp);
+    }
+
+    // volta para a tela com uma mensagem de erro
+    private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        req.getRequestDispatcher(pagina).forward(req, resp);
+        listar(req, resp);
     }
 }

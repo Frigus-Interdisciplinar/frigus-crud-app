@@ -1,0 +1,42 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<nav>
+    <p><strong>Frigus</strong></p>
+
+    <p>Painel</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/visao-geral" class="${menuAtivo == 'visao-geral' ? 'ativo' : ''}">Visão geral</a></li>
+    </ul>
+
+    <p>Donos</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/usuarios" class="${menuAtivo == 'usuarios' ? 'ativo' : ''}">Usuários</a></li>
+        <li><a href="${pageContext.request.contextPath}/admin/empresas" class="${menuAtivo == 'empresas' ? 'ativo' : ''}">Empresas</a></li>
+    </ul>
+
+    <p>Armazenamento</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/geladeiras" class="${menuAtivo == 'geladeiras' ? 'ativo' : ''}">Geladeiras</a></li>
+        <li><a href="${pageContext.request.contextPath}/admin/frigorificos" class="${menuAtivo == 'frigorificos' ? 'ativo' : ''}">Frigoríficos</a></li>
+        <li><a href="${pageContext.request.contextPath}/admin/produtos" class="${menuAtivo == 'produtos' ? 'ativo' : ''}">Produtos</a></li>
+    </ul>
+
+    <p>Conteúdo</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/receitas" class="${menuAtivo == 'receitas' ? 'ativo' : ''}">Receitas</a></li>
+        <li><a href="${pageContext.request.contextPath}/admin/compras" class="${menuAtivo == 'compras' ? 'ativo' : ''}">Lista de compras</a></li>
+    </ul>
+
+    <p>Assinaturas</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/planos" class="${menuAtivo == 'planos' ? 'ativo' : ''}">Planos</a></li>
+    </ul>
+
+    <p>Conta</p>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/admin/configuracoes" class="${menuAtivo == 'configuracoes' ? 'ativo' : ''}">Configurações</a></li>
+        <li><a href="${pageContext.request.contextPath}/logout">Sair</a></li>
+    </ul>
+
+    <p><strong>Superadministrador</strong><br>Acesso total</p>
+</nav>

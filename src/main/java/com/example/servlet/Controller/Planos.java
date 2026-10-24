@@ -7,6 +7,8 @@ import com.example.servlet.Model.Assinatura;
 import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
+import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,38 +17,23 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(urlPatterns = {
-        // usuario
-        "/ver-plano-usuario",
-        "/criar-plano-usuario",
-        "/alterar-plano-usuario",
-        "/deletar-plano-usuario",
-
-        // empresa
-        "/ver-plano-empresa",
-        "/criar-plano-empresa",
-        "/alterar-plano-empresa",
-        "/deletar-plano-empresa"},
-
-        name = "/planos")
+        "/admin/planos"},
+        name = "planos")
 public class Planos extends HttpServlet {
     private AssinaturaDAO assinaturaDAO;
     private UsuarioDAO usuarioDAO;
     private EmpresaDAO empresaDAO;
+    private Validacao validar;
 
-    // caminhos das paginas
-    private static final String jsp_visao_geral_usu = "/assets/pages/visao-geral-usu.jsp";
-    private static final String jsp_ver_plano_usu = "/assets/pages/ver-plano-usuario.jsp";
-    private static final String jsp_criar_plano_usu = "/assets/pages/criar-plano-usuario.jsp";
-    private static final String jsp_alterar_plano_usu = "/assets/pages/alterar-plano-usuario.jsp";
-    private static final String jsp_deletar_plano_usu = "/assets/pages/deletar-plano-usuario.jsp";
+    // caminho das paginas
+    private static final String jsp_planos = "/WEB-INF/pages/planos.jsp";
 
-    private static final String jsp_visao_geral_emp = "/assets/pages/visao-geral-emp.jsp";
-    private static final String jsp_ver_plano_emp = "/assets/pages/ver-plano-empresa.jsp";
-    private static final String jsp_criar_plano_emp = "/assets/pages/criar-plano-empresa.jsp";
-    private static final String jsp_alterar_plano_emp = "/assets/pages/alterar-plano-empresa.jsp";
-    private static final String jsp_deletar_plano_emp = "/assets/pages/deletar-plano-empresa.jsp";
+    // caminho para o servlet
+    private static final String url_servlet = "/admin/planos";
 
 
     @Override
@@ -54,39 +41,22 @@ public class Planos extends HttpServlet {
         assinaturaDAO = new AssinaturaDAO();
         usuarioDAO = new UsuarioDAO();
         empresaDAO =  new EmpresaDAO();
+        validar = new Validacao();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException{
-        HttpSession session = req.getSession(false);
+        // inserir, alterar e deletar só por POST
+        if (req.getParameter("action") != null){
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
 
         String path = req.getServletPath();
         switch (path){
-            case "/ver-plano-usuario":{
-                // verificando se esta logado
-                if(session == null || session.getAttribute("usuarioEmail") == null){
-                    resp.sendRedirect(req.getContextPath() + jsp_criar_plano_usu);
-                    return;
-                }
-                String email = (String) session.getAttribute("usuarioEmail");
-                Usuario usuario = usuarioDAO.buscarUsuario(email);
-                Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
-                req.setAttribute("assinatura", assinatura);
-                req.getRequestDispatcher(jsp_ver_plano_usu).forward(req, resp);
-                break;
-            }
-            case "/ver-plano-empresa": {
-                // verificando se esta logado
-                if(session == null || session.getAttribute("empresaEmail") == null){
-                    resp.sendRedirect(req.getContextPath() + jsp_criar_plano_emp);
-                    return;
-                }
-                String email = (String) session.getAttribute("empresaEmail");
-                Empresa empresa = empresaDAO.buscarEmpresa(email);
-                Assinatura assinatura = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
-                req.setAttribute("assinatura", assinatura);
-                req.getRequestDispatcher(jsp_ver_plano_emp).forward(req, resp);
+            case "/admin/planos":{
+                listar(req, resp);
                 break;
             }
             default:
@@ -99,169 +69,231 @@ public class Planos extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // pegando o caminho do usuario
         String action = req.getParameter("action");
         HttpSession session = req.getSession();
 
+        if (action == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
         switch (action){
-            case "/criar-plano-usuario": {
+            case "inserir": {
                 // pegando as informações do formulario
-                TipoAssinatura plano = TipoAssinatura.valueOf(req.getParameter("plano"));
-                // resgatando o usuario
-                String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-                // buscando no banco
-                Usuario usuario = usuarioDAO.buscarUsuario(usuarioEmail);
+                String planoTxt = req.getParameter("plano");
+                String cpf = req.getParameter("cpf");
+                String cnpj = req.getParameter("cnpj");
 
-                Assinatura assinaturaUsuario = new Assinatura(
-                        usuario,
-                        plano
-                );
+                // o dono é o usuario ou a empresa
+                if (!validar.validarDono(cpf, cnpj)){
+                    voltaComErro(req, resp, "Escolha só o usuário ou só a empresa dona da assinatura.");
+                    return;
+                }
+                TipoAssinatura plano;
+                try {
+                    plano = TipoAssinatura.valueOf(planoTxt.trim().toUpperCase());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    voltaComErro(req, resp, "Plano inválido.");
+                    return;
+                }
 
-                if (assinaturaDAO.inserirAssinaturaUsuario(assinaturaUsuario) == 1) {
-                    req.setAttribute("plano", plano);
-                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
+                Assinatura assinatura;
+                if (cpf != null && !cpf.isBlank()){
+                    Usuario usuario = usuarioDAO.buscarUsuarioPorCpf(cpf.trim());
+                    if (usuario == null){
+                        voltaComErro(req, resp, "Usuário não encontrado.");
+                        return;
+                    }
+                    // cada usuario so pode ter uma assinatura
+                    if (assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf()) != null){
+                        voltaComErro(req, resp, "Esse usuário já tem uma assinatura.");
+                        return;
+                    }
+                    assinatura = new Assinatura(usuario, plano);
+                }
+                else {
+                    Empresa empresa = empresaDAO.buscarEmpresaPorCnpj(cnpj.trim());
+                    if (empresa == null){
+                        voltaComErro(req, resp, "Empresa não encontrada.");
+                        return;
+                    }
+                    // cada empresa so pode ter uma assinatura
+                    if (assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj()) != null){
+                        voltaComErro(req, resp, "Essa empresa já tem uma assinatura.");
+                        return;
+                    }
+                    assinatura = new Assinatura(empresa, plano);
+                }
+
+                if (assinaturaDAO.inserirAssinatura(assinatura) == 1) {
+                    session.setAttribute("sucesso", "Assinatura cadastrada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 } else {
-                    resp.sendRedirect(req.getContextPath() + jsp_criar_plano_usu);
+                    voltaComErro(req, resp, "Erro ao cadastrar a assinatura. Por favor tente novamente.");
                     return;
                 }
             }
 
-            case "/alterar-plano-usuario":{
+            case "alterar":{
                 // pegando as informações do formulario
-                TipoAssinatura plano = TipoAssinatura.valueOf(req.getParameter("plano"));
+                String idTxt = req.getParameter("idAssinatura");
+                String planoTxt = req.getParameter("plano");
+                String cpf = req.getParameter("cpf");
+                String cnpj = req.getParameter("cnpj");
 
-                // resgatando o usuario
-                String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-
-                // buscando no banco
-                Usuario usuario = usuarioDAO.buscarUsuario(usuarioEmail);
-
+                int id;
+                try{
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao alterar essa assinatura. Por favor tente novamente.");
+                    return;
+                }
                 // buscando a assinatura antiga no banco
-                Assinatura assinaturaAntiga = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
+                Assinatura assinaturaAntiga = assinaturaDAO.buscarAssinaturaPorId(id);
+                if (assinaturaAntiga == null){
+                    voltaComErro(req, resp, "Assinatura não encontrada.");
+                    return;
+                }
 
-                Assinatura assinaturaNova = new Assinatura(
-                        usuario,
-                        plano
-                );
+                // o dono é o usuario ou a empresa
+                if (!validar.validarDono(cpf, cnpj)){
+                    voltaComErro(req, resp, "Escolha só o usuário ou só a empresa dona da assinatura.");
+                    return;
+                }
+                TipoAssinatura plano;
+                try {
+                    plano = TipoAssinatura.valueOf(planoTxt.trim().toUpperCase());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    voltaComErro(req, resp, "Plano inválido.");
+                    return;
+                }
 
-                int funcionou = assinaturaDAO.alterarAssinUsuario(assinaturaAntiga, assinaturaNova);
+                // o valor e a descrição vêm do plano escolhido
+                Assinatura assinaturaNova;
+                if (cpf != null && !cpf.isBlank()){
+                    Usuario usuario = usuarioDAO.buscarUsuarioPorCpf(cpf.trim());
+                    if (usuario == null){
+                        voltaComErro(req, resp, "Usuário não encontrado.");
+                        return;
+                    }
+                    // se trocou o dono, o novo dono não pode ter assinatura
+                    Assinatura jaTem = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
+                    if (jaTem != null && jaTem.getIdAssinatura() != assinaturaAntiga.getIdAssinatura()){
+                        voltaComErro(req, resp, "Esse usuário já tem uma assinatura.");
+                        return;
+                    }
+                    assinaturaNova = new Assinatura(usuario, plano);
+                }
+                else {
+                    Empresa empresa = empresaDAO.buscarEmpresaPorCnpj(cnpj.trim());
+                    if (empresa == null){
+                        voltaComErro(req, resp, "Empresa não encontrada.");
+                        return;
+                    }
+                    // se trocou o dono, o novo dono não pode ter assinatura
+                    Assinatura jaTem = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
+                    if (jaTem != null && jaTem.getIdAssinatura() != assinaturaAntiga.getIdAssinatura()){
+                        voltaComErro(req, resp, "Essa empresa já tem uma assinatura.");
+                        return;
+                    }
+                    assinaturaNova = new Assinatura(empresa, plano);
+                }
+
+                int funcionou = assinaturaDAO.alterarAssinatura(assinaturaAntiga, assinaturaNova);
                 if (funcionou == 1){
-                    req.setAttribute("plano", plano);
-                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
-                    break;
+                    session.setAttribute("sucesso", "Assinatura alterada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
+                    return;
                 }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar_plano_usu);
+                    voltaComErro(req, resp, "Erro ao alterar a assinatura. Por favor tente novamente.");
                     return;
                 }
             }
 
 
-            case "/deletar-plano-usuario":{
-                // resgatando o usuario
-                String usuarioEmail = (String) session.getAttribute("usuarioEmail");
+            case "deletar":{
+                String idTxt = req.getParameter("idAssinatura");
+                int id;
+                try{
+                    id = Integer.parseInt(idTxt.trim());
+                } catch (NumberFormatException | NullPointerException e) {
+                    voltaComErro(req, resp, "Erro ao deletar essa assinatura. Por favor tente novamente.");
+                    return;
+                }
 
-                Usuario usuario = usuarioDAO.buscarUsuario(usuarioEmail);
+                Assinatura assinatura = assinaturaDAO.buscarAssinaturaPorId(id);
+                if (assinatura == null){
+                    voltaComErro(req, resp, "Assinatura não encontrada.");
+                    return;
+                }
 
-                Assinatura assinatura = assinaturaDAO.buscarAssinaturaUsuario(usuario.getCpf());
-
-                int funcionou = assinaturaDAO.deletarAssinaturaUsuario(assinatura);
+                int funcionou = assinaturaDAO.deletarAssinatura(assinatura);
                 if(funcionou == 1){
-                    req.removeAttribute("plano");
-                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral_usu);
-                    break;
-                }
-                else {
-                    resp.sendRedirect(req.getContextPath() + jsp_deletar_plano_usu);
-                }
-                break;
-            }
-
-
-
-            case "/criar-plano-empresa": {
-                // pegando as informações do formulario
-                TipoAssinatura plano = TipoAssinatura.valueOf(req.getParameter("plano"));
-
-                // recuperando os dados da empresa
-                String empresaEmail = (String) session.getAttribute("empresaEmail");
-                // buscando no banco
-                Empresa empresa = empresaDAO.buscarEmpresa(empresaEmail);
-
-                Assinatura assinaturaEmpresa = new Assinatura(
-                        empresa,
-                        plano
-                );
-                int funcionouAssiEmpr = assinaturaDAO.inserirAssinaturaEmpresa(assinaturaEmpresa);
-                if (funcionouAssiEmpr == 1) {
-                    req.setAttribute("plano", plano);
-                    resp.sendRedirect(req.getContextPath() + "/produto.jsp");
-                    return;
-                } else {
-                    resp.sendRedirect(req.getContextPath() + "/planoEmpresa.jsp");
+                    session.setAttribute("sucesso", "Assinatura apagada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
                 }
-
-            }
-
-
-            case "/alterar-plano-empresa":{
-                // pegando as informações do formulario
-                TipoAssinatura plano = TipoAssinatura.valueOf(req.getParameter("plano"));
-
-                // resgatando a empresa
-                String empresaEmail = (String) session.getAttribute("empresaEmail");
-
-                // buscando no banco
-                Empresa empresa = empresaDAO.buscarEmpresa(empresaEmail);
-
-                // buscando a assinatura antiga no banco
-                Assinatura assinaturaAntiga = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
-
-                Assinatura assinaturaNova = new Assinatura(
-                        empresa,
-                        plano
-                );
-
-                int funcionou = assinaturaDAO.alterarAssinEmpresa(assinaturaAntiga, assinaturaNova);
-                if (funcionou == 1){
-                    req.setAttribute("plano", plano);
-                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral_emp);
-                    break;
-                }
                 else {
-                    resp.sendRedirect(req.getContextPath() + jsp_alterar_plano_emp);
-                    break;
+                    voltaComErro(req, resp, "Erro ao deletar a assinatura. Por favor tente novamente.");
+                    return;
                 }
-            }
-
-
-
-            case "/deletar-plano-empresa":{
-                // resgatando o usuario
-                String empresaEmail = (String) session.getAttribute("empresaEmail");
-
-                Empresa empresa = empresaDAO.buscarEmpresa(empresaEmail);
-
-                Assinatura assinatura = assinaturaDAO.buscarAssinaturaEmpresa(empresa.getCnpj());
-
-                int funcionou = assinaturaDAO.deletarAssinaturaEmpresa(assinatura);
-
-                if(funcionou == 1){
-                    req.removeAttribute("plano");
-                    resp.sendRedirect(req.getContextPath() + jsp_visao_geral_emp);
-                    break;
-                }
-                else {
-                    resp.sendRedirect(req.getContextPath() + jsp_deletar_plano_emp);
-                }
-                break;
             }
             default:{
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
 
+    }
+
+    // carrega as assinaturas ( ja filtradas ) e mostra a tela, os planos vêm do enum
+    private void listar(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException{
+        // filtros da tela
+        String filtroDono = req.getParameter("dono");
+        String filtroPlano = req.getParameter("plano");
+
+        List<Assinatura> todas = assinaturaDAO.buscarTodasAssinatura();
+        List<Assinatura> assinaturas = new ArrayList<>();
+        for (Assinatura assinatura : todas){
+            String dono = assinatura.getUsuario() != null
+                    ? assinatura.getUsuario().getNome() + " " + assinatura.getUsuario().getSobrenome() + " " + assinatura.getUsuario().getCpf()
+                    : assinatura.getEmpresa().getNome() + " " + assinatura.getEmpresa().getCnpj();
+            boolean achouDono = filtroDono == null || filtroDono.isBlank() || dono.toLowerCase().contains(filtroDono.trim().toLowerCase());
+            boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(assinatura.getTipoAssinatura().name());
+            if (achouDono && achouPlano){
+                assinaturas.add(assinatura);
+            }
+        }
+
+        // ver os detalhes ou editar uma assinatura ( vem no link da linha )
+        String ver = req.getParameter("ver");
+        String editar = req.getParameter("editar");
+        String idEscolhido = (ver != null && !ver.isBlank()) ? ver.trim() : (editar != null && !editar.isBlank() ? editar.trim() : null);
+        if (idEscolhido != null){
+            for (Assinatura assinatura : todas){
+                if (String.valueOf(assinatura.getIdAssinatura()).equals(idEscolhido)){
+                    req.setAttribute("registro", assinatura);
+                    req.setAttribute("modo", ver != null && !ver.isBlank() ? "ver" : "editar");
+                }
+            }
+        }
+
+        req.setAttribute("assinaturas", Paginacao.aplicar(req, assinaturas));
+        req.setAttribute("totalGeral", todas.size());
+        req.setAttribute("usuarios", usuarioDAO.buscarTodosUsuario());
+        req.setAttribute("empresas", empresaDAO.buscarTodasEmpresa());
+        req.setAttribute("planos", TipoAssinatura.values());
+        req.setAttribute("filtroDono", filtroDono == null ? "" : filtroDono);
+        req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
+        req.getRequestDispatcher(jsp_planos).forward(req, resp);
+    }
+
+    // volta para a tela de onde veio com uma mensagem de erro 
+    private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws ServletException, IOException{
+        req.setAttribute("erro", mensagem);
+        listar(req, resp);
     }
 }
