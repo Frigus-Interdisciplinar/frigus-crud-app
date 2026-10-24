@@ -1,103 +1,182 @@
 package com.example.servlet.Dao;
 
-import com.example.servlet.Dto.SugestaoReceita;
+import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Receita;
+import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReceitaDAO {
 
-    // ================== USUARIO ==================
-
-    // RECEITAS DISPONIVEIS - USUARIO
-    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
-    public int totalReceitasDisponiveisUsuario(String cpf){
+    // ================== INSERIR ==================
+    public int inserirReceita(Receita receita){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
-        ResultSet rset = null;
 
-        try {
-            String comandoSql = "SELECT count(*) " +
-                    "FROM Receita r " +
-                    "WHERE r.idUsuario = ? " +
-                    "  AND EXISTS (SELECT 1 FROM Ingrediente i0 WHERE i0.idReceita = r.id) " +
-                    "  AND NOT EXISTS ( " +
-                    "        SELECT 1 " +
-                    "        FROM Ingrediente i " +
-                    "        WHERE i.idReceita = r.id " +
-                    "          AND i.quantidade > COALESCE(( " +
-                    "                SELECT SUM(ig.quantidade) " +
-                    "                FROM ItemGeladeira ig " +
-                    "                JOIN Geladeira g ON g.id = ig.idGeladeira " +
-                    "                WHERE g.idUsuario   = r.idUsuario " +
-                    "                  AND ig.idProduto = i.idProduto " +
-                    "                  AND ig.dtValidade >= CURRENT_DATE " +
-                    "          ), 0) " +
-                    "  );";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cpf);
-            rset = pstmt.executeQuery();
-            if(rset.next()) return rset.getInt(1);
+        try{
+            String comandoSql = "insert into receita (idUsuario, idEmpresa, nome, descricao, modoPreparo, dtReceita, foiFeita) values (?,?,?,?,?,?,?);";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql, Statement.RETURN_GENERATED_KEYS);
+            // o dono é o usuario ou a empresa, o outro vai como NULL
+            if (receita.getUsuario() != null){
+                pstmt.setString(1, receita.getUsuario().getCpf());
+                pstmt.setNull(2, Types.VARCHAR);
+            }
+            else {
+                pstmt.setNull(1, Types.VARCHAR);
+                pstmt.setString(2, receita.getEmpresa().getCnpj());
+            }
+            pstmt.setString(3, receita.getNome());
+            pstmt.setString(4, receita.getDescricao());
+            pstmt.setString(5, receita.getModoPreparo());
+            pstmt.setObject(6, receita.getDtReceita());
+            pstmt.setBoolean(7, receita.isFoiFeita());
+
+            if (pstmt.executeUpdate() > 0){
+                ResultSet chaves = pstmt.getGeneratedKeys();// adicionando a chave criada pelo banco
+                if (chaves.next()) receita.setIdReceita(chaves.getInt(1));
+                return 1;// deu certo
+            }
+            else {
+                return 0;// não deu certo
+            }
         }catch (SQLException sqle){
             sqle.printStackTrace();
+            return -1;
         }
         finally {
             conexao.desconectar(conn);
         }
-
-        return 0;
-    }
-    // RECEITAS DISPONIVEIS - USUARIO
-    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+    }// ================== INSERIR ==================
 
 
-    // SUGESTOES DE RECEITA
-    public List<SugestaoReceita> listarSugestoesUsuario(String cpf){
+
+    // ================== ALTERAR ==================
+    public int alterarReceita(Receita receitaAntiga, Receita receitaNova){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
-        List<SugestaoReceita> lista = new ArrayList<>();
-        ResultSet rs = null;
-        try{
-            String comandoSql = """
-        WITH estoque AS (
-            SELECT ig.idProduto, SUM(ig.quantidade) AS qtd
-            FROM ItemGeladeira ig
-            JOIN Geladeira g ON g.id = ig.idGeladeira
-            WHERE g.idUsuario = ?
-              AND ig.dtValidade >= CURRENT_DATE
-            GROUP BY ig.idProduto
-        )
-        SELECT r.id,
-               r.nome,
-               COUNT(*) AS total_ingredientes,
-               COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
-        FROM Receita r
-        JOIN Ingrediente i ON i.idReceita  = r.id
-        LEFT JOIN estoque e ON e.idProduto = i.idProduto
-        WHERE r.idUsuario = ?
-        GROUP BY r.id, r.nome
-        ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
-                 r.nome
-        LIMIT 3
-        """;
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
 
-            pstmt.setString(1, cpf);
-            pstmt.setString(2, cpf);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                lista.add(new SugestaoReceita(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getInt("total_ingredientes"),
-                        rs.getInt("ingredientes_disponiveis")
-                ));
+        try{
+            String comandoSql = "update receita set idUsuario = ?, idEmpresa = ?, nome = ?, descricao = ?, modoPreparo = ?, dtReceita = ?, foiFeita = ? where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            // o dono é o usuario ou a empresa, o outro vai como NULL
+            if (receitaNova.getUsuario() != null){
+                pstmt.setString(1, receitaNova.getUsuario().getCpf());
+                pstmt.setNull(2, Types.VARCHAR);
+            }
+            else {
+                pstmt.setNull(1, Types.VARCHAR);
+                pstmt.setString(2, receitaNova.getEmpresa().getCnpj());
+            }
+            pstmt.setString(3, receitaNova.getNome());
+            pstmt.setString(4, receitaNova.getDescricao());
+            pstmt.setString(5, receitaNova.getModoPreparo());
+            pstmt.setObject(6, receitaNova.getDtReceita());
+            pstmt.setBoolean(7, receitaNova.isFoiFeita());
+            pstmt.setInt(8, receitaAntiga.getIdReceita());
+
+            if (pstmt.executeUpdate() > 0){
+                return 1;// deu certo
+            }
+            else {
+                return 0;// não deu certo
+            }
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+    }// ================== ALTERAR ==================
+
+
+
+    // ================== DELETAR ==================
+    public int deletarReceita(Receita receita){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        try{
+            // apagar a receita apaga os ingredientes pelo ON DELETE CASCADE, mas os produtos ficariam soltos
+            // por isso tudo acontece na mesma transação
+            conn.setAutoCommit(false); // nada é salvo de verdade até o commit
+
+            // guarda os produtos dos ingredientes antes de apagar a receita
+            String comandoSqlProdutos = "select idProduto from Ingrediente where idReceita = ?;";
+            List<Integer> idsProdutos = ProdutosGeladeiraDAO.buscarIds(conn, comandoSqlProdutos, receita.getIdReceita());
+
+            String comandoSql = "delete from receita where id = ?;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            pstmt.setInt(1, receita.getIdReceita());
+
+            if (pstmt.executeUpdate() <= 0){
+                conn.rollback();
+                return 0;// não deu certo
             }
 
+            // apaga os produtos que sobraram sem ninguém usando
+            ProdutosGeladeiraDAO.apagarProdutosOrfaos(conn, idsProdutos);
 
+            conn.commit();
+            return 1;// deu certo
+        }catch (SQLException sqle){
+            sqle.printStackTrace();
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            return -1;
+        }
+        finally {
+            conexao.desconectar(conn);
+        }
+    }// ================== DELETAR ==================
+
+
+
+    // ================== BUSCAR TODAS AS RECEITAS ( COM O NOME DO DONO ) ==================
+    public List<Receita> buscarTodasReceita(){
+        Conexao conexao = new Conexao();
+        Connection conn = conexao.conectar();
+
+        ResultSet rset = null;
+        List<Receita> lista = new ArrayList<>();
+
+        try{
+            String comandoSql = "select r.*, u.nome as nomeUsuario, u.sobrenome, e.nome as nomeEmpresa " +
+                    "from receita r " +
+                    "left join usuario u on u.cpf = r.idUsuario " +
+                    "left join empresa e on e.cnpj = r.idEmpresa " +
+                    "order by r.id;";
+            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()){
+                Receita receita = new Receita();
+                receita.setIdReceita(rset.getInt("id"));
+                receita.setNome(rset.getString("nome"));
+                receita.setDescricao(rset.getString("descricao"));
+                receita.setModoPreparo(rset.getString("modoPreparo"));
+                receita.setDtReceita(rset.getObject("dtReceita", LocalDate.class));
+                receita.setFoiFeita(rset.getBoolean("foiFeita"));
+
+                // criando o dono: usuario ou empresa
+                if (rset.getString("idUsuario") != null){
+                    Usuario usuario = new Usuario();
+                    usuario.setCpf(rset.getString("idUsuario"));
+                    usuario.setNome(rset.getString("nomeUsuario"));
+                    usuario.setSobrenome(rset.getString("sobrenome"));
+                    receita.setUsuario(usuario);
+                }
+                else {
+                    Empresa empresa = new Empresa();
+                    empresa.setCnpj(rset.getString("idEmpresa"));
+                    empresa.setNome(rset.getString("nomeEmpresa"));
+                    receita.setEmpresa(empresa);
+                }
+                lista.add(receita);
+            }
         }catch (SQLException sqle){
             sqle.printStackTrace();
         }
@@ -105,105 +184,71 @@ public class ReceitaDAO {
             conexao.desconectar(conn);
         }
         return lista;
-    }
-    // SUGESTOES DE RECEITA
+    }// ================== BUSCAR TODAS AS RECEITAS ( COM O NOME DO DONO ) ==================
 
 
 
-    // ================== USUARIO ==================
-
-
-
-    // ================== EMPRESA ==================
-
-    // RECEITAS DISPONIVEIS - EMPRESA
-    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
-    public int totalReceitasDisponiveisEmpresa(String cnpj){
+    // ================== BUSCAR UMA RECEITA PELO ID ==================
+    public Receita buscarReceitaPorId(int idReceita){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
+
         ResultSet rset = null;
+        Receita receita = null;
 
-        try {
-            String comandoSql = """
-            SELECT COUNT(*)
-            FROM Receita r
-            WHERE r.idEmpresa = ?
-              AND EXISTS (SELECT 1 FROM Ingrediente i0 WHERE i0.idReceita = r.id)
-              AND NOT EXISTS (
-                    SELECT 1
-                    FROM Ingrediente i
-                    WHERE i.idReceita = r.id
-                      AND i.quantidade > COALESCE((
-                            SELECT SUM(if.quantidade)
-                            FROM ItemFrigorifico if
-                            JOIN Frigorifico f ON f.id = if.idFrigorifico
-                            WHERE f.idEmpresa   = r.idEmpresa
-                              AND if.idProduto = i.idProduto
-                              AND if.dtValidade >= CURRENT_DATE
-                      ), 0)
-              )
-        """;
+        try{
+            String comandoSql = "select * from receita where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cnpj);
+            // setando o valor do id da receita
+            pstmt.setInt(1, idReceita);
             rset = pstmt.executeQuery();
-            if(rset.next()) return rset.getInt(1);
+
+            if (rset.next()){
+                receita = new Receita();
+                receita.setIdReceita(rset.getInt("id"));
+                receita.setNome(rset.getString("nome"));
+                receita.setDescricao(rset.getString("descricao"));
+                receita.setModoPreparo(rset.getString("modoPreparo"));
+                receita.setDtReceita(rset.getObject("dtReceita", LocalDate.class));
+                receita.setFoiFeita(rset.getBoolean("foiFeita"));
+
+                // criando o dono: usuario ou empresa
+                if (rset.getString("idUsuario") != null){
+                    Usuario usuario = new Usuario();
+                    usuario.setCpf(rset.getString("idUsuario"));
+                    receita.setUsuario(usuario);
+                }
+                else {
+                    Empresa empresa = new Empresa();
+                    empresa.setCnpj(rset.getString("idEmpresa"));
+                    receita.setEmpresa(empresa);
+                }
+            }
         }catch (SQLException sqle){
             sqle.printStackTrace();
         }
         finally {
             conexao.desconectar(conn);
         }
-
-        return 0;
-    }
-    // RECEITAS DISPONIVEIS - EMPRESA
-    // A QUANTIDADE DE PRODUTOS ARMAZENADOS É MAIOR QUE A QUANTIDADE DE PRODUTOS NECESSARIOS PARA A RECEITA
+        return receita;
+    }// ================== BUSCAR UMA RECEITA PELO ID ==================
 
 
 
-    // SUGESTOES DE RECEITA
-    public List<SugestaoReceita> listarSugestoesEmpresa(String cnpj){
+    // ================== TOTAL DE RECEITAS ==================
+    public int totalReceitas(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
-        List<SugestaoReceita> lista = new ArrayList<>();
-        ResultSet rs = null;
+
+        ResultSet rset = null;
+        int total = 0;
+
         try{
-            String comandoSql = """
-        WITH estoque AS (
-            SELECT if.idProduto, SUM(if.quantidade) AS qtd
-            FROM ItemFrigorifico if
-            JOIN Frigorifico f ON f.id = if.idFrigorifico
-            WHERE f.idEmpresa = ?
-              AND if.dtValidade >= CURRENT_DATE
-            GROUP BY if.idProduto
-        )
-        SELECT r.id,
-               r.nome,
-               COUNT(*) AS total_ingredientes,
-               COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade) AS ingredientes_disponiveis
-        FROM Receita r
-        JOIN Ingrediente i ON i.idReceita  = r.id
-        LEFT JOIN estoque e ON e.idProduto = i.idProduto
-        WHERE r.idEmpresa = ?
-        GROUP BY r.id, r.nome
-        ORDER BY COUNT(*) FILTER (WHERE COALESCE(e.qtd, 0) >= i.quantidade)::float / COUNT(*) DESC,
-                 r.nome
-        LIMIT 3
-        """;
+            String comandoSql = "select count(*) as total from receita;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
+            rset = pstmt.executeQuery();
 
-            pstmt.setString(1, cnpj);
-            pstmt.setString(2, cnpj);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                lista.add(new SugestaoReceita(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getInt("total_ingredientes"),
-                        rs.getInt("ingredientes_disponiveis")
-                ));
-            }
-
+            if (rset.next()) total = rset.getInt("total");
 
         }catch (SQLException sqle){
             sqle.printStackTrace();
@@ -211,12 +256,7 @@ public class ReceitaDAO {
         finally {
             conexao.desconectar(conn);
         }
-        return lista;
-    }
-    // SUGESTOES DE RECEITA
-
-
-
-    // ================== EMPRESA ==================
+        return total;
+    }// ================== TOTAL DE RECEITAS ==================
 
 }
