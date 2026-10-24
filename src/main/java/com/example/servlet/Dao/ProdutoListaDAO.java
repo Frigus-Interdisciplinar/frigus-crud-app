@@ -3,11 +3,12 @@ package com.example.servlet.Dao;
 import com.example.servlet.Model.ListaCompras;
 import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.ProdutoLista;
-import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Conexao;
+import com.example.servlet.Util.Enum.Categoria;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoListaDAO {
@@ -202,7 +203,7 @@ public class ProdutoListaDAO {
 
 
     // ============ BUSCAR PRODUTO POR ID ============
-    public ProdutoLista buscarProdutoNumaLista(int idProdutoLista, int idCompra){
+    public ProdutoLista buscarProdutoNumaLista(int idProdutoLista){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
@@ -210,11 +211,10 @@ public class ProdutoListaDAO {
         ProdutoLista produtoLista = null;
 
         try {
-            String comandoSql = "select * from ItemLista where id = ? and idListaCompras = ?;";
+            String comandoSql = "select * from ItemLista where id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // sentando os valores dos ids
+            // sentando o valor do id
             pstmt.setInt(1, idProdutoLista);
-            pstmt.setInt(2, idCompra);
             rset = pstmt.executeQuery();
             if (rset.next()){
                 // criando o objeto lista de compras
@@ -241,35 +241,62 @@ public class ProdutoListaDAO {
     }
     // ============ BUSCAR PRODUTO POR ID ============
 
-
-    // ============== VERIFICAR SE O PRODUTO ESTÁ NA LISTA ==============
-    public boolean estaNaLista(Produto produto, ListaCompras lista){
+    // ============ BUSCAR TODOS OS PRODUTOS DE TODAS AS LISTAS ============
+    public List<ProdutoLista> buscarTodosProdutoLista(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();// abrindo a conexao com o banco
 
         ResultSet rset = null;
-        try{
-            String comandoSql = "select 1 from ItemLista where idProduto = ? and idListaCompras = ?;";
+        List<ProdutoLista> lista = new ArrayList<>();
+
+        try {
+            String comandoSql = "select pl.id as idProdutoLista, pl.quantidade, " +
+                    "p.id as idProduto, p.nome, p.descricao, p.preco, p.categoria, p.marca, p.unidadeMedida, " +
+                    "lc.id as idListaCompras, lc.dtLista " +
+                    "from ItemLista pl " +
+                    "join Produto p on p.id = pl.idProduto " +
+                    "join listaCompras lc on lc.id = pl.idListaCompras " +
+                    "order by pl.id;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            // primeiro parâmetro: produto
-            pstmt.setInt(1, produto.getIdProdutos());
-
-            // segundo parâmetro: lista
-            pstmt.setInt(2, lista.getIdLista());
             rset = pstmt.executeQuery();
-
-            // verifica se tem parcerias ou não
-            return rset.next();
+            while (rset.next()){
+                // criando o objeto produto
+                Produto produto = new Produto(
+                        rset.getInt("idProduto"),
+                        rset.getString("nome"),
+                        rset.getString("descricao"),
+                        rset.getDouble("preco"),
+                        Categoria.valueOf(rset.getString("categoria")),
+                        rset.getString("marca"),
+                        rset.getString("unidadeMedida")
+                );
+                // criando o objeto lista de compras
+                ListaCompras compras = new ListaCompras();
+                compras.setIdLista(rset.getInt("idListaCompras"));
+                compras.setDtLista(rset.getObject("dtLista", LocalDate.class));
+                // criando o objeto produto na lista
+                ProdutoLista produtoLista = new ProdutoLista(
+                        rset.getInt("idProdutoLista"),
+                        compras,
+                        produto,
+                        rset.getInt("quantidade")
+                );
+                lista.add(produtoLista);
+            }
 
         }catch (SQLException sqle){
-            throw new RuntimeException("Erro ao verificar esse produto na lista.", sqle);
-        }finally {
-            conexao.desconectar(conn);//fechando a conexao com o banco
+            sqle.printStackTrace();
         }
-    }// ============== VERIFICAR SE O PRODUTO ESTÁ NA LISTA ==============
+        finally {
+            conexao.desconectar(conn);// fechando a conexao com o banco
+        }
+        return lista;
+    }
+    // ============ BUSCAR TODOS OS PRODUTOS DE TODAS AS LISTAS ============
 
-    // TODOS OS PRODUTOS EM UMA LISTA USUARIO
-    public int totalItensNumaCompraUsuario(String cpf){
+
+    // TOTAL DE PRODUTOS EM TODAS AS LISTAS
+    public int totalItensListas(){
         Conexao conexao = new Conexao();
         Connection conn = conexao.conectar();
 
@@ -277,13 +304,8 @@ public class ProdutoListaDAO {
         int total = 0;
 
         try{
-            String comandoSql = "select count(pl.*) as total " +
-                    "from ItemLista pl " +
-                    "join ListaCompras lc on pl.idListaCompras = lc.id " +
-                    "where lc.idUsuario = ? and lc.dtLista = (select dtLista from ListaCompras where idUsuario = ? order by dtLista desc limit 1);";
+            String comandoSql = "select count(*) as total from ItemLista;";
             PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cpf);
-            pstmt.setString(2, cpf);
             rset = pstmt.executeQuery();
             if (rset.next()) total = rset.getInt("total");
 
@@ -295,38 +317,5 @@ public class ProdutoListaDAO {
         }
         return total;
     }
-    // TODOS OS PRODUTOS EM UMA LISTA USUARIO
-
-
-
-
-
-    // TODOS OS PRODUTOS EM UMA LISTA EMPRESA
-    public int totalItensNumaCompraEmpresa(String cnpj){
-        Conexao conexao = new Conexao();
-        Connection conn = conexao.conectar();
-
-        ResultSet rset = null;
-        int total = 0;
-
-        try{
-            String comandoSql = "select count(pl.*) as total " +
-                    "from ItemLista pl " +
-                    "join ListaCompras lc on pl.idListaCompras = lc.id " +
-                    "where lc.idEmpresa = ? and lc.dtLista = (select dtLista from ListaCompras where idEmpresa = ? order by dtLista desc limit 1);";
-            PreparedStatement pstmt = conn.prepareStatement(comandoSql);
-            pstmt.setString(1, cnpj);
-            pstmt.setString(2, cnpj);
-            rset = pstmt.executeQuery();
-            if (rset.next()) total = rset.getInt("total");
-
-        }catch (SQLException sqle){
-            sqle.printStackTrace();
-        }
-        finally {
-            conexao.desconectar(conn);
-        }
-        return total;
-    }
-    // TODOS OS PRODUTOS EM UMA LISTA EMPRESA
+    // TOTAL DE PRODUTOS EM TODAS AS LISTAS
 }
