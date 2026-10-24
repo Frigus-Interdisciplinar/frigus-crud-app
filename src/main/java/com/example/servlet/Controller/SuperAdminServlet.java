@@ -67,8 +67,6 @@ public class SuperAdminServlet extends HttpServlet {
                 // pegando os dados do formulario
                 String nome = req.getParameter("nome");
                 String email = req.getParameter("email");
-                // a senha é opcional: vazia mantem a senha que ja esta no banco
-                String senha = req.getParameter("senha");
 
                 if (nome == null || nome.isBlank()){
                     voltaComErro(req, resp, "O nome não pode ser vazio!!!");
@@ -98,22 +96,11 @@ public class SuperAdminServlet extends HttpServlet {
                     return;
                 }
 
-                String senhaHash = contaAntiga.getSenha();
-                if (senha != null && !senha.isBlank()){
-                    boolean vSenha = validar.validarSenha(senha);
-                    if (!vSenha){
-                        voltaComErro(req, resp, "Senha inválida!!! Deve ter de 8 a 15 caracteres, uma letra maiúscula e um caractere especial.");
-                        return;
-                    }
-                    // hasheando a senha
-                    senhaHash = Hash.bcrypt(senha);
-                }
-
                 SuperAdmin contaNova = new SuperAdmin(
                         contaAntiga.getIdSuperAdmin(),
                         nome.trim(),
                         email.trim(),
-                        senhaHash
+                        contaAntiga.getSenha()
                 );
 
                 if (superAdminDAO.alterarSuperAdmin(contaAntiga, contaNova) == 1){
@@ -125,6 +112,46 @@ public class SuperAdminServlet extends HttpServlet {
                 }
                 else {
                     voltaComErro(req, resp, "Erro ao alterar a conta. Por favor tente novamente.");
+                    return;
+                }
+            }
+
+            case "alterarSenha": {
+                String senhaAtual = req.getParameter("senhaAtual");
+                String senhaNova = req.getParameter("senhaNova");
+                String senhaConfirma = req.getParameter("senhaConfirma");
+
+                if (senhaAtual == null || senhaAtual.isBlank() || senhaNova == null || senhaNova.isBlank()){
+                    voltaComErro(req, resp, "Preencha a senha atual e a senha nova.");
+                    return;
+                }
+                // so troca a senha quem sabe a senha atual
+                if (!Hash.verficarBcrypt(senhaAtual, contaAntiga.getSenha())){
+                    voltaComErro(req, resp, "A senha atual está incorreta.");
+                    return;
+                }
+                if (!senhaNova.equals(senhaConfirma)){
+                    voltaComErro(req, resp, "A confirmação não é igual à senha nova.");
+                    return;
+                }
+                if (!validar.validarSenha(senhaNova)){
+                    voltaComErro(req, resp, "Senha inválida!!! Deve ter de 8 a 15 caracteres, uma letra maiúscula e um caractere especial.");
+                    return;
+                }
+
+                SuperAdmin contaNova = new SuperAdmin(
+                        contaAntiga.getIdSuperAdmin(),
+                        contaAntiga.getNome(),
+                        contaAntiga.getEmail(),
+                        Hash.bcrypt(senhaNova)
+                );
+                if (superAdminDAO.alterarSuperAdmin(contaAntiga, contaNova) == 1){
+                    session.setAttribute("sucesso", "Senha alterada com sucesso.");
+                    resp.sendRedirect(req.getContextPath() + url_configuracoes);
+                    return;
+                }
+                else {
+                    voltaComErro(req, resp, "Erro ao alterar a senha. Por favor tente novamente.");
                     return;
                 }
             }
