@@ -39,6 +39,13 @@ public class AuthFilter implements Filter {
             session.removeAttribute("sucesso");
         }
 
+        // o erro do formulario tambem vem da sessao ( o servlet redireciona de volta para a tela )
+        Object erro = session.getAttribute("erro");
+        if (erro != null){
+            req.setAttribute("erro", erro);
+            session.removeAttribute("erro");
+        }
+
         chain.doFilter(request, response);
     }
 }
