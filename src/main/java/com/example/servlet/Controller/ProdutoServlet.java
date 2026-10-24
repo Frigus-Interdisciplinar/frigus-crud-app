@@ -12,7 +12,9 @@ import com.example.servlet.Model.Produto;
 import com.example.servlet.Model.ProdutosFrigorifico;
 import com.example.servlet.Model.ProdutosGeladeira;
 import com.example.servlet.Util.Enum.Categoria;
+import com.example.servlet.Util.Enum.StatusProduto;
 import com.example.servlet.Util.Service.ArmazenamentoService;
+import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,7 +25,12 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(urlPatterns = {
         "/admin/produtos"},
@@ -41,6 +48,9 @@ public class ProdutoServlet extends HttpServlet {
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/produtos";
+
+    // as unidades de medida do campo do formulario
+    private static final String[] unidades = {"un", "kg", "g", "L", "ml", "dz"};
 
     @Override
     public void init(){
@@ -79,8 +89,6 @@ public class ProdutoServlet extends HttpServlet {
         String action = req.getParameter("action");
         // o item fica na geladeira ou no frigorifico
         String armazenamento = req.getParameter("armazenamento");
-        // para onde voltar depois de dar certo
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
 
         if (action == null){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -121,7 +129,7 @@ public class ProdutoServlet extends HttpServlet {
                     if (igDAO.inserirProdutoGeladeira(itemg) == 1){
                         atualizarStatusGeladeira(geladeira);
                         session.setAttribute("sucesso", "Item cadastrado na geladeira com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -146,7 +154,7 @@ public class ProdutoServlet extends HttpServlet {
                     if (itfDAO.inserirProdutoFrigorifico(itemf) == 1){
                         atualizarStatusFrigorifico(frigorifico);
                         session.setAttribute("sucesso", "Item cadastrado no frigorífico com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -196,7 +204,7 @@ public class ProdutoServlet extends HttpServlet {
                             atualizarStatusGeladeira(geladeiraDAO.buscarUnicaGeladeira(itemAntigo.getGeladeira().getIdGeladeira()));
                         }
                         session.setAttribute("sucesso", "Item da geladeira alterado com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -231,7 +239,7 @@ public class ProdutoServlet extends HttpServlet {
                             atualizarStatusFrigorifico(frigorificoDAO.buscarFrigorificoPorId(itemAntigo.getFrigorificos().getIdFrigorifico()));
                         }
                         session.setAttribute("sucesso", "Item do frigorífico alterado com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -259,7 +267,7 @@ public class ProdutoServlet extends HttpServlet {
                         // atualizando o status da geladeira
                         atualizarStatusGeladeira(geladeiraDAO.buscarUnicaGeladeira(itemg.getGeladeira().getIdGeladeira()));
                         session.setAttribute("sucesso", "Item da geladeira apagado com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -283,7 +291,7 @@ public class ProdutoServlet extends HttpServlet {
                         // atualizando o status do frigorifico
                         atualizarStatusFrigorifico(frigorificoDAO.buscarFrigorificoPorId(itemf.getFrigorificos().getIdFrigorifico()));
                         session.setAttribute("sucesso", "Item do frigorífico apagado com sucesso.");
-                        resp.sendRedirect(req.getContextPath() + retorno);
+                        resp.sendRedirect(req.getContextPath() + url_servlet);
                         return;
                     }
                     else {
@@ -383,32 +391,141 @@ public class ProdutoServlet extends HttpServlet {
         }
     }
 
-    // carrega as listas e mostra a tela
+    // carrega a lista ( ja filtrada e ordenada ) com os itens das geladeiras e dos frigorificos e mostra a tela
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
-        List<ProdutosGeladeira> itensGeladeira = igDAO.buscarTodosProdutosGeladeira();
-        List<ProdutosFrigorifico> itensFrigorifico = itfDAO.buscarTodosProdutosFrigorifico();
+        // filtros da tela
+        String fProduto = req.getParameter("produto");
+        String fDono = req.getParameter("dono");
+        String fArm = req.getParameter("arm");
+        String fCat = req.getParameter("cat");
+        String fStatus = req.getParameter("status");
+        String fVal = req.getParameter("val");
+        String fOrd = req.getParameter("ord");
+        // vindos dos links "ver os produtos" das telas de geladeira e de frigorifico
+        String fIdGeladeira = req.getParameter("idGeladeira");
+        String fIdFrigorifico = req.getParameter("idFrigorifico");
+
         List<Geladeira> geladeiras = geladeiraDAO.buscarTodasGeladeira();
         List<Frigorificos> frigorificos = frigorificoDAO.buscarTodosFrigorifico();
-        req.setAttribute("itensGeladeira", itensGeladeira);
-        req.setAttribute("itensFrigorifico", itensFrigorifico);
+
+        // juntando os itens das geladeiras e dos frigorificos numa lista so
+        List<Map<String, Object>> todos = new ArrayList<>();
+        for (ProdutosGeladeira ig : igDAO.buscarTodosProdutosGeladeira()){
+            Map<String, Object> linha = new HashMap<>();
+            linha.put("chave", "g-" + ig.getIdProdutosGeladeira());
+            linha.put("tipoArmazenamento", "geladeira");
+            linha.put("idItem", ig.getIdProdutosGeladeira());
+            linha.put("idArmazenamento", ig.getGeladeira().getIdGeladeira());
+            linha.put("armazenamento", ig.getGeladeira().getNome());
+            linha.put("donoTipo", "usuario");
+            linha.put("dono", ig.getGeladeira().getUsuario().getNome() + " " + ig.getGeladeira().getUsuario().getSobrenome());
+            linha.put("produto", ig.getProduto());
+            linha.put("quantidade", ig.getQuantidade());
+            linha.put("lote", ig.getLote());
+            linha.put("dtValidade", ig.getDtValidade());
+            todos.add(linha);
+        }
+        for (ProdutosFrigorifico itf : itfDAO.buscarTodosProdutosFrigorifico()){
+            Map<String, Object> linha = new HashMap<>();
+            linha.put("chave", "f-" + itf.getIdProdutosFrigorifico());
+            linha.put("tipoArmazenamento", "frigorifico");
+            linha.put("idItem", itf.getIdProdutosFrigorifico());
+            linha.put("idArmazenamento", itf.getFrigorificos().getIdFrigorifico());
+            linha.put("armazenamento", itf.getFrigorificos().getNome());
+            linha.put("donoTipo", "empresa");
+            linha.put("dono", itf.getFrigorificos().getEmpresa().getNome());
+            linha.put("produto", itf.getProduto());
+            linha.put("quantidade", itf.getQuantidade());
+            linha.put("lote", itf.getLote());
+            linha.put("dtValidade", itf.getDtValidade());
+            todos.add(linha);
+        }
+
+        // quantos dias faltam para vencer e a situação de cada item ( calculados na hora, pela data de validade )
+        for (Map<String, Object> linha : todos){
+            LocalDate validade = (LocalDate) linha.get("dtValidade");
+            linha.put("dias", ChronoUnit.DAYS.between(LocalDate.now(), validade));
+            linha.put("status", StatusProduto.calcularStatus(validade));
+        }
+
+        List<Map<String, Object>> linhas = new ArrayList<>();
+        for (Map<String, Object> linha : todos){
+            Produto produto = (Produto) linha.get("produto");
+            long dias = (Long) linha.get("dias");
+            String texto = (produto.getNome() + " " + produto.getMarca()).toLowerCase();
+
+            boolean achouProduto = fProduto == null || fProduto.isBlank() || texto.contains(fProduto.trim().toLowerCase());
+            boolean achouDono = fDono == null || fDono.isBlank() || fDono.equals(linha.get("donoTipo"));
+            boolean achouArm = fArm == null || fArm.isBlank() || fArm.equals(linha.get("tipoArmazenamento"));
+            boolean achouCat = fCat == null || fCat.isBlank() || fCat.equals(produto.getCategoria().name());
+            boolean achouStatus = fStatus == null || fStatus.isBlank() || fStatus.equals(((StatusProduto) linha.get("status")).name());
+            boolean achouVal = fVal == null || fVal.isBlank()
+                    || (fVal.equals("vencidos") && dias < 0)
+                    || (fVal.equals("7") && dias >= 0 && dias <= 7)
+                    || (fVal.equals("30") && dias >= 0 && dias <= 30)
+                    || (fVal.equals("longa") && dias > 30);
+            boolean achouGeladeira = fIdGeladeira == null || fIdGeladeira.isBlank()
+                    || ("geladeira".equals(linha.get("tipoArmazenamento")) && fIdGeladeira.trim().equals(String.valueOf(linha.get("idArmazenamento"))));
+            boolean achouFrigorifico = fIdFrigorifico == null || fIdFrigorifico.isBlank()
+                    || ("frigorifico".equals(linha.get("tipoArmazenamento")) && fIdFrigorifico.trim().equals(String.valueOf(linha.get("idArmazenamento"))));
+
+            if (achouProduto && achouDono && achouArm && achouCat && achouStatus && achouVal && achouGeladeira && achouFrigorifico){
+                linhas.add(linha);
+            }
+        }
+
+        // ordem da lista ( padrão: validade mais proxima primeiro )
+        Comparator<Map<String, Object>> porDias = Comparator.comparingLong(l -> (Long) l.get("dias"));
+        Comparator<Map<String, Object>> porNome = Comparator.comparing(l -> ((Produto) l.get("produto")).getNome().toLowerCase());
+        if ("dias:desc".equals(fOrd)){
+            linhas.sort(porDias.reversed());
+        }
+        else if ("nome:asc".equals(fOrd)){
+            linhas.sort(porNome);
+        }
+        else if ("nome:desc".equals(fOrd)){
+            linhas.sort(porNome.reversed());
+        }
+        else {
+            linhas.sort(porDias);
+        }
+
+        // ver os detalhes ou editar um item ( vem no link da linha ), ele sai da lista que ja foi carregada
+        String ver = req.getParameter("ver");
+        String editar = req.getParameter("editar");
+        String chaveEscolhida = (ver != null && !ver.isBlank()) ? ver.trim() : (editar != null && !editar.isBlank() ? editar.trim() : null);
+        if (chaveEscolhida != null){
+            for (Map<String, Object> linha : todos){
+                if (chaveEscolhida.equals(linha.get("chave"))){
+                    req.setAttribute("registro", linha);
+                    req.setAttribute("modo", ver != null && !ver.isBlank() ? "ver" : "editar");
+                }
+            }
+        }
+
+        req.setAttribute("linhas", Paginacao.aplicar(req, linhas));
+        req.setAttribute("totalGeral", todos.size());
         req.setAttribute("geladeiras", geladeiras);
         req.setAttribute("frigorificos", frigorificos);
         req.setAttribute("categorias", Categoria.values());
+        req.setAttribute("statusProduto", StatusProduto.values());
+        req.setAttribute("unidades", unidades);
+        req.setAttribute("filtroProduto", fProduto == null ? "" : fProduto);
+        req.setAttribute("filtroDono", fDono == null ? "" : fDono);
+        req.setAttribute("filtroArm", fArm == null ? "" : fArm);
+        req.setAttribute("filtroCat", fCat == null ? "" : fCat);
+        req.setAttribute("filtroStatus", fStatus == null ? "" : fStatus);
+        req.setAttribute("filtroVal", fVal == null ? "" : fVal);
+        req.setAttribute("filtroOrd", fOrd == null ? "" : fOrd);
         req.getRequestDispatcher(jsp_produtos).forward(req, resp);
     }
 
-    // volta para a tela de onde veio com uma mensagem de erro ( a tela de teste ou a propria tela )
+    // volta para a tela com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
         req.setAttribute("erro", mensagem);
-        String retorno = validar.definirRetorno(req.getParameter("retorno"), url_servlet);
-        if (retorno.equals(url_servlet)){
-            listar(req, resp);
-        }
-        else {
-            req.getRequestDispatcher(retorno).forward(req, resp);
-        }
+        listar(req, resp);
     }
 
     // proteção contra formato errado nos tipos diferentes de string
