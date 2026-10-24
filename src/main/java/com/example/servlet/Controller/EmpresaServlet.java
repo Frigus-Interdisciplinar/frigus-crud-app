@@ -9,6 +9,7 @@ import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
 import com.example.servlet.Util.Paginacao;
 import com.example.servlet.Util.Validacao;
+import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.example.servlet.Util.Ordenar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public class EmpresaServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_empresas = "/WEB-INF/pages/empresas.jsp";
+    private static final String jsp_empresas_form = "/WEB-INF/pages/empresas-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/empresas";
@@ -293,6 +299,12 @@ public class EmpresaServlet extends HttpServlet {
             req.setAttribute("modo", "editar");
         }
 
+        // ordem da lista ( vem do select "Ordenar por" )
+        Map<String, Comparator<Empresa>> ordens = new LinkedHashMap<>();
+        Ordenar.campo(ordens, "nome", (a, b) -> Ordenar.texto(a.getNome(), b.getNome()));
+        Ordenar.campo(ordens, "novo", Comparator.comparing(Empresa::getDtCadastro, Comparator.nullsFirst(Comparator.naturalOrder())));
+        req.setAttribute("filtroOrd", Ordenar.ordenar(empresas, req.getParameter("ord"), "nome:asc", ordens));
+
         req.setAttribute("empresas", Paginacao.aplicar(req, empresas));
         req.setAttribute("totalGeral", todas.size());
         req.setAttribute("filtroBusca", busca == null ? "" : busca);
@@ -300,13 +312,16 @@ public class EmpresaServlet extends HttpServlet {
         req.setAttribute("planosDasEmpresas", planos);
         req.setAttribute("frigorificosPorEmpresa", resumoDAO.contarFrigorificosPorEmpresa());
         req.setAttribute("receitasPorEmpresa", resumoDAO.contarReceitasPorEmpresa());
-        req.getRequestDispatcher(jsp_empresas).forward(req, resp);
+        if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
+            req.setAttribute("modo", "novo");
+        }
+        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_empresas_form : jsp_empresas).forward(req, resp);
     }
 
-    // volta para a tela com uma mensagem de erro
+    // volta para a tela do formulario com uma mensagem de erro
     private void voltaComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
             throws ServletException, IOException{
-        req.setAttribute("erro", mensagem);
-        listar(req, resp);
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect(Voltar.destino(req, url_servlet));
     }
 }
