@@ -16,7 +16,13 @@ public class Conexao {
 
     public Conexao() {
 
-        dotenv = Dotenv.configure().directory("C:\\Users\\20260224-ieg\\OneDrive - Instituto J&F\\Desktop\\Frigus\\Frigus_BackEnd\\.env").ignoreIfMalformed().ignoreIfMissing().load();
+        // a pasta do .env vem da variavel de ambiente FRIGUS_ENV_DIR (sem ela procura na pasta atual)
+        String pastaEnv = System.getenv("FRIGUS_ENV_DIR");
+        if (pastaEnv == null || pastaEnv.isBlank()){
+            pastaEnv = ".";
+        }
+        // o Dotenv tambem enxerga as variaveis de ambiente do sistema
+        dotenv = Dotenv.configure().directory(pastaEnv).ignoreIfMalformed().ignoreIfMissing().load();
 
         url = dotenv.get("DB_URL");
         usuario = dotenv.get("DB_USER");
@@ -24,6 +30,7 @@ public class Conexao {
 
         validarConfiguracoes();
     }
+
 
     /**
      * Abre e retorna uma conexão com o banco de dados.
