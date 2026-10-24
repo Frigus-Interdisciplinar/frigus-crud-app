@@ -151,9 +151,9 @@ public class Validacao {
 //    }
 
 
-    // validar nome
+    // validar nome ( aceita acentos, como o nome do produto )
     public boolean validarNome(String nome){
-        return nome.matches("[A-Za-z ]+");
+        return nome.matches("[A-Za-zÀ-ÖØ-öø-ÿ ]+");
     }
 
     // validar nome do produto
@@ -204,6 +204,21 @@ public class Validacao {
         LocalDate minimo = hoje.minusMonths(6);
         LocalDate maximo = hoje.plusMonths(6);
         return !data.isBefore(minimo) && !data.isAfter(maximo);
+    }
+
+    // o dono do registro é o usuario OU a empresa, nunca os dois e nunca nenhum
+    public boolean validarDono(String cpf, String cnpj){
+        boolean temCpf = cpf != null && !cpf.isBlank();
+        boolean temCnpj = cnpj != null && !cnpj.isBlank();
+        return temCpf != temCnpj;
+    }
+
+    // para onde voltar depois de uma operação ( só aceita telas do painel, senão usa a padrao )
+    public String definirRetorno(String retorno, String padrao){
+        if (retorno != null && retorno.matches("/admin/(teste-banco|visao-geral|configuracoes)")){
+            return retorno;
+        }
+        return padrao;
     }
     // =========== VALIDAR ===========
 }
