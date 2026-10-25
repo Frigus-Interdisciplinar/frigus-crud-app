@@ -193,9 +193,9 @@ public class Validacao {
         return validade.isAfter(LocalDate.now());
     }
 
-    // email
+    // email ( o dominio pode ter varios pontos, como instituto.org.br, e numeros ou hifen )
     public boolean validarEmail(String email){
-        return email.matches("[a-z0-9_.]+@[a-z]+\\.[a-z]+");
+        return email.matches("[a-z0-9_.+-]+@[a-z0-9-]+(\\.[a-z0-9-]+)+");
     }
 
     // datas de cadastro de produtos
