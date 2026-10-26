@@ -99,7 +99,7 @@
                     <select name="cnpj">
                         <option value="">Selecione</option>
                         <c:forEach items="${empresas}" var="e">
-                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.email}"/></option>
                         </c:forEach>
                     </select>
                 </label>
@@ -175,7 +175,7 @@
                 <select name="cnpj">
                     <option value="">Selecione</option>
                     <c:forEach items="${empresas}" var="e">
-                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.email}"/></option>
                     </c:forEach>
                 </select>
             </label>

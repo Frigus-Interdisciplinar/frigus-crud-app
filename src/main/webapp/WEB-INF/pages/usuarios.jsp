@@ -63,13 +63,12 @@
             <c:otherwise>
                 <table>
                     <thead>
-                        <tr><th>Usuário</th><th>CPF</th><th>E-mail</th><th>Plano</th><th>Geladeiras</th><th>Receitas</th><th>Ações</th></tr>
+                        <tr><th>Usuário</th><th>E-mail</th><th>Plano</th><th>Geladeiras</th><th>Receitas</th><th>Ações</th></tr>
                     </thead>
                     <tbody>
                         <c:forEach items="${usuarios}" var="u">
                             <tr>
                                 <td><c:out value="${u.nome} ${u.sobrenome}"/></td>
-                                <td><c:out value="${u.cpf}"/></td>
                                 <td><c:out value="${u.email}"/></td>
                                 <td><c:out value="${planosDosUsuarios[u.cpf]}"/></td>
                                 <td>${empty geladeirasPorUsuario[u.cpf] ? 0 : geladeirasPorUsuario[u.cpf]}</td>

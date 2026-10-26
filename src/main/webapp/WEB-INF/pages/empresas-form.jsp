@@ -30,7 +30,6 @@
             <h2>Detalhes da empresa</h2>
             <dl>
                 <dt>Nome</dt><dd><c:out value="${registro.nome}"/></dd>
-                <dt>CNPJ</dt><dd><c:out value="${registro.cnpj}"/></dd>
                 <dt>E-mail de contato</dt><dd><c:out value="${registro.email}"/></dd>
                 <dt>Plano</dt><dd><c:out value="${planosDasEmpresas[registro.cnpj]}"/></dd>
                 <dt>Frigoríficos</dt><dd>${empty frigorificosPorEmpresa[registro.cnpj] ? 0 : frigorificosPorEmpresa[registro.cnpj]}</dd>
@@ -51,7 +50,6 @@
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
                 <input type="hidden" name="action" value="alterar">
                 <input type="hidden" name="cnpj" value="${registro.cnpj}">
-                <p>CNPJ: <strong><c:out value="${registro.cnpj}"/></strong></p>
                 <label>Nome da empresa <input type="text" name="nome" value="${registro.nome}" required maxlength="80"></label>
                 <label>E-mail de contato <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
                 <label>Nova senha (de 8 a 15 caracteres) <input type="password" name="senha" minlength="8" maxlength="15"></label>

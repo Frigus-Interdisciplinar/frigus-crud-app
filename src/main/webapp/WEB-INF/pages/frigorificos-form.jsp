@@ -31,7 +31,7 @@
             <dl>
                 <dt>Unidade</dt><dd><c:out value="${registro.nome}"/></dd>
                 <dt>Tipo</dt><dd><c:out value="${registro.tipo}"/></dd>
-                <dt>Empresa dona</dt><dd><c:out value="${registro.empresa.nome} (${registro.empresa.cnpj})"/></dd>
+                <dt>Empresa dona</dt><dd><c:out value="${registro.empresa.nome}"/></dd>
                 <dt>Status</dt><dd><c:out value="${registro.status}"/></dd>
                 <dt>Endereço</dt><dd><c:out value="${registro.endereco.rua}, ${registro.endereco.numero} - ${registro.endereco.bairro}"/></dd>
                 <dt>Cidade</dt><dd><c:out value="${registro.endereco.cidade}/${registro.endereco.uf} - ${registro.endereco.pais}"/></dd>
@@ -60,7 +60,7 @@
                 <label>Empresa dona
                     <select name="cnpj" required>
                         <c:forEach items="${empresas}" var="e">
-                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.email}"/></option>
                         </c:forEach>
                     </select>
                 </label>
@@ -98,7 +98,7 @@
                 <select name="cnpj" required>
                     <option value="">Selecione</option>
                     <c:forEach items="${empresas}" var="e">
-                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.email}"/></option>
                     </c:forEach>
                 </select>
             </label>

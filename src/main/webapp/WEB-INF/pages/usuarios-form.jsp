@@ -30,7 +30,6 @@
             <h2>Detalhes do usuário</h2>
             <dl>
                 <dt>Nome</dt><dd><c:out value="${registro.nome} ${registro.sobrenome}"/></dd>
-                <dt>CPF</dt><dd><c:out value="${registro.cpf}"/></dd>
                 <dt>E-mail</dt><dd><c:out value="${registro.email}"/></dd>
                 <dt>Plano</dt><dd><c:out value="${planosDosUsuarios[registro.cpf]}"/></dd>
                 <dt>Geladeiras</dt><dd>${empty geladeirasPorUsuario[registro.cpf] ? 0 : geladeirasPorUsuario[registro.cpf]}</dd>
@@ -51,7 +50,6 @@
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
                 <input type="hidden" name="action" value="alterar">
                 <input type="hidden" name="cpf" value="${registro.cpf}">
-                <p>CPF: <strong><c:out value="${registro.cpf}"/></strong></p>
                 <label>Nome <input type="text" name="nome" value="${registro.nome}" required maxlength="20"></label>
                 <label>Sobrenome <input type="text" name="sobrenome" value="${registro.sobrenome}" required maxlength="60"></label>
                 <label>E-mail <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
