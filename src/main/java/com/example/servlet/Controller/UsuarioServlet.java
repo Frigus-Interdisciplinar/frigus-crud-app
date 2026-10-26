@@ -8,6 +8,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
 import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Service.PlanoService;
 import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
@@ -33,6 +34,7 @@ public class UsuarioServlet extends HttpServlet {
     private UsuarioDAO usuarioDAO;
     private AssinaturaDAO assinaturaDAO;
     private ResumoDAO resumoDAO;
+    private PlanoService planoService;
     private Validacao validar;
 
     // caminho das paginas
@@ -47,6 +49,7 @@ public class UsuarioServlet extends HttpServlet {
         usuarioDAO = new UsuarioDAO();
         assinaturaDAO = new AssinaturaDAO();
         resumoDAO = new ResumoDAO();
+        planoService = new PlanoService();
         validar = new Validacao();
     }
 
@@ -238,6 +241,16 @@ public class UsuarioServlet extends HttpServlet {
                     return;
                 }
 
+                // trocar o plano só se o novo plano comportar o que o usuário já tem ( geladeiras e produtos )
+                Assinatura assinaturaAtual = assinaturaDAO.buscarAssinaturaUsuario(usuarioAntigo.getCpf());
+                if (assinaturaAtual == null || assinaturaAtual.getTipoAssinatura() != plano){
+                    String erroPlano = planoService.validarTrocaDePlanoUsuario(usuarioAntigo.getCpf(), plano);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
+                }
+
                 String senhaHash = usuarioAntigo.getSenha();
                 if (senha != null && !senha.isBlank()){
                     boolean vSenha = validar.validarSenha(senha);
@@ -276,6 +289,9 @@ public class UsuarioServlet extends HttpServlet {
                     voltaComErro(req, resp, "Os dados foram salvos, mas não foi possível trocar o plano.");
                     return;
                 }
+
+                // a ocupação das geladeiras depende do plano
+                planoService.recalcularStatusDoUsuario(usuarioAntigo.getCpf());
 
                 session.setAttribute("sucesso", "Usuário alterado com sucesso.");
                 resp.sendRedirect(req.getContextPath() + url_servlet);

@@ -8,6 +8,7 @@ import com.example.servlet.Model.Empresa;
 import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Service.PlanoService;
 import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
@@ -32,6 +33,7 @@ public class Planos extends HttpServlet {
     private AssinaturaDAO assinaturaDAO;
     private UsuarioDAO usuarioDAO;
     private EmpresaDAO empresaDAO;
+    private PlanoService planoService;
     private Validacao validar;
 
     // caminho das paginas
@@ -47,6 +49,7 @@ public class Planos extends HttpServlet {
         assinaturaDAO = new AssinaturaDAO();
         usuarioDAO = new UsuarioDAO();
         empresaDAO =  new EmpresaDAO();
+        planoService = new PlanoService();
         validar = new Validacao();
     }
 
@@ -115,6 +118,15 @@ public class Planos extends HttpServlet {
                         voltaComErro(req, resp, "Esse usuário já tem uma assinatura.");
                         return;
                     }
+                    // o plano tem que servir para usuário e comportar o que ele já tem
+                    String erroPlano = planoService.validarPlanoDoDono(plano, true);
+                    if (erroPlano == null){
+                        erroPlano = planoService.validarTrocaDePlanoUsuario(usuario.getCpf(), plano);
+                    }
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     assinatura = new Assinatura(usuario, plano);
                 }
                 else {
@@ -128,10 +140,22 @@ public class Planos extends HttpServlet {
                         voltaComErro(req, resp, "Essa empresa já tem uma assinatura.");
                         return;
                     }
+                    String erroPlano = planoService.validarPlanoDoDono(plano, false);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     assinatura = new Assinatura(empresa, plano);
                 }
 
                 if (assinaturaDAO.inserirAssinatura(assinatura) == 1) {
+                    // a ocupação das geladeiras e frigoríficos depende do plano
+                    if (assinatura.getUsuario() != null){
+                        planoService.recalcularStatusDoUsuario(assinatura.getUsuario().getCpf());
+                    }
+                    else {
+                        planoService.recalcularStatusDaEmpresa(assinatura.getEmpresa().getCnpj());
+                    }
                     session.setAttribute("sucesso", "Assinatura cadastrada com sucesso.");
                     resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
@@ -189,6 +213,18 @@ public class Planos extends HttpServlet {
                         voltaComErro(req, resp, "Esse usuário já tem uma assinatura.");
                         return;
                     }
+                    // so confere o que o usuário já tem quando o plano ou o dono mudou
+                    boolean mudou = assinaturaAntiga.getUsuario() == null
+                            || !assinaturaAntiga.getUsuario().getCpf().equals(usuario.getCpf())
+                            || assinaturaAntiga.getTipoAssinatura() != plano;
+                    String erroPlano = planoService.validarPlanoDoDono(plano, true);
+                    if (erroPlano == null && mudou){
+                        erroPlano = planoService.validarTrocaDePlanoUsuario(usuario.getCpf(), plano);
+                    }
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     assinaturaNova = new Assinatura(usuario, plano);
                 }
                 else {
@@ -203,11 +239,22 @@ public class Planos extends HttpServlet {
                         voltaComErro(req, resp, "Essa empresa já tem uma assinatura.");
                         return;
                     }
+                    String erroPlano = planoService.validarPlanoDoDono(plano, false);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     assinaturaNova = new Assinatura(empresa, plano);
                 }
 
                 int funcionou = assinaturaDAO.alterarAssinatura(assinaturaAntiga, assinaturaNova);
                 if (funcionou == 1){
+                    if (assinaturaNova.getUsuario() != null){
+                        planoService.recalcularStatusDoUsuario(assinaturaNova.getUsuario().getCpf());
+                    }
+                    else {
+                        planoService.recalcularStatusDaEmpresa(assinaturaNova.getEmpresa().getCnpj());
+                    }
                     session.setAttribute("sucesso", "Assinatura alterada com sucesso.");
                     resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;
