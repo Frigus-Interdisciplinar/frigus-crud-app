@@ -27,8 +27,7 @@ public class AssinaturaDAO {
             if (assinatura.getUsuario() != null){
                 pstmt.setString(1, assinatura.getUsuario().getCpf());
                 pstmt.setNull(2, Types.VARCHAR);
-            }
-            else {
+            } else {
                 pstmt.setNull(1, Types.VARCHAR);
                 pstmt.setString(2, assinatura.getEmpresa().getCnpj());
             }
