@@ -7,6 +7,7 @@
     <title>Empresas - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="empresas" scope="request"/>
@@ -31,6 +32,7 @@
         <h2>Filtros</h2>
         <form method="get" action="${pageContext.request.contextPath}/admin/empresas">
             <label>Buscar por nome, e-mail ou CNPJ <input type="text" name="busca" value="${filtroBusca}" placeholder="Buscar por nome…"></label>
+            <label>CNPJ <input type="text" id="f-cnpj" name="cnpj" value="${filtroCnpj}" maxlength="18" placeholder="00.000.000/0000-00" inputmode="numeric"></label>
             <label>Plano
                 <select name="plano">
                     <option value="">Todos</option>
@@ -59,13 +61,12 @@
             <c:otherwise>
                 <table>
                     <thead>
-                        <tr><th>Empresa</th><th>CNPJ</th><th>E-mail</th><th>Plano</th><th>Frigoríficos</th><th>Receitas</th><th>Ações</th></tr>
+                        <tr><th>Empresa</th><th>E-mail</th><th>Plano</th><th>Frigoríficos</th><th>Receitas</th><th>Ações</th></tr>
                     </thead>
                     <tbody>
                         <c:forEach items="${empresas}" var="e">
                             <tr>
                                 <td><c:out value="${e.nome}"/></td>
-                                <td><c:out value="${e.cnpj}"/></td>
                                 <td><c:out value="${e.email}"/></td>
                                 <td><c:out value="${planosDasEmpresas[e.cnpj]}"/></td>
                                 <td>${empty frigorificosPorEmpresa[e.cnpj] ? 0 : frigorificosPorEmpresa[e.cnpj]}</td>

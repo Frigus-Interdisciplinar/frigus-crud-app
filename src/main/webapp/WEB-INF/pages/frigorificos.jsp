@@ -86,7 +86,7 @@
                             <c:set var="numeros" value="${ocupacao[f.idFrigorifico]}"/>
                             <tr>
                                 <td><c:out value="${f.nome}"/> (<c:out value="${f.tipo}"/>)</td>
-                                <td><c:out value="${f.empresa.nome}"/> (<c:out value="${f.empresa.cnpj}"/>)</td>
+                                <td><c:out value="${f.empresa.nome}"/></td>
                                 <td><c:out value="${f.endereco.rua}, ${f.endereco.numero} ${f.endereco.bairro} — ${f.endereco.cidade}/${f.endereco.uf}"/></td>
                                 <td><c:out value="${f.endereco.cep}"/></td>
                                 <td>${empty numeros ? 0 : numeros[0]}</td>

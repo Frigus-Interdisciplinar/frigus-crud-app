@@ -90,7 +90,7 @@ public class Login extends HttpServlet {
                 }
 
                 // buscando o super admin no banco
-                SuperAdmin superAdmin = superAdminDAO.buscarSuperAdmin(email.trim());
+                SuperAdmin superAdmin = superAdminDAO.buscarSuperAdmin(validar.normalizarEmail(email));
 
                 // a mensagem e a mesma para nao mostrar se o e-mail existe
                 if (superAdmin == null){
@@ -159,7 +159,7 @@ public class Login extends HttpServlet {
                     voltaComErro(req, resp, "A confirmação da senha não é igual à senha!!!", jsp_cadastro);
                     return;
                 }
-                if (superAdminDAO.buscarSuperAdmin(email.trim()) != null){
+                if (superAdminDAO.buscarSuperAdmin(validar.normalizarEmail(email)) != null){
                     voltaComErro(req, resp, "Esse e-mail já está cadastrado.", jsp_cadastro);
                     return;
                 }
@@ -169,7 +169,7 @@ public class Login extends HttpServlet {
 
                 SuperAdmin superAdmin = new SuperAdmin();
                 superAdmin.setNome(nome.trim());
-                superAdmin.setEmail(email.trim());
+                superAdmin.setEmail(validar.normalizarEmail(email));
                 superAdmin.setSenha(senhaHash);
 
                 if (superAdminDAO.adicionarSuperAdmin(superAdmin) == 1){

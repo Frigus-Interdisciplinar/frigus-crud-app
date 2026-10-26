@@ -90,7 +90,7 @@ public class SuperAdminServlet extends HttpServlet {
                     return;
                 }
                 // se trocou o e-mail, o novo nao pode ser de outra conta
-                SuperAdmin outraConta = superAdminDAO.buscarSuperAdmin(email.trim());
+                SuperAdmin outraConta = superAdminDAO.buscarSuperAdmin(validar.normalizarEmail(email));
                 if (outraConta != null && outraConta.getIdSuperAdmin() != contaAntiga.getIdSuperAdmin()){
                     voltaComErro(req, resp, "Esse e-mail já está cadastrado.");
                     return;
@@ -99,7 +99,7 @@ public class SuperAdminServlet extends HttpServlet {
                 SuperAdmin contaNova = new SuperAdmin(
                         contaAntiga.getIdSuperAdmin(),
                         nome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         contaAntiga.getSenha()
                 );
 

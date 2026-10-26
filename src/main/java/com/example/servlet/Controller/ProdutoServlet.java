@@ -15,6 +15,7 @@ import com.example.servlet.Util.Enum.Categoria;
 import com.example.servlet.Util.Enum.StatusProduto;
 import com.example.servlet.Util.Service.ArmazenamentoService;
 import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Service.PlanoService;
 import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
@@ -46,6 +47,7 @@ public class ProdutoServlet extends HttpServlet {
     private GeladeiraDAO geladeiraDAO;
     private FrigorificosDAO frigorificoDAO;
     private AssinaturaDAO assinaturaDAO;
+    private PlanoService planoService;
     private Validacao validar;
 
     // caminho das paginas
@@ -65,6 +67,7 @@ public class ProdutoServlet extends HttpServlet {
         geladeiraDAO = new GeladeiraDAO();
         frigorificoDAO = new FrigorificosDAO();
         assinaturaDAO = new AssinaturaDAO();
+        planoService = new PlanoService();
         validar = new Validacao();
     }
 
@@ -130,7 +133,12 @@ public class ProdutoServlet extends HttpServlet {
                         return;
                     }
 
-                    // o admin não tem limite de produtos por plano
+                    // cabe no plano do dono da geladeira?
+                    String erroPlano = planoService.validarCapacidadeGeladeira(geladeira.getIdGeladeira(), geladeira.getUsuario().getCpf(), quantidade, 0);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     ProdutosGeladeira itemg = new ProdutosGeladeira(0, geladeira, produto, dataValidade, lote, quantidade);
                     if (igDAO.inserirProdutoGeladeira(itemg) == 1){
                         atualizarStatusGeladeira(geladeira);
@@ -155,7 +163,12 @@ public class ProdutoServlet extends HttpServlet {
                         return;
                     }
 
-                    // o admin não tem limite de produtos por plano
+                    // cabe no plano da empresa dona do frigorifico?
+                    String erroPlano = planoService.validarCapacidadeFrigorifico(frigorifico.getIdFrigorifico(), frigorifico.getEmpresa().getCnpj(), quantidade, 0);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
                     ProdutosFrigorifico itemf = new ProdutosFrigorifico(0, frigorifico, produto, dataValidade, lote, quantidade);
                     if (itfDAO.inserirProdutoFrigorifico(itemf) == 1){
                         atualizarStatusFrigorifico(frigorifico);
@@ -202,6 +215,14 @@ public class ProdutoServlet extends HttpServlet {
                         return;
                     }
 
+                    // as unidades que o item já tinha nessa mesma geladeira saem da conta
+                    int jaTinha = itemAntigo.getGeladeira().getIdGeladeira() == geladeira.getIdGeladeira() ? itemAntigo.getQuantidade() : 0;
+                    String erroPlano = planoService.validarCapacidadeGeladeira(geladeira.getIdGeladeira(), geladeira.getUsuario().getCpf(), quantidade, jaTinha);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
+
                     ProdutosGeladeira itemNovo = new ProdutosGeladeira(0, geladeira, produtoNovo, dataValidade, lote, quantidade);
                     if (igDAO.alterarProdutoGeladeira(itemAntigo, itemNovo) == 1){
                         // atualizando o status da geladeira nova e da antiga
@@ -234,6 +255,13 @@ public class ProdutoServlet extends HttpServlet {
                     Frigorificos frigorifico = frigorificoDAO.buscarFrigorificoPorId(idFrigorifico);
                     if (frigorifico == null){
                         voltaComErro(req, resp, "Frigorífico não encontrado.");
+                        return;
+                    }
+
+                    int jaTinha = itemAntigo.getFrigorificos().getIdFrigorifico() == frigorifico.getIdFrigorifico() ? itemAntigo.getQuantidade() : 0;
+                    String erroPlano = planoService.validarCapacidadeFrigorifico(frigorifico.getIdFrigorifico(), frigorifico.getEmpresa().getCnpj(), quantidade, jaTinha);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
                         return;
                     }
 

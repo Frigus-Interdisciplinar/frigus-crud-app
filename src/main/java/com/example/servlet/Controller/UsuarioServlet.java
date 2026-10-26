@@ -8,6 +8,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Hash;
 import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Service.PlanoService;
 import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
@@ -33,6 +34,7 @@ public class UsuarioServlet extends HttpServlet {
     private UsuarioDAO usuarioDAO;
     private AssinaturaDAO assinaturaDAO;
     private ResumoDAO resumoDAO;
+    private PlanoService planoService;
     private Validacao validar;
 
     // caminho das paginas
@@ -47,6 +49,7 @@ public class UsuarioServlet extends HttpServlet {
         usuarioDAO = new UsuarioDAO();
         assinaturaDAO = new AssinaturaDAO();
         resumoDAO = new ResumoDAO();
+        planoService = new PlanoService();
         validar = new Validacao();
     }
 
@@ -86,8 +89,11 @@ public class UsuarioServlet extends HttpServlet {
 
         switch (action){
             case "inserir": {
-                // pegando os dados do formulario
+                // pegando os dados do formulario ( o CPF pode vir com pontos e traço, fica só com os numeros )
                 String cpf = req.getParameter("cpf");
+                if (cpf != null){
+                    cpf = cpf.replaceAll("\\D", "");
+                }
                 String nome = req.getParameter("nome");
                 String sobrenome = req.getParameter("sobrenome");
                 String email = req.getParameter("email");
@@ -158,7 +164,7 @@ public class UsuarioServlet extends HttpServlet {
                         cpfPuro,
                         nome.trim(),
                         sobrenome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 
@@ -238,6 +244,16 @@ public class UsuarioServlet extends HttpServlet {
                     return;
                 }
 
+                // trocar o plano só se o novo plano comportar o que o usuário já tem ( geladeiras e produtos )
+                Assinatura assinaturaAtual = assinaturaDAO.buscarAssinaturaUsuario(usuarioAntigo.getCpf());
+                if (assinaturaAtual == null || assinaturaAtual.getTipoAssinatura() != plano){
+                    String erroPlano = planoService.validarTrocaDePlanoUsuario(usuarioAntigo.getCpf(), plano);
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
+                }
+
                 String senhaHash = usuarioAntigo.getSenha();
                 if (senha != null && !senha.isBlank()){
                     boolean vSenha = validar.validarSenha(senha);
@@ -254,7 +270,7 @@ public class UsuarioServlet extends HttpServlet {
                         usuarioAntigo.getCpf(),
                         nome.trim(),
                         sobrenome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 
@@ -276,6 +292,9 @@ public class UsuarioServlet extends HttpServlet {
                     voltaComErro(req, resp, "Os dados foram salvos, mas não foi possível trocar o plano.");
                     return;
                 }
+
+                // a ocupação das geladeiras depende do plano
+                planoService.recalcularStatusDoUsuario(usuarioAntigo.getCpf());
 
                 session.setAttribute("sucesso", "Usuário alterado com sucesso.");
                 resp.sendRedirect(req.getContextPath() + url_servlet);
@@ -318,6 +337,9 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException{
         // filtros da tela
         String busca = req.getParameter("busca");
+        // o filtro de CPF ignora pontos e traço
+        String filtroCpf = req.getParameter("cpf");
+        String cpfBuscado = filtroCpf == null ? "" : filtroCpf.replaceAll("\\D", "");
         String filtroPlano = req.getParameter("plano");
 
         List<Usuario> todos = usuarioDAO.buscarTodosUsuario();
@@ -328,7 +350,8 @@ public class UsuarioServlet extends HttpServlet {
             String texto = (usuario.getNome() + " " + usuario.getSobrenome() + " " + usuario.getEmail() + " " + usuario.getCpf()).toLowerCase();
             boolean achouBusca = busca == null || busca.isBlank() || texto.contains(busca.trim().toLowerCase());
             boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(planos.get(usuario.getCpf()));
-            if (achouBusca && achouPlano){
+            boolean achouCpf = cpfBuscado.isEmpty() || usuario.getCpf().contains(cpfBuscado);
+            if (achouBusca && achouPlano && achouCpf){
                 usuarios.add(usuario);
             }
         }
@@ -354,6 +377,7 @@ public class UsuarioServlet extends HttpServlet {
         req.setAttribute("usuarios", Paginacao.aplicar(req, usuarios));
         req.setAttribute("totalGeral", todos.size());
         req.setAttribute("filtroBusca", busca == null ? "" : busca);
+        req.setAttribute("filtroCpf", filtroCpf == null ? "" : filtroCpf);
         req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
         req.setAttribute("planosDosUsuarios", planos);
         req.setAttribute("geladeirasPorUsuario", resumoDAO.contarGeladeirasPorUsuario());

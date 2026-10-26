@@ -2,6 +2,8 @@ package com.example.servlet.Util;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class Validacao {
     // =========== FORMATAR ===========
@@ -193,9 +195,34 @@ public class Validacao {
         return validade.isAfter(LocalDate.now());
     }
 
-    // email
+    // email: o formato pratico dos enderecos que existem de verdade
+    // antes do @: letras, numeros e . ! # $ % & ' * + / = ? ^ _ ` { | } ~ -  ( o ponto nao pode abrir, fechar nem repetir )
+    // depois do @: partes separadas por ponto, sem hifen no começo nem no fim, e o final só com letras ( ou punycode, xn-- )
+    // letras de qualquer idioma valem ( jose@, 我買@屋企.香港 ). Ficam de fora os formatos que nenhum provedor usa:
+    // parte local entre aspas, comentario, dominio com IP entre colchetes, dominio sem ponto e emoji
+    private static final String letra_numero = "\\p{L}\\p{M}\\p{N}";
+    private static final Pattern padrao_email = Pattern.compile(
+            "[" + letra_numero + "!#$%&'*+/=?^_`{|}~-]+(\\.[" + letra_numero + "!#$%&'*+/=?^_`{|}~-]+)*"
+            + "@"
+            + "([" + letra_numero + "]([" + letra_numero + "-]{0,61}[" + letra_numero + "])?\\.)+"
+            + "([\\p{L}\\p{M}]{2,63}|(?i:xn--)[a-zA-Z0-9-]{1,59})");
+
     public boolean validarEmail(String email){
-        return email.matches("[a-z0-9_.]+@[a-z]+\\.[a-z]+");
+        if (email == null){
+            return false;
+        }
+        email = email.trim();
+        // tamanhos maximos: 64 antes do @ e 254 no total ( o banco aceita ate 320 )
+        int arroba = email.indexOf('@');
+        if (arroba < 1 || arroba > 64 || email.length() > 254){
+            return false;
+        }
+        return padrao_email.matcher(email).matches();
+    }
+
+    // o e-mail é guardado sem espaços nas pontas e em minusculas ( Maria@x.com e maria@x.com são a mesma conta )
+    public String normalizarEmail(String email){
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
     // datas de cadastro de produtos

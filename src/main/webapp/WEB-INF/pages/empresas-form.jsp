@@ -7,6 +7,7 @@
     <title>Empresas - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="empresas" scope="request"/>
@@ -29,7 +30,6 @@
             <h2>Detalhes da empresa</h2>
             <dl>
                 <dt>Nome</dt><dd><c:out value="${registro.nome}"/></dd>
-                <dt>CNPJ</dt><dd><c:out value="${registro.cnpj}"/></dd>
                 <dt>E-mail de contato</dt><dd><c:out value="${registro.email}"/></dd>
                 <dt>Plano</dt><dd><c:out value="${planosDasEmpresas[registro.cnpj]}"/></dd>
                 <dt>Frigoríficos</dt><dd>${empty frigorificosPorEmpresa[registro.cnpj] ? 0 : frigorificosPorEmpresa[registro.cnpj]}</dd>
@@ -50,9 +50,8 @@
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
                 <input type="hidden" name="action" value="alterar">
                 <input type="hidden" name="cnpj" value="${registro.cnpj}">
-                <p>CNPJ: <strong><c:out value="${registro.cnpj}"/></strong></p>
                 <label>Nome da empresa <input type="text" name="nome" value="${registro.nome}" required maxlength="80"></label>
-                <label>E-mail de contato <input type="email" name="email" value="${registro.email}" required></label>
+                <label>E-mail de contato <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
                 <label>Nova senha (de 8 a 15 caracteres) <input type="password" name="senha" minlength="8" maxlength="15"></label>
                 <p>Plano: <c:out value="${planosDasEmpresas[registro.cnpj]}"/> (o plano é trocado na tela Planos)</p>
                 <button type="submit">Salvar alterações</button>
@@ -69,14 +68,14 @@
             <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
             <input type="hidden" name="action" value="inserir">
             <label>Nome da empresa <input type="text" name="nome" required maxlength="80"></label>
-            <label>CNPJ <input type="text" name="cnpj" required maxlength="18"></label>
+            <label>CNPJ <input type="text" id="em-cnpj" name="cnpj" required maxlength="18" placeholder="00.000.000/0000-00" inputmode="numeric"></label>
             <label>Plano
                 <select name="plano" required>
                     <option value="">Selecione</option>
                     <option value="COMERCIAL">Comercial</option>
                 </select>
             </label>
-            <label>E-mail de contato <input type="email" name="email" required></label>
+            <label>E-mail de contato <input type="text" inputmode="email" name="email" required></label>
             <label>Senha (de 8 a 15 caracteres, uma maiúscula e um especial) <input type="password" name="senha" required minlength="8" maxlength="15"></label>
             <button type="submit">Adicionar empresa</button>
         </form>

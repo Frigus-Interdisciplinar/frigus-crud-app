@@ -21,6 +21,20 @@ public enum TipoAssinatura {
         }
     }
 
+    // quantas geladeiras o usuario pode ter em cada plano ( a empresa nao tem geladeira, tem frigorifico )
+    public static int limiteGeladeiras(TipoAssinatura plano){
+        switch (plano){
+            case FREE:
+                return 1;
+            case PLUS:
+                return 3;
+            case FAMILIA:
+                return 3;
+            default:
+                return 0;
+        }
+    }
+
     // definir o valor de cada plano
     public static double definirValorPlano(TipoAssinatura plano){
         switch (plano){

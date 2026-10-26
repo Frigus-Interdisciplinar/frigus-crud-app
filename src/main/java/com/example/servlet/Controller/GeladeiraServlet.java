@@ -8,6 +8,7 @@ import com.example.servlet.Model.Usuario;
 import com.example.servlet.Util.Enum.StatusArmazenamento;
 import com.example.servlet.Util.Enum.TipoAssinatura;
 import com.example.servlet.Util.Paginacao;
+import com.example.servlet.Util.Service.PlanoService;
 import com.example.servlet.Util.Validacao;
 import com.example.servlet.Util.Voltar;
 import jakarta.servlet.ServletException;
@@ -35,6 +36,7 @@ public class GeladeiraServlet extends HttpServlet {
     private GeladeiraDAO gelaDao;
     private UsuarioDAO usuarioDAO;
     private ResumoDAO resumoDAO;
+    private PlanoService planoService;
     private Validacao validar;
 
 
@@ -52,6 +54,7 @@ public class GeladeiraServlet extends HttpServlet {
         gelaDao = new GeladeiraDAO();
         usuarioDAO = new UsuarioDAO();
         resumoDAO = new ResumoDAO();
+        planoService = new PlanoService();
         validar = new Validacao();
     }
 
@@ -125,7 +128,13 @@ public class GeladeiraServlet extends HttpServlet {
                     return;
                 }
 
-                // o admin não tem limite de geladeiras por plano
+                // o plano do dono limita quantas geladeiras ele pode ter ( vale para o admin também )
+                String erroPlano = planoService.validarNovaGeladeira(usuario.getCpf());
+                if (erroPlano != null){
+                    voltaComErro(req, resp, erroPlano);
+                    return;
+                }
+
                 Geladeira geladeira = new Geladeira(
                         usuario,
                         tipo.trim(),
@@ -189,9 +198,23 @@ public class GeladeiraServlet extends HttpServlet {
                     return;
                 }
 
+                // se a geladeira passou para outro usuario, o plano do novo dono tem que comportar ela
+                if (!usuario.getCpf().equals(geldeiraAntiga.getUsuario().getCpf())){
+                    String erroPlano = planoService.validarNovaGeladeira(usuario.getCpf());
+                    if (erroPlano == null){
+                        erroPlano = planoService.validarCapacidadeGeladeira(geldeiraAntiga.getIdGeladeira(), usuario.getCpf(), 0, 0);
+                    }
+                    if (erroPlano != null){
+                        voltaComErro(req, resp, erroPlano);
+                        return;
+                    }
+                }
+
                 Geladeira geladeiraNova = new Geladeira(usuario, geldeiraAntiga.getStatus(), tipo.trim(), nome.trim());
 
                 if (gelaDao.alterarGeradeira(geldeiraAntiga, geladeiraNova) == 1){
+                    // a ocupação depende do plano do dono
+                    planoService.recalcularStatusDaGeladeira(gelaDao.buscarUnicaGeladeira(id));
                     session.setAttribute("sucesso", "Geladeira alterada com sucesso.");
                     resp.sendRedirect(req.getContextPath() + url_servlet);
                     return;

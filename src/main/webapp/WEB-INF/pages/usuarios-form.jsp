@@ -7,6 +7,7 @@
     <title>Usuários - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="usuarios" scope="request"/>
@@ -29,7 +30,6 @@
             <h2>Detalhes do usuário</h2>
             <dl>
                 <dt>Nome</dt><dd><c:out value="${registro.nome} ${registro.sobrenome}"/></dd>
-                <dt>CPF</dt><dd><c:out value="${registro.cpf}"/></dd>
                 <dt>E-mail</dt><dd><c:out value="${registro.email}"/></dd>
                 <dt>Plano</dt><dd><c:out value="${planosDosUsuarios[registro.cpf]}"/></dd>
                 <dt>Geladeiras</dt><dd>${empty geladeirasPorUsuario[registro.cpf] ? 0 : geladeirasPorUsuario[registro.cpf]}</dd>
@@ -50,10 +50,9 @@
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
                 <input type="hidden" name="action" value="alterar">
                 <input type="hidden" name="cpf" value="${registro.cpf}">
-                <p>CPF: <strong><c:out value="${registro.cpf}"/></strong></p>
                 <label>Nome <input type="text" name="nome" value="${registro.nome}" required maxlength="20"></label>
                 <label>Sobrenome <input type="text" name="sobrenome" value="${registro.sobrenome}" required maxlength="60"></label>
-                <label>E-mail <input type="email" name="email" value="${registro.email}" required></label>
+                <label>E-mail <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
                 <label>Nova senha (de 8 a 15 caracteres) <input type="password" name="senha" minlength="8" maxlength="15"></label>
                 <label>Plano
                     <select name="plano" required>
@@ -77,8 +76,8 @@
             <input type="hidden" name="action" value="inserir">
             <label>Nome <input type="text" name="nome" required maxlength="20"></label>
             <label>Sobrenome <input type="text" name="sobrenome" required maxlength="60"></label>
-            <label>CPF <input type="text" name="cpf" required maxlength="14"></label>
-            <label>E-mail <input type="email" name="email" required></label>
+            <label>CPF <input type="text" id="us-cpf" name="cpf" required maxlength="14" placeholder="000.000.000-00" inputmode="numeric"></label>
+            <label>E-mail <input type="text" inputmode="email" name="email" required></label>
             <label>Senha (de 8 a 15 caracteres, uma maiúscula e um especial) <input type="password" name="senha" required minlength="8" maxlength="15"></label>
             <label>Plano
                 <select name="plano" required>

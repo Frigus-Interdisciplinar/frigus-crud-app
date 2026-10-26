@@ -308,11 +308,11 @@ alter table Empresa
 
 alter table Usuario
 	add constraint chk_email_formato
-	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+	check (email ~ '^[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+(\.[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+)*@([a-zA-Z0-9\u0080-\uffff]([a-zA-Z0-9\u0080-\uffff-]{0,61}[a-zA-Z0-9\u0080-\uffff])?\.)+([a-zA-Z\u0080-\uffff]{2,63}|[xX][nN]--[a-zA-Z0-9-]{1,59})$' and char_length(email) <= 254 and char_length(split_part(email, '@', 1)) <= 64);
 
 alter table Empresa
 	add constraint chk_email_formato
-	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+	check (email ~ '^[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+(\.[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+)*@([a-zA-Z0-9\u0080-\uffff]([a-zA-Z0-9\u0080-\uffff-]{0,61}[a-zA-Z0-9\u0080-\uffff])?\.)+([a-zA-Z\u0080-\uffff]{2,63}|[xX][nN]--[a-zA-Z0-9-]{1,59})$' and char_length(email) <= 254 and char_length(split_part(email, '@', 1)) <= 64);
 
 alter table Ingrediente
 	add constraint chk_quantidade_ingrediente
@@ -336,7 +336,7 @@ CHECK (cep ~ '^\d{8}$');
 
 alter table SuperAdmin
 	add constraint chk_email_formato
-	check (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+	check (email ~ '^[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+(\.[a-zA-Z0-9!#$%&''*+/=?^_`{|}~\u0080-\uffff-]+)*@([a-zA-Z0-9\u0080-\uffff]([a-zA-Z0-9\u0080-\uffff-]{0,61}[a-zA-Z0-9\u0080-\uffff])?\.)+([a-zA-Z\u0080-\uffff]{2,63}|[xX][nN]--[a-zA-Z0-9-]{1,59})$' and char_length(email) <= 254 and char_length(split_part(email, '@', 1)) <= 64);
 
 
 

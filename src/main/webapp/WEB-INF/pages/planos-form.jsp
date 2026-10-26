@@ -31,8 +31,8 @@
                 <dt>Dono</dt>
                 <dd>
                     <c:choose>
-                        <c:when test="${not empty registro.usuario}">Usuário: <c:out value="${registro.usuario.nome} ${registro.usuario.sobrenome} (${registro.usuario.cpf})"/></c:when>
-                        <c:otherwise>Empresa: <c:out value="${registro.empresa.nome} (${registro.empresa.cnpj})"/></c:otherwise>
+                        <c:when test="${not empty registro.usuario}">Usuário: <c:out value="${registro.usuario.nome} ${registro.usuario.sobrenome}"/></c:when>
+                        <c:otherwise>Empresa: <c:out value="${registro.empresa.nome}"/></c:otherwise>
                     </c:choose>
                 </dd>
                 <dt>Plano</dt><dd>${registro.tipoAssinatura}</dd>
@@ -69,7 +69,7 @@
                     <select name="cnpj">
                         <option value="">Selecione</option>
                         <c:forEach items="${empresas}" var="e">
-                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                            <option value="${e.cnpj}" ${registro.empresa.cnpj == e.cnpj ? 'selected' : ''}><c:out value="${e.nome} · ${e.email}"/></option>
                         </c:forEach>
                     </select>
                 </label>
@@ -109,7 +109,7 @@
                 <select name="cnpj">
                     <option value="">Selecione</option>
                     <c:forEach items="${empresas}" var="e">
-                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.cnpj}"/></option>
+                        <option value="${e.cnpj}"><c:out value="${e.nome} · ${e.email}"/></option>
                     </c:forEach>
                 </select>
             </label>
