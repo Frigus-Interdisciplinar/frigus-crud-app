@@ -158,7 +158,7 @@ public class UsuarioServlet extends HttpServlet {
                         cpfPuro,
                         nome.trim(),
                         sobrenome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 
@@ -254,7 +254,7 @@ public class UsuarioServlet extends HttpServlet {
                         usuarioAntigo.getCpf(),
                         nome.trim(),
                         sobrenome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 

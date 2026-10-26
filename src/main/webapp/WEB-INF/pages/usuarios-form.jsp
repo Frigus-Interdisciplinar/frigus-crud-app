@@ -53,7 +53,7 @@
                 <p>CPF: <strong><c:out value="${registro.cpf}"/></strong></p>
                 <label>Nome <input type="text" name="nome" value="${registro.nome}" required maxlength="20"></label>
                 <label>Sobrenome <input type="text" name="sobrenome" value="${registro.sobrenome}" required maxlength="60"></label>
-                <label>E-mail <input type="email" name="email" value="${registro.email}" required></label>
+                <label>E-mail <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
                 <label>Nova senha (de 8 a 15 caracteres) <input type="password" name="senha" minlength="8" maxlength="15"></label>
                 <label>Plano
                     <select name="plano" required>
@@ -78,7 +78,7 @@
             <label>Nome <input type="text" name="nome" required maxlength="20"></label>
             <label>Sobrenome <input type="text" name="sobrenome" required maxlength="60"></label>
             <label>CPF <input type="text" name="cpf" required maxlength="14"></label>
-            <label>E-mail <input type="email" name="email" required></label>
+            <label>E-mail <input type="text" inputmode="email" name="email" required></label>
             <label>Senha (de 8 a 15 caracteres, uma maiúscula e um especial) <input type="password" name="senha" required minlength="8" maxlength="15"></label>
             <label>Plano
                 <select name="plano" required>

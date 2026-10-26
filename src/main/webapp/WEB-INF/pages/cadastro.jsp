@@ -18,7 +18,7 @@
         <label for="nome">Nome</label>
         <input type="text" id="nome" name="nome" required>
         <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" required>
+        <input type="text" inputmode="email" id="email" name="email" required>
         <label for="senha">Senha (de 8 a 15 caracteres, uma maiúscula e um especial)</label>
         <input type="password" id="senha" name="senha" required>
         <label for="confirmarSenha">Confirmar senha</label>

@@ -19,7 +19,7 @@
     </c:if>
     <form method="post" action="${pageContext.request.contextPath}/login">
         <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" required>
+        <input type="text" inputmode="email" id="email" name="email" required>
         <label for="senha">Senha</label>
         <input type="password" id="senha" name="senha" required>
         <button type="submit">Entrar</button>

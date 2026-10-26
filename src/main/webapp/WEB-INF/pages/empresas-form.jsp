@@ -52,7 +52,7 @@
                 <input type="hidden" name="cnpj" value="${registro.cnpj}">
                 <p>CNPJ: <strong><c:out value="${registro.cnpj}"/></strong></p>
                 <label>Nome da empresa <input type="text" name="nome" value="${registro.nome}" required maxlength="80"></label>
-                <label>E-mail de contato <input type="email" name="email" value="${registro.email}" required></label>
+                <label>E-mail de contato <input type="text" inputmode="email" name="email" value="${registro.email}" required></label>
                 <label>Nova senha (de 8 a 15 caracteres) <input type="password" name="senha" minlength="8" maxlength="15"></label>
                 <p>Plano: <c:out value="${planosDasEmpresas[registro.cnpj]}"/> (o plano é trocado na tela Planos)</p>
                 <button type="submit">Salvar alterações</button>
@@ -76,7 +76,7 @@
                     <option value="COMERCIAL">Comercial</option>
                 </select>
             </label>
-            <label>E-mail de contato <input type="email" name="email" required></label>
+            <label>E-mail de contato <input type="text" inputmode="email" name="email" required></label>
             <label>Senha (de 8 a 15 caracteres, uma maiúscula e um especial) <input type="password" name="senha" required minlength="8" maxlength="15"></label>
             <button type="submit">Adicionar empresa</button>
         </form>

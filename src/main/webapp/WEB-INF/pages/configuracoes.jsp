@@ -37,7 +37,7 @@
         <form method="post" action="${pageContext.request.contextPath}/admin/conta">
             <input type="hidden" name="action" value="alterar">
             <label>Nome <input type="text" name="nome" value="${conta.nome}" required maxlength="20"></label>
-            <label>E-mail <input type="email" name="email" value="${conta.email}" required></label>
+            <label>E-mail <input type="text" inputmode="email" name="email" value="${conta.email}" required></label>
             <button type="submit">Salvar perfil</button>
         </form>
     </section>

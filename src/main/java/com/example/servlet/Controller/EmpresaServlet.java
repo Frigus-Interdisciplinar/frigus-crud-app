@@ -142,7 +142,7 @@ public class EmpresaServlet extends HttpServlet {
                 Empresa empresa = new Empresa(
                         cnpjPuro,
                         nome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 
@@ -221,7 +221,7 @@ public class EmpresaServlet extends HttpServlet {
                 Empresa empresaNova = new Empresa(
                         empresaAntiga.getCnpj(),
                         nome.trim(),
-                        email.trim(),
+                        validar.normalizarEmail(email),
                         senhaHash
                 );
 
