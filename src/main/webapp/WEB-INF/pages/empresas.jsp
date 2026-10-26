@@ -7,6 +7,7 @@
     <title>Empresas - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="empresas" scope="request"/>
@@ -31,6 +32,7 @@
         <h2>Filtros</h2>
         <form method="get" action="${pageContext.request.contextPath}/admin/empresas">
             <label>Buscar por nome, e-mail ou CNPJ <input type="text" name="busca" value="${filtroBusca}" placeholder="Buscar por nome…"></label>
+            <label>CNPJ <input type="text" id="f-cnpj" name="cnpj" value="${filtroCnpj}" maxlength="18" placeholder="00.000.000/0000-00" inputmode="numeric"></label>
             <label>Plano
                 <select name="plano">
                     <option value="">Todos</option>

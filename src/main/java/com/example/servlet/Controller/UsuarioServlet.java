@@ -89,8 +89,11 @@ public class UsuarioServlet extends HttpServlet {
 
         switch (action){
             case "inserir": {
-                // pegando os dados do formulario
+                // pegando os dados do formulario ( o CPF pode vir com pontos e traço, fica só com os numeros )
                 String cpf = req.getParameter("cpf");
+                if (cpf != null){
+                    cpf = cpf.replaceAll("\\D", "");
+                }
                 String nome = req.getParameter("nome");
                 String sobrenome = req.getParameter("sobrenome");
                 String email = req.getParameter("email");
@@ -334,6 +337,9 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException{
         // filtros da tela
         String busca = req.getParameter("busca");
+        // o filtro de CPF ignora pontos e traço
+        String filtroCpf = req.getParameter("cpf");
+        String cpfBuscado = filtroCpf == null ? "" : filtroCpf.replaceAll("\\D", "");
         String filtroPlano = req.getParameter("plano");
 
         List<Usuario> todos = usuarioDAO.buscarTodosUsuario();
@@ -344,7 +350,8 @@ public class UsuarioServlet extends HttpServlet {
             String texto = (usuario.getNome() + " " + usuario.getSobrenome() + " " + usuario.getEmail() + " " + usuario.getCpf()).toLowerCase();
             boolean achouBusca = busca == null || busca.isBlank() || texto.contains(busca.trim().toLowerCase());
             boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(planos.get(usuario.getCpf()));
-            if (achouBusca && achouPlano){
+            boolean achouCpf = cpfBuscado.isEmpty() || usuario.getCpf().contains(cpfBuscado);
+            if (achouBusca && achouPlano && achouCpf){
                 usuarios.add(usuario);
             }
         }
@@ -370,6 +377,7 @@ public class UsuarioServlet extends HttpServlet {
         req.setAttribute("usuarios", Paginacao.aplicar(req, usuarios));
         req.setAttribute("totalGeral", todos.size());
         req.setAttribute("filtroBusca", busca == null ? "" : busca);
+        req.setAttribute("filtroCpf", filtroCpf == null ? "" : filtroCpf);
         req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
         req.setAttribute("planosDosUsuarios", planos);
         req.setAttribute("geladeirasPorUsuario", resumoDAO.contarGeladeirasPorUsuario());

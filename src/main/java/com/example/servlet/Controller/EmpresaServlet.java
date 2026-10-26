@@ -82,8 +82,11 @@ public class EmpresaServlet extends HttpServlet {
 
         switch (action){
             case "inserir": {
-                // pegando os dados do formulario
+                // pegando os dados do formulario ( o CNPJ pode vir com pontos, barra e traço, fica só com os numeros )
                 String cnpj = req.getParameter("cnpj");
+                if (cnpj != null){
+                    cnpj = cnpj.replaceAll("\\D", "");
+                }
                 String nome = req.getParameter("nome");
                 String email = req.getParameter("email");
                 String senha = req.getParameter("senha");
@@ -272,6 +275,9 @@ public class EmpresaServlet extends HttpServlet {
             throws ServletException, IOException{
         // filtros da tela
         String busca = req.getParameter("busca");
+        // o filtro de CNPJ ignora pontos, barra e traço
+        String filtroCnpj = req.getParameter("cnpj");
+        String cnpjBuscado = filtroCnpj == null ? "" : filtroCnpj.replaceAll("\\D", "");
         String filtroPlano = req.getParameter("plano");
 
         List<Empresa> todas = empresaDAO.buscarTodasEmpresa();
@@ -282,7 +288,8 @@ public class EmpresaServlet extends HttpServlet {
             String texto = (empresa.getNome() + " " + empresa.getEmail() + " " + empresa.getCnpj()).toLowerCase();
             boolean achouBusca = busca == null || busca.isBlank() || texto.contains(busca.trim().toLowerCase());
             boolean achouPlano = filtroPlano == null || filtroPlano.isBlank() || filtroPlano.equals(planos.get(empresa.getCnpj()));
-            if (achouBusca && achouPlano){
+            boolean achouCnpj = cnpjBuscado.isEmpty() || empresa.getCnpj().contains(cnpjBuscado);
+            if (achouBusca && achouPlano && achouCnpj){
                 empresas.add(empresa);
             }
         }
@@ -308,6 +315,7 @@ public class EmpresaServlet extends HttpServlet {
         req.setAttribute("empresas", Paginacao.aplicar(req, empresas));
         req.setAttribute("totalGeral", todas.size());
         req.setAttribute("filtroBusca", busca == null ? "" : busca);
+        req.setAttribute("filtroCnpj", filtroCnpj == null ? "" : filtroCnpj);
         req.setAttribute("filtroPlano", filtroPlano == null ? "" : filtroPlano);
         req.setAttribute("planosDasEmpresas", planos);
         req.setAttribute("frigorificosPorEmpresa", resumoDAO.contarFrigorificosPorEmpresa());

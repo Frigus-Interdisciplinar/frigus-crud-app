@@ -7,6 +7,7 @@
     <title>Usuários - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="usuarios" scope="request"/>
@@ -77,7 +78,7 @@
             <input type="hidden" name="action" value="inserir">
             <label>Nome <input type="text" name="nome" required maxlength="20"></label>
             <label>Sobrenome <input type="text" name="sobrenome" required maxlength="60"></label>
-            <label>CPF <input type="text" name="cpf" required maxlength="14"></label>
+            <label>CPF <input type="text" id="us-cpf" name="cpf" required maxlength="14" placeholder="000.000.000-00" inputmode="numeric"></label>
             <label>E-mail <input type="text" inputmode="email" name="email" required></label>
             <label>Senha (de 8 a 15 caracteres, uma maiúscula e um especial) <input type="password" name="senha" required minlength="8" maxlength="15"></label>
             <label>Plano

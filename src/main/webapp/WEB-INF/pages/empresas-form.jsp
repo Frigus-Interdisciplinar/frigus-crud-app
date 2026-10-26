@@ -7,6 +7,7 @@
     <title>Empresas - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="empresas" scope="request"/>
@@ -69,7 +70,7 @@
             <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
             <input type="hidden" name="action" value="inserir">
             <label>Nome da empresa <input type="text" name="nome" required maxlength="80"></label>
-            <label>CNPJ <input type="text" name="cnpj" required maxlength="18"></label>
+            <label>CNPJ <input type="text" id="em-cnpj" name="cnpj" required maxlength="18" placeholder="00.000.000/0000-00" inputmode="numeric"></label>
             <label>Plano
                 <select name="plano" required>
                     <option value="">Selecione</option>

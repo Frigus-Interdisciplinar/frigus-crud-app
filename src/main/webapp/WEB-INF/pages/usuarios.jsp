@@ -7,6 +7,7 @@
     <title>Usuários - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="usuarios" scope="request"/>
@@ -31,6 +32,7 @@
         <h2>Filtros</h2>
         <form method="get" action="${pageContext.request.contextPath}/admin/usuarios">
             <label>Buscar por nome, e-mail ou CPF <input type="text" name="busca" value="${filtroBusca}" placeholder="Buscar por nome…"></label>
+            <label>CPF <input type="text" id="f-cpf" name="cpf" value="${filtroCpf}" maxlength="14" placeholder="000.000.000-00" inputmode="numeric"></label>
             <label>Plano
                 <select name="plano">
                     <option value="">Todos</option>

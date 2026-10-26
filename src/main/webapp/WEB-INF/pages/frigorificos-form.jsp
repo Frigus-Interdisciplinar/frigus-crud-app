@@ -7,6 +7,7 @@
     <title>Frigoríficos - Frigus Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
     <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/mascaras.js" defer></script>
 </head>
 <body>
 <c:set var="menuAtivo" value="frigorificos" scope="request"/>
@@ -66,7 +67,7 @@
                 <label>Tipo <input type="text" name="tipo" value="${registro.tipo}" required maxlength="20"></label>
                 <h3>Endereço da unidade</h3>
                 <label>Nome da unidade <input type="text" name="nomeUnidade" value="${registro.nome}" required maxlength="50"></label>
-                <label>CEP <input type="text" name="cep" value="${registro.endereco.cep}" required maxlength="9"></label>
+                <label>CEP <input type="text" id="fr-cep" name="cep" value="${registro.endereco.cep}" required maxlength="9" placeholder="00000-000" inputmode="numeric"></label>
                 <label>País <input type="text" name="pais" value="${registro.endereco.pais}"></label>
                 <label>Rua <input type="text" name="rua" value="${registro.endereco.rua}" required></label>
                 <label>Número <input type="text" name="numero" value="${registro.endereco.numero}" required maxlength="20"></label>
@@ -104,7 +105,7 @@
             <label>Tipo <input type="text" name="tipo" required maxlength="20" placeholder="Ex.: Câmara refrigerada"></label>
             <h3>Endereço da unidade</h3>
             <label>Nome da unidade <input type="text" name="nomeUnidade" required maxlength="50" placeholder="Ex.: Unidade Paulista"></label>
-            <label>CEP <input type="text" name="cep" required maxlength="9"></label>
+            <label>CEP <input type="text" id="fr-cep" name="cep" required maxlength="9" placeholder="00000-000" inputmode="numeric"></label>
             <label>País <input type="text" name="pais" placeholder="Brasil"></label>
             <label>Rua <input type="text" name="rua" required></label>
             <label>Número <input type="text" name="numero" required maxlength="20"></label>
