@@ -1,0 +1,9 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- mensagens de erro e sucesso vindas do servidor --%>
+<c:if test="${not empty erro}">
+    <div class="mensagem-servidor mensagem-erro" role="alert"><c:out value="${erro}"/></div>
+</c:if>
+<c:if test="${not empty sucesso}">
+    <div class="mensagem-servidor mensagem-sucesso" role="status"><c:out value="${sucesso}"/></div>
+</c:if>

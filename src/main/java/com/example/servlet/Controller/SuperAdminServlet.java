@@ -106,6 +106,7 @@ public class SuperAdminServlet extends HttpServlet {
                 if (superAdminDAO.alterarSuperAdmin(contaAntiga, contaNova) == 1){
                     // o e-mail da sessao acompanha o e-mail novo
                     session.setAttribute("admin", contaNova.getEmail());
+                    session.setAttribute("adminNome", contaNova.getNome());
                     session.setAttribute("sucesso", "Conta alterada com sucesso.");
                     resp.sendRedirect(req.getContextPath() + url_configuracoes);
                     return;

@@ -1,0 +1,1806 @@
+/* ==========================================================================
+   1. VARIÁVEIS
+   Paleta de cores e transparências usadas no site todo
+   ========================================================================== */
+:root{
+  --vidro-nav: #00000005;
+  --vidro-nav2: #F0F6F870;
+  --borda-nav: #ffffff9f;
+  --cor-1: #2552C8;
+  --cor-2: #131C55;
+  --cor-3: #1F5F97;
+  --cor-4: #70A2D7;
+  --cor-5: #C9DEF9;
+  --cor-6: #F9C968;
+  --cor-7: #FFFFFF;
+  --cor-8: #1A1919;
+  --cor-9: #565E73;
+  --header: #1a19192c;
+  --transparente: #00000000;
+  --promo: #1a191986;
+}
+
+/* ==========================================================================
+   2. RESET E UTILITÁRIOS
+   ========================================================================== */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  background-color: #F5F7FB;
+  overflow: hidden;
+}
+
+.padding{
+  padding: 10px 25px;
+}
+
+h1{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 125%;
+  color: var(--cor-8);
+}
+
+p{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cor-9);
+}
+
+.page-header{
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 24px;
+}
+
+.subtitulo-pagina{
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 150%;
+  color: var(--cor-9);
+}
+
+/* ==========================================================================
+   3. TIPOGRAFIA
+   ========================================================================== */
+.titulo-menu {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #93A8DA;
+}
+
+.titulo-cards{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-8);
+}
+
+.dados-cards{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: bolder;
+  color: var(--cor-2);
+}
+
+.texto-pequeno-cards{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--cor-9);
+}
+
+.titulo-perfil {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cor-7);
+}
+
+/* ==========================================================================
+   4. MENU LATERAL
+   ========================================================================== */
+.menu-lateral {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 238px;
+  height: 100%;
+  padding: 15px;
+  background-color: var(--cor-2);
+  border-right: 1px solid var(--cor-8);
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.menu-lateral > * {
+  flex-shrink: 0;
+}
+
+.logo img {
+  height: 50px;
+  width: 140px;
+  display: block;
+  backface-visibility: hidden;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1 0 auto;
+}
+
+.titulo-menu-conta {
+  margin-top: auto;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--cor-7);
+  padding: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.topicos-menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 210px;
+  height: 44px;
+  padding: 5px 13px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: lighter;
+  color: var(--cor-5);
+}
+
+.icones-menu {
+  display: block;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+nav a:hover {
+  background: #162466;
+  width: 210px;
+  border-radius: 8px;
+  color: var(--cor-7);
+  box-shadow: inset 0 0 0 1px var(--vidro-nav);
+}
+
+.nav a[aria-current="page"] {
+  background: var(--cor-1);
+  width: 210px;
+  border-radius: 8px;
+  color: var(--cor-7);
+  box-shadow: inset 0 0 0 1px var(--vidro-nav);
+}
+
+/* ==========================================================================
+   5. PERFIL NO MENU LATERAL (rodapé do menu)
+   ========================================================================== */
+.caixa-perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 210px;
+  height: 44px;
+  padding: 5px 13px;
+}
+
+.circulos {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--cor-7);
+}
+
+/* ==========================================================================
+   6. HEADER
+   ========================================================================== */
+.header-app {
+  position: fixed;
+  top: 0;
+  left: 238px;
+  right: 0;
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #F5F7FB;
+  border-bottom: 1px solid #E1E7F1;
+  z-index: 1000;
+}
+
+.perfil-header {
+  position: relative;
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 600;
+  color: var(--cor-8);
+}
+
+.perfil-header summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.perfil-header summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu-perfil {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 12px;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  background: var(--cor-7);
+  border: 1px solid #E1E7F1;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.menu-perfil a {
+  padding: 8px 12px;
+  color: var(--cor-8);
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.menu-perfil a:hover {
+  background: var(--cor-5);
+  border-radius: 6px;
+}
+
+.menu-perfil a.sair:hover{
+  background: var(--cor-6);
+  border-radius: 6px;
+}
+
+.perfil-header svg {
+  transition: transform 0.2s;
+}
+
+.perfil-header[open] svg {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+    7. CONTEÚDO DA PÁGINA
+========================================================================== */
+.conteudo {
+  margin-left: 238px;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: calc(64px + 28px) 32px 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.conteudo > .page-header,
+.conteudo > .topo-pagina,
+.conteudo > .caixa-tabela,
+.conteudo > .caixa-cards-pequenos-visao-geral {
+  flex-shrink: 0;
+}
+
+/* ----- Cards pequenos (4 por linha) ----- */
+.caixa-cards-pequenos-visao-geral{
+  display: grid;
+  width: 100%;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cards-pequenos-visao-geral{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 106px;
+  padding: 16px 20px;
+  font-family: 'Sarabun', sans-serif;
+  border-radius: 14px;
+  border: 2px solid #E1E7F1;
+  background-color: var(--cor-7);
+  text-decoration: none;
+}
+
+/* ----- Cards grandes (2 por linha) ----- */
+.caixa-cards-grandes-visao-geral{
+  display: grid;
+  width: 100%;
+  gap: 16px;
+  margin-top: 24px;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.cards-grandes-visao-geral{
+  width: 100%;
+  min-height: 0;
+  padding: 20px;
+  font-family: 'Sarabun', sans-serif;
+  border-radius: 14px;
+  border: 2px solid #E1E7F1;
+  background-color: var(--cor-7);
+  text-decoration: none;
+}
+
+/* ----- Gráficos dos cards grandes ----- */
+.conteudo > .caixa-cards-grandes-visao-geral{
+  min-height: 340px;
+}
+
+.card-grafico{
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+}
+
+.grafico-titulo{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-8);
+}
+
+.grafico-subtitulo{
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--cor-9);
+}
+
+.grafico-destaque{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 18px 0 12px;
+}
+
+.grafico-numero{
+  font-size: 28px;
+  line-height: 1;
+  font-weight: bolder;
+  color: var(--cor-2);
+}
+
+.grafico-unidade,
+.grafico-variacao{
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--cor-9);
+}
+
+.grafico-unidade{
+  font-size: 13px;
+}
+
+.grafico-area{
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+}
+
+.grafico-erro{
+  padding-top: 24px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.botao-ver-planos{
+  align-self: flex-start;
+  margin-top: 28px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cor-8);
+  text-decoration: none;
+  border: 1px solid #E1E7F1;
+  border-radius: 8px;
+}
+
+.botao-ver-planos:hover{
+  background-color: var(--cor-5);
+  border-color: var(--cor-1);
+}
+
+/* ----- Telas menores: os cards se reorganizam ----- */
+@media (max-width: 1100px) {
+  .caixa-cards-pequenos-visao-geral { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .caixa-cards-grandes-visao-geral  { grid-template-columns: 1fr; }
+}
+
+
+/* ==========================================================================
+   8. USUÁRIOS
+   ========================================================================== */
+
+/* ----- Ícones ----- */
+.icone {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+}
+
+/* ----- Topo da página ----- */
+.topo-pagina {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.topo-pagina .page-header {
+  margin-bottom: 0;
+}
+
+.botao-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--cor-1);
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.botao-principal:hover {
+  filter: brightness(1.12);
+  background: var(--cor-4);
+}
+
+/* ----- Caixa da tabela ----- */
+.caixa-tabela {
+  background-color: var(--cor-7);
+  border: 1px solid #E1E7F1;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ----- Filtros ----- */
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  padding: 20px;
+}
+
+.filtro-grande {
+  grid-column: span 2;
+}
+
+/* telas médias: 3 filtros por linha */
+@media (max-width: 1280px) {
+  .filtros { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .filtro-grande { grid-column: span 1; }
+}
+
+/* telas pequenas: 2 filtros por linha */
+@media (max-width: 1100px) {
+  .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filtro-grande { grid-column: span 2; }
+}
+
+.filtro label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cor-9);
+}
+
+.filtro input,
+.filtro select {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  background-color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  color: var(--cor-8);
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.filtro input::placeholder {
+  color: #8A92A6;
+}
+
+.filtro select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231A1919' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+.filtro input:focus,
+.filtro select:focus {
+  border-color: var(--cor-1);
+}
+
+.filtro-destaque select {
+  background-color: var(--cor-5);
+  border-color: var(--cor-1);
+}
+
+.botao-limpar {
+  align-self: end;
+  justify-self: start;
+  height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cor-9);
+  cursor: pointer;
+}
+
+.botao-limpar:hover {
+  color: var(--cor-1);
+}
+
+/* ----- Tabela ----- */
+.tabela {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  color: var(--cor-8);
+}
+
+.tabela th:nth-child(1) { width: 17%; }
+.tabela th:nth-child(2) { width: 24.5%; }
+.tabela th:nth-child(3) { width: 10.5%; }
+.tabela th:nth-child(4) { width: 13.3%; }
+.tabela th:nth-child(5) { width: 10.7%; }
+.tabela th:nth-child(6) { width: 11.5%; }
+
+.tabela th {
+  height: 38px;
+  padding: 0 10px;
+  background-color: #F8F9FB;
+  border-top: 1px solid #E8ECF3;
+  border-bottom: 1px solid #E8ECF3;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-9);
+}
+
+.tabela td {
+  height: 62px;
+  padding: 0 10px;
+  border-bottom: 1px solid #E8ECF3;
+  vertical-align: middle;
+}
+
+.etiqueta-plano {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background-color: #EDEEF2;
+  font-size: 11px;
+  font-weight: 600;
+  color: #3B4257;
+}
+
+.etiqueta-plano::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.etiqueta-plus {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+.botoes-tabela {
+  white-space: nowrap;
+}
+
+.botao-icone {
+  width: 36px;
+  height: 32px;
+  border: 0;
+  background: none;
+  color: var(--cor-9);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.botao-icone:hover {
+  color: var(--cor-1);
+}
+
+/* ----- Rodapé e paginação ----- */
+.rodape-tabela {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  color: var(--cor-9);
+}
+
+.paginacao {
+  display: flex;
+  gap: 6px;
+}
+
+.pagina {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  background-color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cor-8);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagina:hover:not(:disabled):not(.pagina-ativa) {
+  background-color: #F0F4FB;
+}
+
+.pagina:disabled {
+  color: #9AA1B3;
+  cursor: default;
+}
+
+.pagina-ativa {
+  background-color: var(--cor-2);
+  border-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+.pagina-proxima {
+  font-weight: 600;
+  color: var(--cor-2);
+}
+
+/* ----- Tabela da geladeira (larguras próprias) ----- */
+.tabela-geladeira th:nth-child(1) { width: 17%; }
+.tabela-geladeira th:nth-child(2) { width: 20%; }
+.tabela-geladeira th:nth-child(3) { width: 12%; }
+.tabela-geladeira th:nth-child(4) { width: 15%; }
+.tabela-geladeira th:nth-child(5) { width: 9%; }
+.tabela-geladeira th:nth-child(6) { width: 14%; }
+.tabela-geladeira th:nth-child(7) { width: 13%; }
+
+.tabela-geladeira td {
+  height: 59px;
+}
+
+.etiqueta-escura {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+.alerta {
+  font-weight: 500;
+  color: #B32323;
+}
+
+.sem-alerta {
+  font-size: 11px;
+  color: var(--cor-9);
+}
+
+/* ==========================================================================
+   9. DROPDOWN
+   Troca o select nativo pelo visual do Figma (o JS monta o resto)
+   ========================================================================== */
+
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+/* esconde o select de verdade, mas ele continua existindo */
+.filtro select.select-escondido {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ----- Botão fechado ----- */
+.dropdown-botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+.dropdown-botao:hover {
+  border-color: var(--cor-4);
+}
+
+/* aberto ou focado: borda azul */
+.dropdown.aberto .dropdown-botao,
+.dropdown-botao:focus-visible {
+  outline: none;
+  border-color: var(--cor-1);
+  box-shadow: 0 0 0 1px var(--cor-1);
+}
+
+/* filtro "Ordenar por" fica azul claro */
+.filtro-destaque .dropdown-botao {
+  background: #EDF3FF;
+  border-color: var(--cor-1);
+}
+
+.dropdown-seta {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-right: 1.5px solid #59647D;
+  border-bottom: 1.5px solid #59647D;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform .2s ease;
+}
+
+.dropdown.aberto .dropdown-seta {
+  transform: rotate(225deg) translate(-1px, -1px);
+}
+
+/* ----- Lista aberta (o JS coloca no body) ----- */
+.dropdown-lista {
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid #C9D5EA;
+  border-radius: 8px;
+  background: #FFFFFF;
+  box-shadow: 0 8px 24px rgba(19, 28, 85, .12);
+  font-family: 'Sarabun', sans-serif;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cor-8);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus-visible {
+  outline: none;
+  background: #F3F6FD;
+}
+
+.dropdown-item.selecionado {
+  background: #EDF3FF;
+  color: var(--cor-1);
+  font-weight: 600;
+}
+
+.dropdown-check {
+  display: flex;
+  width: 14px;
+  height: 14px;
+  color: var(--cor-1);
+}
+
+.dropdown-item:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================================
+   10. AVATAR COM INICIAIS
+   Bolinha azul com "SA", usada no header e no menu lateral
+   ========================================================================== */
+.avatar-iniciais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: var(--cor-4);
+  color: var(--cor-2);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.avatar-grande {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+}
+
+/* ==========================================================================
+   11. VARIAÇÕES DOS FILTROS
+   Empresas cabe tudo numa linha; Frigoríficos usa 5 colunas
+   ========================================================================== */
+.filtros-sete-colunas {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.filtros-cinco-colunas {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (max-width: 1280px) {
+  .filtros-sete-colunas,
+  .filtros-cinco-colunas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1100px) {
+  .filtros-sete-colunas,
+  .filtros-cinco-colunas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   12. LARGURA DAS COLUNAS DE CADA TABELA
+   (a última coluna é sempre a dos botões)
+   ========================================================================== */
+
+/* ----- Empresas ----- */
+.tabela-empresa th:nth-child(1) { width: 17%; }
+.tabela-empresa th:nth-child(2) { width: 26%; }
+.tabela-empresa th:nth-child(3) { width: 13%; }
+.tabela-empresa th:nth-child(4) { width: 13%; }
+.tabela-empresa th:nth-child(5) { width: 8%; }
+.tabela-empresa th:nth-child(6) { width: 10%; }
+.tabela-empresa th:nth-child(7) { width: 13%; }
+
+/* ----- Frigoríficos ----- */
+.tabela-frigorifico th:nth-child(1) { width: 19%; }
+.tabela-frigorifico th:nth-child(2) { width: 13%; }
+.tabela-frigorifico th:nth-child(3) { width: 18%; }
+.tabela-frigorifico th:nth-child(4) { width: 8%; }
+.tabela-frigorifico th:nth-child(5) { width: 8%; }
+.tabela-frigorifico th:nth-child(6) { width: 6%; }
+.tabela-frigorifico th:nth-child(7) { width: 16%; }
+.tabela-frigorifico th:nth-child(8) { width: 12%; }
+
+.tabela-frigorifico td {
+  height: 59px;
+}
+
+/* ----- Produtos ----- */
+.tabela-produto th:nth-child(1) { width: 18%; }
+.tabela-produto th:nth-child(2) { width: 14%; }
+.tabela-produto th:nth-child(3) { width: 15%; }
+.tabela-produto th:nth-child(4) { width: 8%; }
+.tabela-produto th:nth-child(5) { width: 14%; }
+.tabela-produto th:nth-child(6) { width: 11%; }
+.tabela-produto th:nth-child(7) { width: 8%; }
+.tabela-produto th:nth-child(8) { width: 12%; }
+
+/* ----- Receitas ----- */
+.tabela-receita th:nth-child(1) { width: 30%; }
+.tabela-receita th:nth-child(2) { width: 17%; }
+.tabela-receita th:nth-child(3) { width: 17%; }
+.tabela-receita th:nth-child(4) { width: 11%; }
+.tabela-receita th:nth-child(5) { width: 12%; }
+.tabela-receita th:nth-child(6) { width: 13%; }
+
+/* ----- Lista de compras ----- */
+.tabela-compra th:nth-child(1) { width: 19%; }
+.tabela-compra th:nth-child(2) { width: 15%; }
+.tabela-compra th:nth-child(3) { width: 12%; }
+.tabela-compra th:nth-child(4) { width: 13%; }
+.tabela-compra th:nth-child(5) { width: 16%; }
+.tabela-compra th:nth-child(6) { width: 15%; }
+.tabela-compra th:nth-child(7) { width: 10%; }
+
+/* ----- Planos ----- */
+.tabela-plano th:nth-child(1) { width: 24%; }
+.tabela-plano th:nth-child(2) { width: 24%; }
+.tabela-plano th:nth-child(3) { width: 18%; }
+.tabela-plano th:nth-child(4) { width: 18%; }
+.tabela-plano th:nth-child(5) { width: 16%; }
+
+/* ==========================================================================
+   13. DETALHES DAS CÉLULAS
+   ========================================================================== */
+
+/* texto grande (ex.: categoria "Conservados e enlatados") quebra dentro da coluna em vez de invadir a vizinha */
+.tabela td {
+  overflow-wrap: anywhere;
+}
+
+/* a etiqueta fica numa linha só */
+.etiqueta-plano {
+  white-space: nowrap;
+}
+
+/* etiqueta pequena embaixo do texto principal (ex.: Geladeira / Cozinha) */
+.etiqueta-plano + .texto-pequeno-cards {
+  margin-top: 4px;
+}
+
+.etiqueta-vencido {
+  background-color: #FDE4E4;
+  color: #B32323;
+}
+
+.etiqueta-pendente {
+  background-color: #FFF1CC;
+  color: #8A5A00;
+}
+
+/* campo vazio no banco (NULL) */
+.etiqueta-nulo {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px dashed #C4CCDD;
+  border-radius: 4px;
+  background-color: #F3F5F9;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #6B7285;
+}
+
+/* "1 vencido • 1 a vencer" */
+.alerta-separador {
+  margin: 0 10px;
+  color: var(--cor-8);
+}
+
+/* descrição da receita corta com "..." quando é grande */
+.descricao-curta {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* "..." da paginação */
+.pagina-reticencias {
+  align-self: center;
+  padding: 0 2px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  color: var(--cor-9);
+}
+
+/* ==========================================================================
+   14. CONFIGURAÇÕES
+   ========================================================================== */
+.caixa-configuracao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.conteudo > .caixa-configuracao {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1100px) {
+  .caixa-configuracao { grid-template-columns: 1fr; }
+}
+
+.cartao-config {
+  padding: 24px;
+  border: 1px solid #E1E7F1;
+  border-radius: 14px;
+  background-color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+}
+
+.cartao-config-topo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cartao-config-nome {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 130%;
+  color: var(--cor-8);
+}
+
+.cartao-config-email {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.cartao-config-titulo {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-8);
+}
+
+.cartao-config-texto {
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+.linha-dado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-top: 1px solid #E8ECF3;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--cor-9);
+}
+
+.linha-dado strong {
+  font-weight: 600;
+  color: var(--cor-8);
+}
+
+.botoes-config {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.botao-secundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  background-color: var(--cor-7);
+  color: var(--cor-2);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.botao-secundario:hover {
+  background-color: #F0F4FB;
+}
+
+
+/* ==========================================================================
+   14. RESPONSIVIDADE
+   Menu lateral vira gaveta, tabelas rolam para o lado e o resto se reorganiza
+   ========================================================================== */
+
+/* ----- Base (vale em qualquer tamanho) ----- */
+.menu-lateral {
+  z-index: 1100;
+  transition: transform 0.25s ease;
+}
+
+/* controles do menu em telas pequenas: escondidos no desktop */
+.controle-menu {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.botao-menu,
+.fundo-menu {
+  display: none;
+}
+
+.topo-pagina {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.rodape-tabela {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.paginacao {
+  flex-wrap: wrap;
+}
+
+/* a tabela rola dentro da caixa quando não couber */
+.rolagem-tabela {
+  overflow-x: auto;
+}
+
+.tabela { min-width: 760px; }
+.tabela-geladeira { min-width: 900px; }
+.tabela-empresa { min-width: 820px; }
+.tabela-frigorifico { min-width: 1000px; }
+.tabela-produto { min-width: 1040px; }
+.tabela-receita { min-width: 820px; }
+.tabela-compra { min-width: 960px; }
+.tabela-plano { min-width: 760px; }
+
+/* visão geral: os cards grandes não somem se a janela for baixa */
+.caixa-cards-grandes-visao-geral {
+  min-height: 240px;
+}
+
+/* ----- Tablet e celular: menu vira gaveta ----- */
+@media (max-width: 900px) {
+  .menu-lateral {
+    transform: translateX(-100%);
+  }
+
+  .controle-menu:checked ~ .menu-lateral {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(19, 28, 85, 0.35);
+  }
+
+  .fundo-menu {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    background-color: rgba(19, 28, 85, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .controle-menu:checked ~ .fundo-menu {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .botao-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    color: var(--cor-8);
+    cursor: pointer;
+  }
+
+  .botao-menu:hover {
+    background-color: #E8ECF3;
+  }
+
+  .header-app {
+    left: 0;
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+
+  .conteudo {
+    margin-left: 0;
+    padding: calc(64px + 20px) 16px 24px;
+  }
+}
+
+/* ----- Celular ----- */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  .filtros,
+  .filtros-sete-colunas,
+  .filtros-cinco-colunas {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .filtro-grande {
+    grid-column: span 1;
+  }
+
+  .caixa-cards-pequenos-visao-geral {
+    grid-template-columns: 1fr;
+  }
+
+  .rodape-tabela {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .perfil-header span {
+    max-width: 150px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .cartao-config {
+    padding: 20px;
+  }
+
+  .linha-dado {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .botoes-config {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ==========================================================================
+   15. POP-UPS
+   Gaveta lateral (adicionar, editar e detalhes) e confirmação de exclusão
+   ========================================================================== */
+
+/* ----- Fundo escuro que cobre a tela ----- */
+.popup-fundo {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  background-color: rgba(19, 28, 85, 0.45);
+}
+
+.popup-fundo.aberto {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* o de exclusão fica no meio da tela */
+.popup-fundo-centro.aberto {
+  justify-content: center;
+  align-items: center;
+}
+
+/* ----- Textos dos pop-ups ----- */
+.popup-titulo {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 130%;
+  color: var(--cor-8);
+}
+
+.popup-texto {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+/* ----- Gaveta ----- */
+.gaveta {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background-color: var(--cor-7);
+  animation: gaveta-entrando 0.25s ease;
+}
+
+@keyframes gaveta-entrando {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.gaveta-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid #E1E7F1;
+}
+
+.botao-fechar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--cor-9);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.botao-fechar:hover {
+  background-color: #F0F4FB;
+  color: var(--cor-1);
+}
+
+/* o form ocupa o resto da gaveta: corpo rola, rodapé fica fixo embaixo */
+.gaveta-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.gaveta-corpo {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.gaveta-secao {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-9);
+}
+
+.gaveta-divisor {
+  height: 1px;
+  border: 0;
+  background-color: #E8ECF3;
+}
+
+/* dois campos lado a lado (CEP + País, Cidade + UF...) */
+.gaveta-linha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gaveta-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid #E1E7F1;
+}
+
+/* ----- Detalhes dos campos dentro da gaveta ----- */
+.obrigatorio {
+  color: #B32323;
+}
+
+.ajuda-campo {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* campo só para leitura (pop-up de detalhes) */
+.filtro input[readonly] {
+  background-color: #F8F9FB;
+  cursor: default;
+}
+
+.aviso-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #EDF3FF;
+  color: var(--cor-3);
+}
+
+.aviso-info svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.aviso-info p {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  color: var(--cor-3);
+}
+
+/* ----- Confirmação de exclusão ----- */
+.modal-exclusao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+  margin: 16px;
+  padding: 24px;
+  border-radius: 14px;
+  background-color: var(--cor-7);
+  box-shadow: 0 8px 24px rgba(19, 28, 85, 0.12);
+}
+
+.modal-exclusao .popup-titulo {
+  font-size: 16px;
+}
+
+.modal-exclusao .popup-texto {
+  font-size: 13px;
+}
+
+.modal-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background-color: #FDE4E4;
+  color: #B32323;
+}
+
+.modal-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.botao-perigo {
+  background-color: #B32323;
+}
+
+.botao-perigo:hover {
+  background-color: #B32323;
+}
+
+/* ----- Gaveta larga (duas colunas): produtos e receitas ----- */
+.gaveta-larga {
+  max-width: 880px;
+}
+
+.gaveta-corpo-duplo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 32px;
+}
+
+.gaveta-coluna {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .gaveta-corpo-duplo { grid-template-columns: 1fr; }
+}
+
+/* campos escondidos pelo alternador (Usuário/Empresa, Geladeira/Frigorífico) */
+.popup-fundo [hidden] {
+  display: none;
+}
+
+.popup-fundo button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ----- Campo de texto grande ----- */
+.filtro textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  background-color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  color: var(--cor-8);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.filtro textarea::placeholder {
+  color: #8A92A6;
+}
+
+.filtro textarea:focus {
+  border-color: var(--cor-1);
+}
+
+.filtro textarea[readonly] {
+  background-color: #F8F9FB;
+  resize: none;
+}
+
+/* ----- Alternador de duas opções (Usuário | Empresa) ----- */
+.alternador {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  height: 38px;
+  border: 1px solid #D5DCEA;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.alternador-opcao {
+  position: relative;
+  cursor: pointer;
+}
+
+.alternador-opcao input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.alternador-opcao span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-8);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.alternador-opcao input:checked + span {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+.alternador-opcao input:focus-visible + span {
+  outline: 2px solid var(--cor-1);
+  outline-offset: -2px;
+}
+
+/* ----- Ingredientes da receita ----- */
+.ingredientes-titulos,
+.ingrediente-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px 32px;
+  gap: 8px;
+  align-items: center;
+}
+
+.ingredientes-titulos span {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-9);
+}
+
+.ingredientes-lista {
+  display: grid;
+  gap: 8px;
+}
+
+.ingrediente-unidade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #E4ECFD;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cor-1);
+}
+
+.ingrediente-linha .filtro input {
+  padding: 0 8px;
+}
+
+.botao-adicionar-ingrediente {
+  justify-self: start;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+/* ==========================================================================
+   MENSAGENS DO SERVIDOR (erro e sucesso depois de salvar, alterar ou excluir)
+   ========================================================================== */
+.mensagem-servidor {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mensagem-erro {
+  background-color: #FCE9E9;
+  color: #B32323;
+}
+
+.mensagem-sucesso {
+  background-color: #E6F4EA;
+  color: #1E6B35;
+}
+
+/* ==========================================================================
+   16. CORES DAS ETIQUETAS
+   O script-app.js põe em cada etiqueta a classe etiqueta-<texto> (ex.: etiqueta-familia).
+   Só tons de azul da paleta; amarelo e vermelho ficam para o que pede atenção
+   ========================================================================== */
+
+/* ----- Planos ----- */
+.etiqueta-free {
+  background-color: #EDEEF2;
+  color: #3B4257;
+}
+
+.etiqueta-familia {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-comercial {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+/* ----- Armazenamento ----- */
+.etiqueta-geladeira {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+.etiqueta-frigorifico {
+  background-color: var(--cor-3);
+  color: var(--cor-7);
+}
+
+/* ----- Ocupação da geladeira ----- */
+.etiqueta-vazio {
+  background-color: #EDEEF2;
+  color: #3B4257;
+}
+
+.etiqueta-ocupacao-baixa {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-ocupacao-moderada {
+  background-color: var(--cor-4);
+  color: var(--cor-2);
+}
+
+.etiqueta-ocupacao-alta {
+  background-color: var(--cor-1);
+  color: var(--cor-7);
+}
+
+.etiqueta-cheia {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+.etiqueta-ilimitado {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+/* ----- Situação do produto (vencido e pendente já existem na seção 13) ----- */
+.etiqueta-validade-longa {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-regular {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+.etiqueta-proximo-vencimento {
+  background-color: #FFF1CC;
+  color: #8A5A00;
+}
+
+.etiqueta-atencao {
+  background-color: var(--cor-6);
+  color: var(--cor-8);
+}

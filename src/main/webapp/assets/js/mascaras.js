@@ -30,7 +30,8 @@ var camposMascara = [
   ["us-cpf", mascararCpf, 11],
   ["f-cnpj", mascararCnpj, 14],
   ["em-cnpj", mascararCnpj, 14],
-  ["fr-cep", mascararCep, 8]
+  ["fr-cep", mascararCep, 8],
+  ["fr-cep-editar", mascararCep, 8]
 ];
 
 camposMascara.forEach(function (c) {
