@@ -1,0 +1,789 @@
+/* ==========================================================================
+   Telas de erro - Friguinho
+
+   Índice:
+   1. Variáveis
+   2. Reset e base
+   3. Componentes (logo, neve, montes de neve)
+   4. Tela (cabeçalho, texto, botões)
+   5. Ilustração (halo, número, Friguinho)
+   6. Tons de cada tela (cores e flocos de cada erro)
+   7. Responsivo
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. VARIÁVEIS
+   ========================================================================== */
+:root {
+  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+
+
+/* ==========================================================================
+   2. RESET E BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--s-bg2);
+  color: var(--s-fg);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+figure {
+  margin: 0;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--s-accent);
+  outline-offset: 3px;
+}
+
+.ic {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* ==========================================================================
+   3. COMPONENTES
+   ========================================================================== */
+
+/* ----- Logo ----- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo-mark {
+  display: block;
+  width: 44px;
+  height: 48px;
+}
+
+/* ----- Neve ----- */
+.flakes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.sf {
+  position: absolute;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+/* Posição de cada floco desenhado */
+/* ----- Neve animada (desenhada pelo script-erro.js) ----- */
+.neve {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ----- Montes de neve na base ----- */
+.drift {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 96px;
+  pointer-events: none;
+}
+
+.drift .d1 {
+  fill: var(--s-drift);
+}
+
+.drift .d2 {
+  fill: var(--s-drift2);
+}
+
+
+/* ==========================================================================
+   4. TELA
+   ========================================================================== */
+.scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-block: 16px 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  background: linear-gradient(165deg, var(--s-bg1), var(--s-bg2));
+  color: var(--s-fg);
+}
+
+.scene > * {
+  position: relative;
+  z-index: 2;
+}
+
+.scene > .flakes {
+  position: absolute;
+  z-index: 0;
+}
+
+.scene > .neve {
+  position: absolute;
+  z-index: 1;
+}
+
+.scene > .drift {
+  position: absolute;
+  z-index: 1;
+}
+
+.topbar {
+  flex: none;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 1100px;
+  min-height: 0;
+  margin: 0 auto;
+  padding-block: 0 34px;
+}
+
+/* ----- Texto ----- */
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  min-width: 0;
+}
+
+.eyebrow {
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--s-chip);
+  color: var(--s-accent);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  max-width: 48ch;
+  color: var(--s-muted);
+  font-size: 1.28rem;
+  line-height: 1.7;
+}
+
+/* ----- Botões ----- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  text-decoration: none;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 28px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font: 800 1.12rem var(--font-body);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn--primary {
+  background: var(--s-btn-bg);
+  color: var(--s-btn-fg);
+  box-shadow: 0 10px 22px -12px rgba(8, 16, 60, 0.7);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--s-line);
+  color: var(--s-fg);
+}
+
+/* ----- Dica ----- */
+.tip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 4px;
+  color: var(--s-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.tip span {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--s-chip);
+  color: var(--s-fg);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
+/* ==========================================================================
+   5. ILUSTRAÇÃO
+   Tudo é medido pela altura do próprio bloco (cqh/cqw), para nunca estourar a tela.
+   ========================================================================== */
+.pg {
+  --d: min(86cqh, 92cqw, 480px);   /* diâmetro do círculo */
+  --fs: min(36cqh, 62cqw, 310px);  /* tamanho do número do erro */
+
+  position: relative;
+  align-self: stretch;
+  min-width: 0;
+  height: 100%;
+  container-type: size;
+}
+
+.halo {
+  position: absolute;
+  bottom: 3cqh;
+  left: 50%;
+  z-index: 1;
+  width: var(--d);
+  height: var(--d);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--s-halo);
+}
+
+.ghost {
+  position: absolute;
+  right: 0;
+  bottom: calc(3cqh + var(--d) - 0.24 * var(--fs));
+  left: 0;
+  z-index: 0;
+  color: var(--s-num);
+  font-family: var(--font-display);
+  font-size: var(--fs);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 3px 0 rgba(10, 20, 70, 0.18);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.shadow {
+  position: absolute;
+  bottom: calc(3cqh + 0.035 * var(--d));
+  left: 50%;
+  z-index: 2;
+  width: calc(var(--d) * 0.6);
+  height: calc(var(--d) * 0.08);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--s-shadow);
+  filter: blur(7px);
+}
+
+.pg img {
+  position: absolute;
+  bottom: calc(3cqh + 0.05 * var(--d));
+  left: 50%;
+  z-index: 3;
+  width: auto;
+  max-width: 96%;
+  height: calc(var(--d) * 0.96);
+  transform: translateX(-50%);
+  object-fit: contain;
+}
+
+
+/* ==========================================================================
+   6. TONS DE CADA TELA
+   Cada tela de erro tem o seu tom (cores, neve e flocos desenhados):
+   .t-snow = 404, .t-ice = 401, .t-navy = 403, .t-sky = 500
+   ========================================================================== */
+
+/* ----- Erro 404 ----- */
+.t-snow {
+  /* Cores base */
+  --s-bg1: #FFFFFF;
+  --s-bg2: #E3EFFC;
+  --s-fg: #0F1E55;
+  --s-muted: #3F5389;
+  --s-accent: #2F63B5;
+
+  /* Botões e detalhes */
+  --s-chip: rgba(47, 99, 181, .12);
+  --s-line: rgba(15, 30, 85, .22);
+  --s-btn-bg: #101F5C;
+  --s-btn-fg: #F4F9FF;
+
+  /* Neve, halo e número */
+  --s-flake: rgba(67, 120, 200, .28);
+  --s-ghost: rgba(67, 120, 200, .13);
+  --s-halo: rgba(190, 217, 247, .9);
+  --s-num: #4A7FCB;
+  --s-neve: rgba(67, 120, 200, 0.6);
+
+  /* Montes de neve e sombra */
+  --s-drift: #FFFFFF;
+  --s-drift2: #D6E7FB;
+  --s-shadow: rgba(20,50,120,.22);
+}
+
+.t-snow .flakes {
+  background-image:
+    radial-gradient(circle at 66% 10%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 21% 70%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 21% 32%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 28% 20%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 73% 21%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 52% 7%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 97% 9%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 83% 47%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 48% 49%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 74% 23%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 25% 63%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 96% 59%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 16% 29%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 95% 21%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 26%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 43% 42%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 6%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 5% 10%, var(--s-flake) 0 4px, transparent 5px);
+}
+
+.t-snow .sf {
+  opacity: 0.3;
+}
+
+.t-snow .sf--1 {
+  top: 41%;
+  left: 83%;
+  width: 44px;
+}
+
+.t-snow .sf--2 {
+  top: 56%;
+  left: 5%;
+  width: 22px;
+}
+
+.t-snow .sf--3 {
+  top: 16%;
+  left: 9%;
+  width: 34px;
+}
+
+.t-snow .sf--4 {
+  top: 24%;
+  left: 26%;
+  width: 34px;
+}
+
+/* ----- Erro 401 ----- */
+.t-ice {
+  /* Cores base */
+  --s-bg1: #EEF6FF;
+  --s-bg2: #B9D6F5;
+  --s-fg: #0F1E55;
+  --s-muted: #34498A;
+  --s-accent: #234F9E;
+
+  /* Botões e detalhes */
+  --s-chip: rgba(35, 79, 158, .13);
+  --s-line: rgba(15, 30, 85, .24);
+  --s-btn-bg: #101F5C;
+  --s-btn-fg: #F4F9FF;
+
+  /* Neve, halo e número */
+  --s-flake: rgba(255, 255, 255, .95);
+  --s-ghost: rgba(255, 255, 255, .55);
+  --s-halo: rgba(255, 255, 255, .85);
+  --s-num: #3A6EBF;
+  --s-neve: rgba(255, 255, 255, 0.95);
+
+  /* Montes de neve e sombra */
+  --s-drift: #F7FBFF;
+  --s-drift2: #CFE2F8;
+  --s-shadow: rgba(20,50,120,.24);
+}
+
+.t-ice .flakes {
+  background-image:
+    radial-gradient(circle at 79% 61%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 40% 65%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 30% 15%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 10% 32%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 34% 39%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 92% 71%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 52% 63%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 85% 48%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 59% 10%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 38% 56%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 73% 18%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 70% 75%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 62% 38%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 25% 39%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 30% 19%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 85% 21%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 88% 66%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 10% 39%, var(--s-flake) 0 5px, transparent 6px);
+}
+
+.t-ice .sf {
+  opacity: 0.8;
+}
+
+.t-ice .sf--1 {
+  top: 18%;
+  left: 75%;
+  width: 34px;
+}
+
+.t-ice .sf--2 {
+  top: 37%;
+  left: 90%;
+  width: 44px;
+}
+
+.t-ice .sf--3 {
+  top: 48%;
+  left: 29%;
+  width: 28px;
+}
+
+.t-ice .sf--4 {
+  top: 41%;
+  left: 80%;
+  width: 44px;
+}
+
+/* ----- Erro 403 ----- */
+.t-navy {
+  /* Cores base */
+  --s-bg1: #17297C;
+  --s-bg2: #0A1442;
+  --s-fg: #EEF5FF;
+  --s-muted: #B7CBEE;
+  --s-accent: #9CC5F8;
+
+  /* Botões e detalhes */
+  --s-chip: rgba(156, 197, 248, .17);
+  --s-line: rgba(238, 245, 255, .4);
+  --s-btn-bg: #EAF3FF;
+  --s-btn-fg: #0F1E55;
+
+  /* Neve, halo e número */
+  --s-flake: rgba(234, 243, 255, .55);
+  --s-ghost: rgba(156, 197, 248, .12);
+  --s-halo: rgba(214, 230, 252, .96);
+  --s-num: #6F9DEA;
+  --s-neve: rgba(234, 243, 255, 0.85);
+
+  /* Montes de neve e sombra */
+  --s-drift: #2A44A3;
+  --s-drift2: #1B2F7E;
+  --s-shadow: rgba(10,20,70,.4);
+}
+
+.t-navy .flakes {
+  background-image:
+    radial-gradient(circle at 15% 33%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 10% 27%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 45% 41%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 65% 46%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 12% 61%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 29%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 4% 64%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 38% 68%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 50%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 89% 30%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 67% 5%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 31% 8%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 20% 70%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 67% 37%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 95% 33%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 68% 39%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 5% 44%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 87% 69%, var(--s-flake) 0 4px, transparent 5px);
+}
+
+.t-navy .sf {
+  opacity: 0.47;
+}
+
+.t-navy .sf--1 {
+  top: 32%;
+  left: 67%;
+  width: 34px;
+}
+
+.t-navy .sf--2 {
+  top: 22%;
+  left: 52%;
+  width: 34px;
+}
+
+.t-navy .sf--3 {
+  top: 36%;
+  left: 70%;
+  width: 22px;
+}
+
+.t-navy .sf--4 {
+  top: 41%;
+  left: 90%;
+  width: 28px;
+}
+
+/* ----- Erro 500 ----- */
+.t-sky {
+  /* Cores base */
+  --s-bg1: #4A84D2;
+  --s-bg2: #2D60B3;
+  --s-fg: #FFFFFF;
+  --s-muted: #F0F6FF;
+  --s-accent: #FFFFFF;
+
+  /* Botões e detalhes */
+  --s-chip: rgba(255, 255, 255, .2);
+  --s-line: rgba(255, 255, 255, .5);
+  --s-btn-bg: #0F1E55;
+  --s-btn-fg: #FFFFFF;
+
+  /* Neve, halo e número */
+  --s-flake: rgba(255, 255, 255, .6);
+  --s-ghost: rgba(255, 255, 255, .15);
+  --s-halo: rgba(234, 243, 255, .62);
+  --s-num: #14297A;
+  --s-neve: rgba(255, 255, 255, 0.85);
+
+  /* Montes de neve e sombra */
+  --s-drift: #EAF3FF;
+  --s-drift2: #7FAAE2;
+  --s-shadow: rgba(8,24,80,.32);
+}
+
+.t-sky .flakes {
+  background-image:
+    radial-gradient(circle at 19% 4%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 92% 12%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 77% 74%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 11% 53%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 36% 78%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 47% 45%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 5% 70%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 5% 76%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 36% 72%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 40% 36%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 55% 65%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 19% 10%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 27% 18%, var(--s-flake) 0 3px, transparent 4px),
+    radial-gradient(circle at 26% 66%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 35% 67%, var(--s-flake) 0 2px, transparent 3px),
+    radial-gradient(circle at 91% 38%, var(--s-flake) 0 5px, transparent 6px),
+    radial-gradient(circle at 36% 75%, var(--s-flake) 0 4px, transparent 5px),
+    radial-gradient(circle at 15% 39%, var(--s-flake) 0 2px, transparent 3px);
+}
+
+.t-sky .sf {
+  opacity: 0.5;
+}
+
+.t-sky .sf--1 {
+  top: 9%;
+  left: 93%;
+  width: 34px;
+}
+
+.t-sky .sf--2 {
+  top: 59%;
+  left: 56%;
+  width: 28px;
+}
+
+.t-sky .sf--3 {
+  top: 53%;
+  left: 26%;
+  width: 22px;
+}
+
+.t-sky .sf--4 {
+  top: 25%;
+  left: 33%;
+  width: 44px;
+}
+
+
+/* ==========================================================================
+   7. RESPONSIVO (sempre por último, para sobrescrever o resto)
+   ========================================================================== */
+@media (min-width: 760px) {
+  .scene {
+    padding-left: max(32px, env(safe-area-inset-left, 0px));
+    padding-right: max(32px, env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (max-height: 700px) and (min-width: 760px) {
+  .title {
+    font-size: clamp(2.1rem, 4.8vw, 3.2rem);
+  }
+
+  .lead {
+    font-size: 1.12rem;
+    line-height: 1.6;
+  }
+
+  .copy {
+    gap: 16px;
+  }
+}
+
+@media (max-height: 560px) and (min-width: 760px) {
+  .tip {
+    display: none;
+  }
+}
+
+@media (max-width: 759px) {
+  .logo-mark {
+    width: 36px;
+    height: 40px;
+  }
+
+  .scene {
+    padding-block: 12px 0;
+  }
+
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding-block: 0 34px;
+  }
+
+  .pg {
+    --d: min(78cqh, 90cqw, 370px);
+    --fs: min(32cqh, 58cqw, 210px);
+
+    order: -1;
+  }
+
+  .copy {
+    gap: 14px;
+  }
+
+  .eyebrow {
+    padding: 4px 12px;
+    font-size: 0.82rem;
+  }
+
+  .title {
+    font-size: clamp(2rem, 8.8vw, 2.7rem);
+  }
+
+  .lead {
+    font-size: 1.1rem;
+    line-height: 1.58;
+  }
+
+  .btn {
+    padding: 12px 22px;
+    font-size: 1rem;
+  }
+
+  .tip {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 759px) and (max-height: 640px) {
+  .lead {
+    font-size: 1rem;
+  }
+
+  .tip {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
