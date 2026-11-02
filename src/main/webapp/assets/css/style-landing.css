@@ -1049,3 +1049,374 @@ header{
 }
 
 
+/* ==========================================================================
+   12. FAQ
+   ========================================================================== */
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1123.16px;
+  margin: 0 auto;
+}
+
+.faq__item {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--cor-2);
+}
+
+.faq__item summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-sizing: border-box;
+  height: 83.48px;
+  padding: 0 42px;
+  background: var(--cor-1);
+  color: var(--cor-7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.25s;
+  margin-top: -4px;
+}
+
+.faq__item[open] summary::after {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+
+.faq__item p {
+  padding: 20px 42px 28px;
+  color: var(--cor-7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.faq__item summary:hover {
+  background: #5073CF;
+}
+
+
+/* ----- 12.1 Privacidade (bloco de texto centralizado, texto alinhado à esquerda) ----- */
+#privacidade .texto-maior-p {
+  width: 100%;
+  max-width: 1123.16px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+#privacidade .texto-maior-p p {
+  line-height: 33px;
+}
+
+#privacidade .texto-maior-p p + p {
+  padding-top: 35px;
+}
+
+
+/* ==========================================================================
+   13. PLANOS
+   ========================================================================== */
+
+/* ----- 13.1 Container e cards base ----- */
+.caixa-planos{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 47px;
+}
+
+.caixa-plano{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 40px;
+  width: 299px;
+  height: 472px;
+  border-radius: 14.23px;
+  justify-content: flex-start;
+  gap: 0;
+  background: rgba(248, 248, 248, 0.7);
+  border: 1px solid var(--borda-nav);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.caixa-plano-comercial{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 27px;
+  width: 768px;
+  height: 496px;
+  border-radius: 14.23px;
+  background: var(--cor-2);
+  border: 1px solid var(--cor-2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* ----- 13.2 Textos do plano ----- */
+.plano-sub{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 16px;
+  color: var(--cor-8);
+  margin-top: 6px;
+}
+
+.plano-preco{
+  font-family: 'Montserrat', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--cor-8);
+  margin-top: 36px;
+}
+
+.plano-centavos{
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.plano-periodo{
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.plano-aviso{
+  margin-top: 24px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12.5px;
+  color: #6b6b6b;
+}
+
+/* ----- 13.3 Listas com ícone ----- */
+.plano-lista{
+  list-style: none;
+  margin-top: 24px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  color: var(--cor-8);
+}
+
+.plano-lista li{
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.plano-lista li::before{
+  content: "❄\FE0E";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cor-3);
+  -webkit-text-stroke: 0.5px var(--cor-3);
+  font-size: 20px;
+  line-height: 1;
+}
+
+
+
+/* ----- 13.4 Card Plus ----- */
+.plano-escuro{
+  background: var(--cor-2);
+  border: 6px solid var(--cor-1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.caixa-plano.plano-escuro{
+  width: 309px;
+  max-width: 100%;
+  height: 481px;
+}
+
+.plano-escuro .titulo-a-escuro,
+.plano-escuro .plano-sub,
+.plano-escuro .plano-preco,
+.plano-escuro .plano-lista{
+  color: var(--cor-7);
+}
+
+.plano-escuro .plano-periodo{
+  color: var(--cor-7);
+}
+
+.plano-escuro .plano-lista li::before{
+  color: var(--cor-4);
+  -webkit-text-stroke-color: var(--cor-4);
+}
+
+.plano-badge{
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  border-radius: 10px;
+  background: var(--cor-1);
+  color: var(--cor-7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ----- 13.5 Plano comercial ----- */
+.conteudo-comercial {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+}
+
+.img-comercial{
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  width: 390.82px;
+  height: auto;
+  pointer-events: none;
+}
+
+.caixa-plano-comercial > *:not(.img-comercial){
+  max-width: 330px;
+}
+
+
+/* ----- 13.6 Tamanhos do Figma (cards de plano) ----- */
+.caixa-plano .titulo-a-escuro { font-size: 28.5px; line-height: 34px; margin-top: 11px; }
+.caixa-plano .plano-sub { font-size: 14.3px; line-height: 20px; margin-top: 5px; }
+.caixa-plano .plano-preco { font-size: 37px; line-height: 44px; margin-top: 26px; }
+.caixa-plano .plano-centavos { font-size: 22px; }
+.caixa-plano .plano-periodo { font-size: 13px; }
+.caixa-plano .plano-lista { font-size: 11.5px; margin-top: 27px; }
+.caixa-plano .plano-lista li { padding-left: 19px; margin-bottom: 9px; line-height: 16px; }
+.caixa-plano .plano-lista li::before { font-size: 14px; }
+.caixa-plano .plano-lista-extra { margin-top: 27px; }
+.caixa-plano .plano-aviso { font-size: 10.5px; line-height: 13.5px; margin-top: 33px; }
+.caixa-plano .botao-plano { margin-top: auto; padding: 11px 16px; line-height: 18px; font-size: 14px; }
+.caixa-plano .plano-badge { top: -16px; padding: 8px 16px; font-size: 12px; line-height: 14px; }
+
+
+/* ==========================================================================
+   14. RODAPÉ
+   ========================================================================== */
+.rodape-colunas{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px;
+}
+
+.rodape-titulo{
+  margin-bottom: 40px;
+}
+
+.rodape-lista{
+  list-style: none;
+}
+
+.rodape-lista li{
+  margin-bottom: 40px;
+}
+
+.rodape-lista a{
+  text-decoration: none;
+}
+
+.rodape-lista a:hover{
+  text-decoration: underline;
+}
+
+.rodape-contato li{
+  margin-bottom: 20px;
+}
+
+.rodape-copy{
+  margin-top: 10px;
+  color: var(--cor-4);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+}
+
+.botao-rodape{
+  width: 192px;
+  height: 44px;
+  padding: 12px;
+  background: var(--cor-5);
+}
+
+.botao-rodape:hover{
+  background: #5073CF;
+}
+
+.texto-botao-rodape{
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  justify-content: center;
+  color: var(--cor-2);
+  text-decoration: none;
+}
+
+
+/* ==========================================================================
+   15. ACESSIBILIDADE (foco do teclado)
+   ========================================================================== */
+.logo:focus-visible,
+.alternante-pg-inicial a:focus-visible,
+.botao:focus-visible {
+  outline: 2px solid var(--cor-7);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   PARALLAX DO HERO
+   ========================================================================== */
+html {
+  min-height: 100%;
+  background-color: var(--cor-2);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  isolation: isolate;
+  background-color: var(--cor-2);
+}
+
+body > :not(.hero):not(header) {
+  position: relative;
+  z-index: 10;
+}
+
+.hero + .forma-branca-pg-inicial {
+  margin-top: calc(100vh - 600px);
+}
+
+
