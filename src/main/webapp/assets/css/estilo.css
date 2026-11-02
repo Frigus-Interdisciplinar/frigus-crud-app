@@ -86,11 +86,9 @@ button.excluir { background: #b91c1c; }
 .contagens div { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 14px; }
 .contagens strong { display: block; font-size: 22px; }
 
-/* pagina inicial e login */
-body.inicio, body.entrar { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-body.inicio .cartao, body.entrar .cartao { width: 320px; text-align: center; }
-body.entrar form { text-align: left; }
-body.entrar input { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+/* pagina inicial */
+body.inicio { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+body.inicio .cartao { width: 320px; text-align: center; }
 
 /* cartoes lado a lado */
 .lado-a-lado { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
