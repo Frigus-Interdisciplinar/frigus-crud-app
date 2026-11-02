@@ -87,9 +87,9 @@
                             <td>${i.quantidade} <c:out value="${i.produto.unidadeMedida}"/></td>
                             <td>${lista.dtLista}</td>
                             <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${lista.usuario.nome} ${lista.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${lista.usuario.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${lista.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
                             <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${lista.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${lista.empresa.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${lista.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
                             <td class="botoes-tabela">
                                 <button class="botao-icone" type="button" aria-label="Visualizar"
                                         data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-produto="<c:out value='${i.produto.nome}'/>"

@@ -63,9 +63,9 @@
                         <c:set var="dono" value="${ehUsuario ? a.usuario.nome.concat(' ').concat(a.usuario.sobrenome).concat(' · ').concat(a.usuario.email) : a.empresa.nome.concat(' · ').concat(a.empresa.email)}"/>
                         <tr>
                             <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${a.usuario.nome} ${a.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${a.usuario.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${a.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
                             <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${a.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${a.empresa.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${a.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
                             <td><span class="etiqueta-plano">${a.tipoAssinatura}</span></td>
                             <td>R$ ${a.valor}</td>
                             <td class="botoes-tabela">

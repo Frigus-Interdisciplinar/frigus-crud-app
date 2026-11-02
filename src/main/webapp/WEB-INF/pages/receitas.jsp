@@ -77,9 +77,9 @@
                             <td><div class="titulo-cards"><c:out value="${r.nome}"/></div>
                                 <div class="texto-pequeno-cards descricao-curta"><c:out value="${r.descricao}"/></div></td>
                             <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${r.usuario.nome} ${r.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${r.usuario.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${r.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
                             <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${r.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${r.empresa.email}"/></div></c:if></td>
+                                <div class="texto-pequeno-cards"><c:out value="${r.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
                             <td>${qtdIng}</td>
                             <td>${r.dtReceita}</td>
                             <td class="botoes-tabela">
