@@ -291,7 +291,8 @@ body {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  width: 500px;
+  /* cresce junto com a largura da tela (a sombra e o pinguim acompanham, pois são medidos em %) */
+  width: clamp(420px, 33vw, 640px);
   aspect-ratio: 1;
 }
 
@@ -301,7 +302,7 @@ body {
   position: absolute;
   left: 50%;
   bottom: 12%;
-  width: 68%;
+  width: 73%;
   height: 9%;
   transform: translateX(-50%);
   border-radius: 50%;
