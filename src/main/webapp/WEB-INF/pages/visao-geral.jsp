@@ -16,7 +16,7 @@
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/usuarios">
                 <div class="titulo-cards">Usuários</div>
                 <div class="dados-cards">${totais.usuarios}</div>
-                <div class="texto-pequeno-cards">${totais.usuariosPagos} em plano pago</div>
+                <div class="texto-pequeno-cards">${totais.usuariospagos} em plano pago</div>
             </a>
 
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/empresas">
@@ -27,17 +27,17 @@
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/geladeiras">
                 <div class="titulo-cards">Geladeiras</div>
                 <div class="dados-cards">${totais.geladeiras}</div>
-                    <div class="texto-pequeno-cards">de ${totais.usuariosComGeladeira} usuários</div>
+                    <div class="texto-pequeno-cards">de ${totais.usuarioscomgeladeira} usuários</div>
             </a>
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/frigorificos">
                 <div class="titulo-cards">Frigoríficos</div>
                 <div class="dados-cards">${totais.frigorificos}</div>
-                <div class="texto-pequeno-cards">de ${totais.empresasComFrigorifico} empresas</div>
+                <div class="texto-pequeno-cards">de ${totais.empresascomfrigorifico} empresas</div>
             </a>
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/produtos">
                 <div class="titulo-cards">Produtos</div>
-                <div class="dados-cards">${totais.itensGeladeira + totais.itensFrigorifico}</div>
-                <div class="texto-pequeno-cards">${totais.produtosAtencao} vencidos ou com atenção</div>
+                <div class="dados-cards">${totais.itensgeladeira + totais.itensfrigorifico}</div>
+                <div class="texto-pequeno-cards">${totais.produtosatencao} vencidos ou com atenção</div>
             </a>
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/receitas">
                 <div class="titulo-cards">Receitas</div>
@@ -46,7 +46,7 @@
             </a>
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/compras">
                 <div class="titulo-cards">Itens em listas</div>
-                <div class="dados-cards">${totais.itensLista}</div>
+                <div class="dados-cards">${totais.itenslista}</div>
                 <div class="texto-pequeno-cards">em ${totais.listas} listas</div>
             </a>
             <a class="cards-pequenos-visao-geral" href="${ctx}/admin/planos">
