@@ -1,76 +1,137 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Configurações - Frigus Admin</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/painel.css">
-    <script src="${pageContext.request.contextPath}/assets/js/admin.js"></script>
-</head>
-<body>
 <c:set var="menuAtivo" value="configuracoes" scope="request"/>
-<%@ include file="menu.jspf" %>
-<main>
-    <header>
-        <h1>Configurações</h1>
-        <p>Dados da sua conta de administrador.</p>
-    </header>
+<c:set var="tituloPagina" value="Configurações" scope="request"/>
+<%@ include file="cabecalho.jspf" %>
 
-    <c:if test="${not empty erro}">
-        <div class="erro"><c:out value="${erro}"/></div>
-    </c:if>
-    <c:if test="${not empty sucesso}">
-        <div class="sucesso"><c:out value="${sucesso}"/></div>
-    </c:if>
+    <div class="conteudo" id="conteudo">
+        <!-- Título da página -->
+        <div class="page-header">
+                <h1>Configurações</h1>
+                <p class="subtitulo-pagina">Perfil e acesso do superadministrador.</p>
+            </div>
 
-    <%-- perfil de quem esta logado --%>
-    <section id="perfil">
-        <h2>Perfil</h2>
-        <p><strong>Nome:</strong> <c:out value="${conta.nome}"/></p>
-        <p><strong>E-mail:</strong> <c:out value="${conta.email}"/></p>
-    </section>
+        <%@ include file="mensagens.jspf" %>
 
-    <%-- editar o perfil --%>
-    <section id="editar-perfil">
-        <h2>Editar perfil</h2>
-        <form method="post" action="${pageContext.request.contextPath}/admin/conta">
-            <input type="hidden" name="action" value="alterar">
-            <label>Nome <input type="text" name="nome" value="${conta.nome}" required maxlength="20"></label>
-            <label>E-mail <input type="text" inputmode="email" name="email" value="${conta.email}" required></label>
-            <button type="submit">Salvar perfil</button>
-        </form>
-    </section>
+        <!-- Cartões da página -->
+        <div class="caixa-configuracao">
+            <!-- Perfil -->
+            <section class="cartao-config">
+                <div class="cartao-config-topo">
+                    <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+                    <div>
+                        <h2 class="cartao-config-nome"><c:out value="${conta.nome}"/></h2>
+                        <p class="cartao-config-email"><c:out value="${conta.email}"/></p>
+                        <span class="etiqueta-plano etiqueta-escura">Superadministrador</span>
+                    </div>
+                </div>
 
-    <%-- trocar a senha --%>
-    <section id="alterar-senha">
-        <h2>Alterar senha</h2>
-        <p>De 8 a 15 caracteres, com uma letra maiúscula e um caractere especial.</p>
-        <form method="post" action="${pageContext.request.contextPath}/admin/conta">
-            <input type="hidden" name="action" value="alterarSenha">
-            <label>Senha atual <input type="password" name="senhaAtual" required></label>
-            <label>Nova senha <input type="password" name="senhaNova" required maxlength="15"></label>
-            <label>Confirmar nova senha <input type="password" name="senhaConfirma" required maxlength="15"></label>
-            <button type="submit">Alterar senha</button>
-        </form>
-    </section>
+                <div class="linha-dado">
+                    <span>Nome</span>
+                    <strong><c:out value="${conta.nome}"/></strong>
+                </div>
+                <div class="linha-dado">
+                    <span>E-mail</span>
+                    <strong><c:out value="${conta.email}"/></strong>
+                </div>
 
-    <%-- sessão --%>
-    <section id="sessao">
-        <h2>Sessão</h2>
-        <p>Você está logado como <strong><c:out value="${conta.email}"/></strong>.</p>
-        <a href="${pageContext.request.contextPath}/logout">Sair</a>
-    </section>
+                <div class="botoes-config">
+                    <button class="botao-principal" type="button" data-abrir-popup="popup-editar-perfil">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        Editar perfil
+                    </button>
+                    <button class="botao-secundario" type="button" data-abrir-popup="popup-alterar-senha">Alterar senha</button>
+                </div>
+            </section>
 
-    <%-- apagar a conta --%>
-    <section id="apagar-conta">
-        <h2>Deseja deletar essa conta?</h2>
-        <p>A conta de <strong><c:out value="${conta.email}"/></strong> será apagada e você sairá do painel. Isso não pode ser desfeito.</p>
-        <form method="post" action="${pageContext.request.contextPath}/admin/conta" onsubmit="return confirmarExclusao()">
-            <input type="hidden" name="action" value="deletar">
-            <button type="submit">Deletar minha conta</button>
-        </form>
-    </section>
-</main>
-</body>
-</html>
+            <!-- Sessão -->
+            <section class="cartao-config">
+                <h2 class="cartao-config-titulo">Sessão</h2>
+                <p class="cartao-config-texto">Você é o superadministrador deste sistema e vê os dados de todos os usuários e empresas. Saia da conta quando terminar.</p>
+                <a class="botao-secundario" href="${ctx}/logout">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sair da conta
+                </a>
+            </section>
+        </div>
+    </div>
+    <!-- ========== POP-UPS ========== -->
+
+    <!-- Editar perfil -->
+    <div class="popup-fundo" id="popup-editar-perfil">
+        <aside class="gaveta" role="dialog" aria-modal="true" aria-labelledby="popup-editar-perfil-titulo">
+            <header class="gaveta-topo">
+                <div>
+                    <h2 class="popup-titulo" id="popup-editar-perfil-titulo">Editar perfil</h2>
+                    <p class="popup-texto">Nome e e-mail usados para entrar no painel.</p>
+                </div>
+                <button class="botao-fechar" type="button" aria-label="Fechar" data-fechar>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </header>
+            <form class="gaveta-form" method="post" action="${ctx}/admin/conta">
+                <input type="hidden" name="action" value="alterar">
+                <div class="gaveta-corpo">
+                    <p class="gaveta-secao">Dados do perfil</p>
+                    <div class="filtro">
+                        <label for="perfil-nome">Nome <span class="obrigatorio">*</span></label>
+                        <input id="perfil-nome" name="nome" type="text" value="<c:out value='${conta.nome}'/>" required maxlength="20">
+                    </div>
+                    <div class="filtro">
+                        <label for="perfil-email">E-mail <span class="obrigatorio">*</span></label>
+                        <input id="perfil-email" name="email" type="text" inputmode="email" value="<c:out value='${conta.email}'/>" required>
+                    </div>
+                </div>
+                <footer class="gaveta-rodape">
+                    <button class="botao-secundario" type="button" data-fechar>Cancelar</button>
+                    <button class="botao-principal" type="submit">Salvar alterações</button>
+                </footer>
+            </form>
+        </aside>
+    </div>
+
+    <!-- Alterar senha -->
+    <div class="popup-fundo" id="popup-alterar-senha">
+        <aside class="gaveta" role="dialog" aria-modal="true" aria-labelledby="popup-alterar-senha-titulo">
+            <header class="gaveta-topo">
+                <div>
+                    <h2 class="popup-titulo" id="popup-alterar-senha-titulo">Alterar senha</h2>
+                    <p class="popup-texto">Escolha uma senha nova para a sua conta.</p>
+                </div>
+                <button class="botao-fechar" type="button" aria-label="Fechar" data-fechar>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </header>
+            <form class="gaveta-form" method="post" action="${ctx}/admin/conta">
+                <input type="hidden" name="action" value="alterarSenha">
+                <div class="gaveta-corpo">
+                    <p class="gaveta-secao">Nova senha</p>
+                    <div class="filtro">
+                        <label for="senha-atual">Senha atual <span class="obrigatorio">*</span></label>
+                        <input id="senha-atual" name="senhaAtual" type="password" required autocomplete="current-password">
+                    </div>
+                    <div class="filtro">
+                        <label for="senha-nova">Nova senha <span class="obrigatorio">*</span></label>
+                        <input id="senha-nova" name="senhaNova" type="password" placeholder="De 8 a 15 caracteres" required minlength="8" maxlength="15" autocomplete="new-password">
+                    </div>
+                    <div class="filtro">
+                        <label for="senha-confirmar">Confirmar nova senha <span class="obrigatorio">*</span></label>
+                        <input id="senha-confirmar" name="senhaConfirma" type="password" required minlength="8" maxlength="15" autocomplete="new-password">
+                    </div>
+                </div>
+                <footer class="gaveta-rodape">
+                    <button class="botao-secundario" type="button" data-fechar>Cancelar</button>
+                    <button class="botao-principal" type="submit">Alterar senha</button>
+                </footer>
+            </form>
+        </aside>
+    </div>
+
+<%@ include file="rodape.jspf" %>
