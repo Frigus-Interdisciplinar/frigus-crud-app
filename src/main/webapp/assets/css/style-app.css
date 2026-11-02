@@ -420,7 +420,7 @@ nav a:hover {
 
 .botao-ver-planos{
   align-self: flex-start;
-  margin-top: 12px;
+  margin-top: 28px;
   padding: 7px 14px;
   font-size: 12px;
   font-weight: 600;
@@ -685,6 +685,10 @@ nav a:hover {
 }
 
 .pagina {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   min-width: 32px;
   height: 32px;
   padding: 0 10px;
@@ -720,12 +724,13 @@ nav a:hover {
 }
 
 /* ----- Tabela da geladeira (larguras próprias) ----- */
-.tabela-geladeira th:nth-child(1) { width: 14%; }
-.tabela-geladeira th:nth-child(2) { width: 19%; }
-.tabela-geladeira th:nth-child(3) { width: 10%; }
-.tabela-geladeira th:nth-child(4) { width: 19%; }
-.tabela-geladeira th:nth-child(5) { width: 10%; }
-.tabela-geladeira th:nth-child(6) { width: 15%; }
+.tabela-geladeira th:nth-child(1) { width: 17%; }
+.tabela-geladeira th:nth-child(2) { width: 20%; }
+.tabela-geladeira th:nth-child(3) { width: 12%; }
+.tabela-geladeira th:nth-child(4) { width: 15%; }
+.tabela-geladeira th:nth-child(5) { width: 9%; }
+.tabela-geladeira th:nth-child(6) { width: 14%; }
+.tabela-geladeira th:nth-child(7) { width: 13%; }
 
 .tabela-geladeira td {
   height: 59px;
@@ -959,45 +964,52 @@ nav a:hover {
 }
 
 /* ----- Produtos ----- */
-.tabela-produto th:nth-child(1) { width: 15%; }
-.tabela-produto th:nth-child(2) { width: 13%; }
-.tabela-produto th:nth-child(3) { width: 13%; }
-.tabela-produto th:nth-child(4) { width: 7%; }
-.tabela-produto th:nth-child(5) { width: 12%; }
-.tabela-produto th:nth-child(6) { width: 12%; }
-.tabela-produto th:nth-child(7) { width: 6%; }
-.tabela-produto th:nth-child(8) { width: 10%; }
-.tabela-produto th:nth-child(9) { width: 12%; }
+.tabela-produto th:nth-child(1) { width: 18%; }
+.tabela-produto th:nth-child(2) { width: 14%; }
+.tabela-produto th:nth-child(3) { width: 15%; }
+.tabela-produto th:nth-child(4) { width: 8%; }
+.tabela-produto th:nth-child(5) { width: 14%; }
+.tabela-produto th:nth-child(6) { width: 11%; }
+.tabela-produto th:nth-child(7) { width: 8%; }
+.tabela-produto th:nth-child(8) { width: 12%; }
 
 /* ----- Receitas ----- */
-.tabela-receita th:nth-child(1) { width: 38%; }
-.tabela-receita th:nth-child(2) { width: 13%; }
-.tabela-receita th:nth-child(3) { width: 15%; }
-.tabela-receita th:nth-child(4) { width: 12%; }
-.tabela-receita th:nth-child(5) { width: 10%; }
-.tabela-receita th:nth-child(6) { width: 12%; }
+.tabela-receita th:nth-child(1) { width: 30%; }
+.tabela-receita th:nth-child(2) { width: 17%; }
+.tabela-receita th:nth-child(3) { width: 17%; }
+.tabela-receita th:nth-child(4) { width: 11%; }
+.tabela-receita th:nth-child(5) { width: 12%; }
+.tabela-receita th:nth-child(6) { width: 13%; }
 
 /* ----- Lista de compras ----- */
-.tabela-compra th:nth-child(1) { width: 17%; }
-.tabela-compra th:nth-child(2) { width: 10%; }
-.tabela-compra th:nth-child(3) { width: 11%; }
-.tabela-compra th:nth-child(4) { width: 10%; }
-.tabela-compra th:nth-child(5) { width: 13%; }
+.tabela-compra th:nth-child(1) { width: 19%; }
+.tabela-compra th:nth-child(2) { width: 15%; }
+.tabela-compra th:nth-child(3) { width: 12%; }
+.tabela-compra th:nth-child(4) { width: 13%; }
+.tabela-compra th:nth-child(5) { width: 16%; }
 .tabela-compra th:nth-child(6) { width: 15%; }
-.tabela-compra th:nth-child(7) { width: 11%; }
-.tabela-compra th:nth-child(8) { width: 13%; }
+.tabela-compra th:nth-child(7) { width: 10%; }
 
 /* ----- Planos ----- */
-.tabela-plano th:nth-child(1) { width: 19%; }
-.tabela-plano th:nth-child(2) { width: 18%; }
+.tabela-plano th:nth-child(1) { width: 24%; }
+.tabela-plano th:nth-child(2) { width: 24%; }
 .tabela-plano th:nth-child(3) { width: 18%; }
 .tabela-plano th:nth-child(4) { width: 18%; }
 .tabela-plano th:nth-child(5) { width: 16%; }
-.tabela-plano th:nth-child(6) { width: 11%; }
 
 /* ==========================================================================
    13. DETALHES DAS CÉLULAS
    ========================================================================== */
+
+/* texto grande (ex.: categoria "Conservados e enlatados") quebra dentro da coluna em vez de invadir a vizinha */
+.tabela td {
+  overflow-wrap: anywhere;
+}
+
+/* a etiqueta fica numa linha só */
+.etiqueta-plano {
+  white-space: nowrap;
+}
 
 /* etiqueta pequena embaixo do texto principal (ex.: Geladeira / Cozinha) */
 .etiqueta-plano + .texto-pequeno-cards {
@@ -1036,7 +1048,7 @@ nav a:hover {
 
 /* descrição da receita corta com "..." quando é grande */
 .descricao-curta {
-  max-width: 325px;
+  max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1706,4 +1718,89 @@ nav a:hover {
 .mensagem-sucesso {
   background-color: #E6F4EA;
   color: #1E6B35;
+}
+
+/* ==========================================================================
+   16. CORES DAS ETIQUETAS
+   O script-app.js põe em cada etiqueta a classe etiqueta-<texto> (ex.: etiqueta-familia).
+   Só tons de azul da paleta; amarelo e vermelho ficam para o que pede atenção
+   ========================================================================== */
+
+/* ----- Planos ----- */
+.etiqueta-free {
+  background-color: #EDEEF2;
+  color: #3B4257;
+}
+
+.etiqueta-familia {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-comercial {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+/* ----- Armazenamento ----- */
+.etiqueta-geladeira {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+.etiqueta-frigorifico {
+  background-color: var(--cor-3);
+  color: var(--cor-7);
+}
+
+/* ----- Ocupação da geladeira ----- */
+.etiqueta-vazio {
+  background-color: #EDEEF2;
+  color: #3B4257;
+}
+
+.etiqueta-ocupacao-baixa {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-ocupacao-moderada {
+  background-color: var(--cor-4);
+  color: var(--cor-2);
+}
+
+.etiqueta-ocupacao-alta {
+  background-color: var(--cor-1);
+  color: var(--cor-7);
+}
+
+.etiqueta-cheia {
+  background-color: var(--cor-2);
+  color: var(--cor-7);
+}
+
+.etiqueta-ilimitado {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+/* ----- Situação do produto (vencido e pendente já existem na seção 13) ----- */
+.etiqueta-validade-longa {
+  background-color: var(--cor-5);
+  color: var(--cor-2);
+}
+
+.etiqueta-regular {
+  background-color: #E4ECFD;
+  color: var(--cor-1);
+}
+
+.etiqueta-proximo-vencimento {
+  background-color: #FFF1CC;
+  color: #8A5A00;
+}
+
+.etiqueta-atencao {
+  background-color: var(--cor-6);
+  color: var(--cor-8);
 }
