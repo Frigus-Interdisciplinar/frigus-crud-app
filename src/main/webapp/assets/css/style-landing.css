@@ -1414,6 +1414,15 @@ body > :not(.hero):not(header) {
   margin-top: calc(100vh - 600px);
 }
 
+/* Emenda entre a forma branca e a seção de baixo: a seção de baixo passa a pintar 2px do mesmo branco
+   da forma (#F0F6F8) por cima da emenda. Assim, se sobrar uma fresta de meio pixel (zoom ou escala do
+   Windows), ela aparece branca e não mostra o hero que fica fixo atrás. */
+.fundoinicial + .fundo-geral {
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 -2px 0 #F0F6F8;
+}
+
 
 /* ==========================================================================
    17. NOSSA EQUIPE (carrossel)
