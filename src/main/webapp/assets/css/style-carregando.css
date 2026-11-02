@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
 /* ==========================================================================
    Tela de carregamento - Friguinho
 
@@ -119,39 +121,39 @@
 }
 
 /* ----- Flocos desenhados ao fundo ----- */
-.carregando .flakes {
+.carregando-flocos {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
 }
 
-.carregando .sf {
+.carregando-floco {
   position: absolute;
   height: auto;
   aspect-ratio: 1;
   opacity: 0.16;
 }
 
-.carregando .sf--1 {
+.carregando-floco--1 {
   top: 17%;
   left: 5%;
   width: 150px;
 }
 
-.carregando .sf--2 {
+.carregando-floco--2 {
   top: 8%;
   left: 83%;
   width: 130px;
 }
 
-.carregando .sf--3 {
+.carregando-floco--3 {
   top: 60%;
   left: 17%;
   width: 90px;
 }
 
-.carregando .sf--4 {
+.carregando-floco--4 {
   top: 58%;
   left: 77%;
   width: 70px;
@@ -224,7 +226,7 @@
   transition: width 0.2s linear;
 }
 
-.carregando .tip {
+.carregando-dica {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -238,7 +240,7 @@
   line-height: 1.5;
 }
 
-.carregando .tip strong {
+.carregando-dica strong {
   color: var(--c-texto);
   font-weight: 700;
 }
@@ -247,7 +249,7 @@
 /* ==========================================================================
    6. MONTES DE NEVE
    ========================================================================== */
-.carregando .drift {
+.carregando-monte {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -259,11 +261,11 @@
   pointer-events: none;
 }
 
-.carregando .drift .d2 {
+.carregando-monte .m2 {
   fill: #5B84CF;
 }
 
-.carregando .drift .d1 {
+.carregando-monte .m1 {
   fill: #D2EAF8;
 }
 
