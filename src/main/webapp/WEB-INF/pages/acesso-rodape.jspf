@@ -1,0 +1,9 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%-- fim comum das telas de acesso: fecha o cartão e mostra o rodapé e o script --%>
+        </div>
+      </div>
+    </main>
+    <footer>© 2026 Frigus. Todos os direitos reservados.</footer>
+    <script src="${pageContext.request.contextPath}/assets/js/script-acesso.js"></script>
+  </body>
+</html>
