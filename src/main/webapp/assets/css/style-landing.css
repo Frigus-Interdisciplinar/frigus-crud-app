@@ -237,3 +237,371 @@ body {
 }
 
 
+/* ==========================================================================
+   4. FUNDOS DE SEÇÃO
+   ========================================================================== */
+.fundoinicial{
+  width: 1268.5px;
+  display: flow-root;
+  clip-path: inset(0);
+}
+
+.fundo-inicial-sobre-nos{
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 90px 120px;
+  width: 1268.5px;
+  height: 830px;
+  gap: 20px;
+  background: url("../img/landing/fundo-sobre-nos-inicial.svg");
+}
+
+.fundo-inicial-sobre-nos .hero-neve{
+  z-index: 0;
+}
+
+/* ondas que ligam a parte azul à tela clara: ficam sempre coladas no rodapé,
+   por baixo da neve (os pontinhos caem por cima delas, como no Figma) */
+.fundo-inicial-sobre-nos::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: -1;
+  aspect-ratio: 1366 / 161;
+  background: url("../img/landing/ondas-sobre-nos-inicial.svg") bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.quem-somos-texto{
+  position: relative;
+  z-index: 1;
+}
+
+.quem-somos-texto .titulo-maior-b{
+  margin-bottom: 20px;
+}
+
+/* ----- Friguinho (pinguim animado do Rive) ----- */
+.friguinho{
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 500px;
+  aspect-ratio: 1;
+}
+
+/* sombra de gelo embaixo do pinguim */
+.friguinho::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 68%;
+  height: 9%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--cor-4);
+  opacity: 0.4;
+  filter: blur(1px);
+}
+
+.friguinho canvas{
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fundo-inicial-suporte{
+  width: 1268.5px;
+  height: 900px;
+  background: url("../img/landing/fundo-suporte-inicial.svg");
+}
+
+
+.fundo-geral{
+  height: 100%;
+  width: 1268.5px;
+  background: linear-gradient(#131C55,#CFEEF9 15%, #CCE6F9 30%,#C9DEF9 47%, #B3C9EC 67%, #738AC4 88%, #1C378E 98%, #131C55 100%); ;
+}
+
+.fundo-geral2{
+  height: 100%;
+  width: 1268.5px;
+  background: linear-gradient(#131C55,#CFEEF9 15%, #CCE6F9 30%,#C9DEF9 47%, #B3C9EC 80%, #6e8bd2 100%); ;
+}
+
+.fundo-escuro{
+  height: 390px;
+  width: 1268.5px;
+  background-color: var(--cor-2);
+}
+
+.obtenhaPromo{
+  top: 184px;
+  width: 100%;
+  height: 580px;
+  left: 0px;
+  top: 0px;
+  padding: 90px; 
+  padding-top: 180px; 
+  align-items: center;
+  background: var(--promo);
+}
+
+.img-obtenha{
+width: 1366px;
+height: 527px;
+left: 0px;
+top: -75px;
+background: url(../img/landing/img-fundo-obtenhaPromo.svg) center / cover no-repeat;
+}
+
+
+/* ==========================================================================
+   5. FORMAS BRANCAS (SVGs de transição entre seções)
+   ========================================================================== */
+.forma-branca-pg-inicial{
+  position: relative;
+  z-index: 2;
+  height: 859.44px;
+  background: url(../img/landing/forma-branca-pg-inicial.svg) center / cover no-repeat;
+  pointer-events: none;
+ 
+}
+
+.forma-funcionalidades{
+  width: 1268.5px;
+  height: 859.44px;
+  background: url(../img/landing/forma-branca-funcionalidades.svg) center / cover no-repeat;
+}
+.forma-inicial-sobre-nos{
+  width: 1268.5px;
+  height: 859.44px;
+  margin-top: 500px;
+  background: url(../img/landing/forma-inicial-sobre-nos.svg) center / cover no-repeat;
+}
+
+.forma-branca-dp-obter{
+  width: 1268.5px;
+  height: auto;
+  background: url(../img/landing/forma-branca-dp-obter.svg) center / cover no-repeat;
+}
+
+.fundo-nossos-valores{
+  position: relative;
+  overflow: hidden;
+  width: 1269.57px;
+  height: 1421px;
+  padding: 116px ;
+  margin-top: -25px;
+  background:
+    radial-gradient(ellipse 48% 98% at 55.5% 53.6%, transparent 25%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(rgba(19, 28, 85, 0.8), rgba(19, 28, 85, 0.8)),
+    url(../img/landing/fundo-nossos-valores-foto.jpg) center / 100% 109.56% no-repeat,
+    var(--cor-2);
+}
+
+/* ----- Fundo Nossos valores (linha azul e título) ----- */
+.fundo-nossos-valores > div{
+  position: relative;
+  z-index: 1;
+}
+
+.fundo-nossos-valores::before{
+  --linha: var(--cor-1);
+  --arco-esq: radial-gradient(circle at 100% 50%, transparent 115px, var(--linha) 116px, var(--linha) 124px, transparent 125px);
+  --arco-dir: radial-gradient(circle at 0% 50%, transparent 115px, var(--linha) 116px, var(--linha) 124px, transparent 125px);
+  --barra: linear-gradient(var(--linha), var(--linha));
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1270px;
+  height: 1421px;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-image:
+    var(--barra), var(--barra), var(--barra), var(--barra), var(--barra), var(--barra), var(--barra),
+    var(--arco-esq), var(--arco-dir), var(--arco-esq), var(--arco-dir), var(--arco-esq), var(--arco-dir);
+  background-size:
+    804px 9px, 804px 9px, 804px 9px, 804px 9px, 804px 9px, 804px 9px, 804px 9px,
+    125px 249px, 125px 249px, 125px 249px, 125px 249px, 125px 249px, 125px 249px;
+  background-position:
+    232px -4px, 232px 236px, 232px 476px, 232px 716px, 232px 956px, 232px 1196px, 232px 1436px,
+    107px -4px, 1036px 236px, 107px 476px, 1036px 716px, 107px 956px, 1036px 1196px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 85%, transparent 100%);
+}
+
+.fundo-nossos-valores::after{
+  content: "NOSSOS VALORES";
+  position: absolute;
+  top: calc(235px - 0.86em);
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1;
+  color: var(--cor-1);
+  opacity: 0.85;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(28px, 4.8vw, 61px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.forma-nossa-missao{
+  display: flex;
+  width: 1268.5px;
+  height: 850px;
+  background: url(../img/landing/forma-azul-nossa-missão.svg);
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+}
+
+.fundo-nossos-planos{
+  width: 1268.5px;
+  height: 859.44px;
+  background: url(../img/landing/forma-branca-nossos-planos.svg) center / cover no-repeat;
+}
+
+/* ----- Forma branca + FAQ ----- */
+.forma-branca-faq {
+  position: relative;
+  width: 1268.5px;
+  margin-top: -2px;
+}
+
+.forma-branca-faq::before {
+  content: "";
+  position: absolute;
+  top: 280px;
+  left: 0;
+  width: 100%;
+  height: 1100px;
+  background: url("../img/landing/forma-branca-faq.svg") right top / auto 100% no-repeat;
+  z-index: 0;
+}
+
+.forma-branca-faq > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ==========================================================================
+   6. CABEÇALHO E NAVEGAÇÃO
+   ========================================================================== */
+header{
+  position: fixed;
+  top: 0;
+  width: 1268.5px;
+  height: 109.09px;
+  z-index: 1000;
+  background: linear-gradient(#020c51c1 15%, var(--transparente));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px clamp(20px, 8vw, 80px);
+}
+
+.caixa-itens-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+}
+
+.logo img {
+  height: 61.66px;
+  width: 156.09px;
+  display: block;
+}
+
+/* ----- Menu de navegação ----- */
+.nav {
+  width: 408.19;
+  height: 47.43;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(240, 246, 248, 0.10);
+
+  backdrop-filter:
+    blur(2px)
+    saturate(120%);
+
+  -webkit-backdrop-filter:
+    blur(27.23px)
+    saturate(120%);
+
+  border: 1px solid rgba(240, 246, 248, 0.18);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(19, 28, 85, 0.08);
+  font-family: "Sabarun", sans-serif;
+}
+
+.nav::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: -50%;
+
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 35%, transparent 55% );
+  transform: rotate(-45deg);
+  pointer-events: none;
+}
+
+
+.nav a {
+  padding: 8px 16px;
+  border-radius: 10px;
+  color: var(--cor-7);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 525;
+  transition: 0.2s;
+}
+
+.nav a:hover {
+
+  color: var(--cor-7);
+  text-decoration: underline;
+  box-shadow: inset 0 0 0 1px var(--vidro-nav);
+}
+
+.nav a[aria-current="page"] {
+  background: var(--cor-2);
+  text-decoration: none;
+  color: var(--cor-7);
+  box-shadow: inset 0 0 0 1px var(--vidro-nav);
+}
+
+/* ----- Botões do cabeçalho ----- */
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
