@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="opcoes">
-              <label class="checkbox"><input type="checkbox" id="termos" name="termos" required><span>Li e aceito os <a class="link" href="#">Termos de uso</a> e a <a class="link" href="#">Política de privacidade.</a></span></label>
+              <label class="checkbox"><input type="checkbox" id="termos" name="termos" required><span>Li e aceito os <a class="link" href="${ctx}/suporte.html#privacidade" target="_blank" rel="noopener noreferrer">Termos de uso</a> e a <a class="link" href="${ctx}/suporte.html#privacidade" target="_blank" rel="noopener noreferrer">Política de privacidade.</a></span></label>
             </div>
             <button class="botao" type="submit">Continuar</button>
           </form>
