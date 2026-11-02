@@ -1,0 +1,99 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- topo comum das telas do painel: head, menu lateral e barra de cima ( usa menuAtivo e tituloPagina ) --%>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><c:out value="${tituloPagina}"/></title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@600&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="${ctx}/assets/css/style-app.css">
+</head>
+<body>
+    <aside class="menu-lateral padding">
+        <div class="logo">
+            <img src="${ctx}/assets/icones/Logo.svg" alt="Logo">
+        </div>
+        <br>
+        <p class="titulo-menu">PAINEL</p>
+        <nav class="nav" aria-label="Visão">
+            <a class="topicos-menu" href="${ctx}/admin/visao-geral" ${menuAtivo == 'visao-geral' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-visao-geral.svg" alt="">
+                Visão geral
+            </a>
+            <p class="titulo-menu">DONOS</p>
+            <a class="topicos-menu" href="${ctx}/admin/usuarios" ${menuAtivo == 'usuarios' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-usuario.svg" alt="">
+                Usuários
+            </a>
+            <a class="topicos-menu" href="${ctx}/admin/empresas" ${menuAtivo == 'empresas' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-empresa.svg" alt="">
+                Comércio
+            </a>
+            <p class="titulo-menu">ARMAZENAMENTO</p>
+            <a class="topicos-menu" href="${ctx}/admin/geladeiras" ${menuAtivo == 'geladeiras' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-geladeira.svg" alt="">
+                Geladeira
+            </a>
+            <a class="topicos-menu" href="${ctx}/admin/frigorificos" ${menuAtivo == 'frigorificos' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-frigorificos.svg" alt="">
+                Frigoríficos
+            </a>
+            <a class="topicos-menu" href="${ctx}/admin/produtos" ${menuAtivo == 'produtos' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-produtos.svg" alt="">
+                Produtos
+            </a>
+            <p class="titulo-menu">CONTEÚDO</p>
+            <a class="topicos-menu" href="${ctx}/admin/receitas" ${menuAtivo == 'receitas' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-receitas.svg" alt="">
+                Receitas
+            </a>
+            <a class="topicos-menu" href="${ctx}/admin/compras" ${menuAtivo == 'compras' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-lista-compras.svg" alt="">
+                Lista de compras
+            </a>
+            <p class="titulo-menu">ASSINATURAS</p>
+            <a class="topicos-menu" href="${ctx}/admin/planos" ${menuAtivo == 'planos' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-planos.svg" alt="">
+                Plano
+            </a>
+            <p class="titulo-menu titulo-menu-conta">CONTA</p>
+            <a class="topicos-menu" href="${ctx}/admin/configuracoes" ${menuAtivo == 'configuracoes' ? 'aria-current="page"' : ''}>
+                <img src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+                Configurações
+            </a>
+        </nav>
+
+        <hr style="opacity: 20%;">
+        <hr style="opacity: 20%;">
+        <div class="caixa-perfil">
+            <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+            <div class="info-perfil">
+                <p class="titulo-perfil">Superadministrador</p>
+                <p class="titulo-menu">Acesso total</p>
+            </div>
+        </div>
+    </aside>
+
+    <header class="header-app">
+        <details class="perfil-header">
+            <summary>
+                <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+                <span>Superadministrador</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </summary>
+            <div class="menu-perfil">
+                <a href="${ctx}/admin/configuracoes" class="topicos-menu"><img src="${ctx}/assets/icones/icone-configuracoes.svg" class="icone " alt="">Configurações</a>
+                <a class="sair topicos-menu" href="${ctx}/logout"><img src="${ctx}/assets/icones/icone-sair.svg" class="icone" alt="">Sair</a>
+            </div>
+        </details>
+    </header>
