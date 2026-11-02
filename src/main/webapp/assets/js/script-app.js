@@ -259,3 +259,28 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = window.location.pathname;
   });
 });
+
+/* ==========================================================================
+   4. ETIQUETAS
+   Põe em cada etiqueta a classe etiqueta-<texto> (ex.: "FAMILIA" vira etiqueta-familia),
+   e o style-app.css escolhe a cor. Depois deixa o texto legível ("OCUPACAO_BAIXA" vira "Ocupação baixa")
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  // palavras que precisam de acento
+  const acentos = { ocupacao: 'ocupação', atencao: 'atenção', familia: 'família', proximo: 'próximo' };
+
+  document.querySelectorAll('.etiqueta-plano').forEach(etiqueta => {
+    const original = etiqueta.textContent.trim();
+    const nome = original.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // tira os acentos
+      .replace(/[^a-z0-9]+/g, '-');
+    if (!nome) return;
+    etiqueta.classList.add('etiqueta-' + nome);
+
+    // só reescreve o que veio em MAIÚSCULAS do servidor (os nomes dos enums)
+    if (original === original.toUpperCase() && /[A-Z]/.test(original)) {
+      const frase = nome.split('-').map(palavra => acentos[palavra] || palavra).join(' ');
+      etiqueta.textContent = frase.charAt(0).toUpperCase() + frase.slice(1);
+    }
+  });
+});
