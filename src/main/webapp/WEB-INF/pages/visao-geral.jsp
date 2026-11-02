@@ -103,5 +103,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="${ctx}/assets/js/grafico-visao-geral.js"></script>
+    <script src="${ctx}/assets/js/script-carregando.js"></script>
 </body>
 </html>
