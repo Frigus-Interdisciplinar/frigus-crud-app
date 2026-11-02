@@ -1,0 +1,26 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- rodapé da tabela: contagem e botões de página ( usa pagina, totalPaginas, totalFiltrado e queryPagina vindos do Paginacao; o texto vem de rotuloLista ) --%>
+<c:set var="primeiro" value="${totalFiltrado == 0 ? 0 : (pagina - 1) * 10 + 1}"/>
+<c:set var="ultimo" value="${pagina * 10 < totalFiltrado ? pagina * 10 : totalFiltrado}"/>
+<div class="rodape-tabela">
+    <span>Mostrando ${primeiro}–${ultimo} de ${totalFiltrado} ${rotuloLista}</span>
+
+    <c:if test="${totalPaginas > 1}">
+        <div class="paginacao">
+            <c:choose>
+                <c:when test="${pagina > 1}"><a class="pagina" href="?pagina=${pagina - 1}<c:out value='${queryPagina}'/>">‹ Anterior</a></c:when>
+                <c:otherwise><button class="pagina" type="button" disabled>‹ Anterior</button></c:otherwise>
+            </c:choose>
+
+            <c:forEach begin="1" end="${totalPaginas}" var="n">
+                <a class="pagina ${n == pagina ? 'pagina-ativa' : ''}" href="?pagina=${n}<c:out value='${queryPagina}'/>">${n}</a>
+            </c:forEach>
+
+            <c:choose>
+                <c:when test="${pagina < totalPaginas}"><a class="pagina pagina-proxima" href="?pagina=${pagina + 1}<c:out value='${queryPagina}'/>">Próxima ›</a></c:when>
+                <c:otherwise><button class="pagina pagina-proxima" type="button" disabled>Próxima ›</button></c:otherwise>
+            </c:choose>
+        </div>
+    </c:if>
+</div>
