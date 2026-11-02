@@ -74,7 +74,7 @@
         <hr style="opacity: 20%;">
         <hr style="opacity: 20%;">
         <div class="caixa-perfil">
-            <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+            <span class="avatar-iniciais" aria-hidden="true">SA</span>
             <div class="info-perfil">
                 <p class="titulo-perfil">Superadministrador</p>
                 <p class="titulo-menu">Acesso total</p>
@@ -85,7 +85,7 @@
     <header class="header-app">
         <details class="perfil-header">
             <summary>
-                <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+                <span class="avatar-iniciais" aria-hidden="true">SA</span>
                 <span>Superadministrador</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>

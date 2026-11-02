@@ -18,7 +18,7 @@
             <!-- Perfil -->
             <section class="cartao-config">
                 <div class="cartao-config-topo">
-                    <img class="circulos" src="${ctx}/assets/icones/icone-perfil.svg" alt="">
+                    <span class="avatar-iniciais avatar-grande" aria-hidden="true">SA</span>
                     <div>
                         <h2 class="cartao-config-nome"><c:out value="${conta.nome}"/></h2>
                         <p class="cartao-config-email"><c:out value="${conta.email}"/></p>
