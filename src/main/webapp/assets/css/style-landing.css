@@ -798,13 +798,14 @@ header{
   top: 0;
   left: 0;
   inset: 0;
-  width: 1290px;
+  /* nunca passa da largura da tela (em 1280px o celular ficava cortado) e a margem lateral encolhe junto */
+  width: min(100vw, 1290px);
   height: 100vh;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 90px;
+  padding: 90px clamp(16px, 6vw, 90px);
   overflow: hidden;
   z-index: -2;
   background: var(--cor-2);
@@ -827,6 +828,14 @@ header{
   flex: 0 0 420px;
   margin-top: 90px;
   margin-left: -100px;
+}
+
+/* Em telas entre 1025px e 1365px (laptop com zoom, projetor) os celulares encolhem junto com a largura:
+   50vw - 263px dá exatamente 420px em 1366px e vai diminuindo de forma contínua, sem salto */
+@media (min-width: 1025px) and (max-width: 1365px) {
+  .celular {
+    flex-basis: calc(50vw - 263px);
+  }
 }
 
 .celular img {
