@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>403 - Frigus</title>
+    <link rel="icon" type="image/svg+xml" href="${pageContext.request.contextPath}/assets/img/favicon.svg">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/estilo.css">
 </head>
 <body class="inicio">
