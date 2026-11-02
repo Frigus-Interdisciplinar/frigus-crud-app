@@ -100,11 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const ATRASO_MS = 120;
   let adiar = 0;
 
-  function sair() {
+  // imediato = true mostra na hora (ex.: botão Área restrita, que pode demorar quando o servidor está acordando)
+  function sair(imediato) {
     // guarda a hora de saída para medir quanto a próxima página demora
     try { sessionStorage.setItem('carregandoInicio', String(Date.now())); } catch (e) { /* sem armazenamento, segue sem medir */ }
     clearTimeout(adiar);
-    adiar = setTimeout(mostrar, ATRASO_MS);
+    if (imediato === true) mostrar();
+    else adiar = setTimeout(mostrar, ATRASO_MS);
   }
 
   // clicou num link que leva para outra página
@@ -117,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const destino = new URL(link.href, window.location.href);
     if (destino.origin !== window.location.origin) return;
     if (link.getAttribute('href').startsWith('#')) return;
-    sair();
+    sair(link.dataset.carregando === 'agora');
   });
 
   // enviou um formulário (cadastro, login, filtros, salvar, excluir)
