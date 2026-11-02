@@ -3,6 +3,9 @@
 <%-- rodapé da tabela: contagem e botões de página ( usa pagina, totalPaginas, totalFiltrado e queryPagina vindos do Paginacao; o texto vem de rotuloLista ) --%>
 <c:set var="primeiro" value="${totalFiltrado == 0 ? 0 : (pagina - 1) * 10 + 1}"/>
 <c:set var="ultimo" value="${pagina * 10 < totalFiltrado ? pagina * 10 : totalFiltrado}"/>
+<%-- janela de 5 números de página ao redor da atual --%>
+<c:set var="fimJanela" value="${(pagina < 3 ? 1 : pagina - 2) + 4 > totalPaginas ? totalPaginas : (pagina < 3 ? 1 : pagina - 2) + 4}"/>
+<c:set var="inicioJanela" value="${fimJanela - 4 < 1 ? 1 : fimJanela - 4}"/>
 <div class="rodape-tabela">
     <span>Mostrando ${primeiro}–${ultimo} de ${totalFiltrado} ${rotuloLista}</span>
 
@@ -13,7 +16,7 @@
                 <c:otherwise><button class="pagina" type="button" disabled>‹ Anterior</button></c:otherwise>
             </c:choose>
 
-            <c:forEach begin="1" end="${totalPaginas}" var="n">
+            <c:forEach begin="${inicioJanela}" end="${fimJanela}" var="n">
                 <a class="pagina ${n == pagina ? 'pagina-ativa' : ''}" href="?pagina=${n}<c:out value='${queryPagina}'/>">${n}</a>
             </c:forEach>
 
