@@ -2,5 +2,6 @@
 <%-- fim comum das telas do painel: scripts e fechamento da página --%>
     <script src="${pageContext.request.contextPath}/assets/js/mascaras.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/script-app.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/script-carregando.js"></script>
 </body>
 </html>

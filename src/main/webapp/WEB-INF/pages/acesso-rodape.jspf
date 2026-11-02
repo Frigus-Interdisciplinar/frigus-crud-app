@@ -1,0 +1,16 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%-- fim comum das telas de acesso: fecha o cartão e mostra o rodapé e o script --%>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <span>© 2026 Frigus. Todos os direitos reservados.</span>
+      <span class="rodape-contato">
+        <a href="mailto:frigus.ofc@gmail.com" target="_blank" rel="noopener noreferrer">frigus.ofc@gmail.com</a>
+        <a href="https://instagram.com/frigus.app" target="_blank" rel="noopener noreferrer">Instagram: frigus.app</a>
+      </span>
+    </footer>
+    <script src="${pageContext.request.contextPath}/assets/js/script-acesso.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/script-carregando.js"></script>
+  </body>
+</html>

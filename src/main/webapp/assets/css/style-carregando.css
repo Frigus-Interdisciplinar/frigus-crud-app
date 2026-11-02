@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+/* ==========================================================================
+   Tela de carregamento - Friguinho
+
+   Aparece por cima da página quando a pessoa troca de tela e o servidor
+   ainda está buscando as informações no banco.
+
+   Índice:
+   1. Variáveis
+   2. Tela
+   3. Neve e flocos
+   4. Friguinho
+   5. Texto e barra
+   6. Montes de neve
+   7. Movimento reduzido
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. VARIÁVEIS
+   ========================================================================== */
+.carregando {
+  --c-fundo-topo: #0B1445;
+  --c-fundo-meio: #1A3A8F;
+  --c-fundo-base: #2552C8;
+  --c-texto: #FFFFFF;
+  --c-texto-suave: #C9DEF9;
+  --c-trilho: rgba(255, 255, 255, .22);
+  --c-barra: linear-gradient(90deg, #9CC5F8, #E4EEFF);
+  --c-chip: rgba(255, 255, 255, .12);
+  --c-halo: rgba(120, 170, 255, .38);
+}
+
+
+/* ==========================================================================
+   2. TELA
+   Cobre a página inteira; o atributo hidden esconde e a classe .ativo faz o fade
+   ========================================================================== */
+.carregando {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 30%, rgba(40, 130, 170, .35), transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(95, 85, 175, .38), transparent 46%),
+    linear-gradient(180deg, var(--c-fundo-topo) 0%, var(--c-fundo-meio) 68%, var(--c-fundo-base) 100%);
+  color: var(--c-texto);
+  font-family: 'Sarabun', Arial, sans-serif;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.carregando[hidden] {
+  display: none;
+}
+
+.carregando.ativo {
+  opacity: 1;
+}
+
+.carregando-centro {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 640px);
+  padding: 0 24px;
+  text-align: center;
+}
+
+
+/* ==========================================================================
+   3. NEVE E FLOCOS
+   ========================================================================== */
+
+/* ----- Neve caindo (só CSS: duas camadas de pontinhos em velocidades diferentes) ----- */
+.neve-css {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.neve-css::before,
+.neve-css::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+
+.neve-css::before {
+  background-image:
+    radial-gradient(2px 2px at 30px 40px, rgba(255, 255, 255, .85), transparent),
+    radial-gradient(1.5px 1.5px at 120px 90px, rgba(255, 255, 255, .7), transparent),
+    radial-gradient(2.5px 2.5px at 190px 170px, rgba(255, 255, 255, .8), transparent),
+    radial-gradient(1.5px 1.5px at 70px 200px, rgba(255, 255, 255, .6), transparent);
+  background-size: 240px 240px;
+  animation: neve-cai 16s linear infinite;
+}
+
+.neve-css::after {
+  background-image:
+    radial-gradient(3px 3px at 60px 80px, rgba(255, 255, 255, .55), transparent),
+    radial-gradient(2px 2px at 250px 30px, rgba(255, 255, 255, .5), transparent),
+    radial-gradient(3px 3px at 180px 260px, rgba(255, 255, 255, .6), transparent);
+  background-size: 360px 360px;
+  animation: neve-cai 26s linear infinite;
+}
+
+@keyframes neve-cai {
+  to {
+    background-position: 50px 100%;
+  }
+}
+
+/* ----- Flocos desenhados ao fundo ----- */
+.carregando-flocos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.carregando-floco {
+  position: absolute;
+  height: auto;
+  aspect-ratio: 1;
+  opacity: 0.16;
+}
+
+.carregando-floco--1 {
+  top: 17%;
+  left: 5%;
+  width: 150px;
+}
+
+.carregando-floco--2 {
+  top: 8%;
+  left: 83%;
+  width: 130px;
+}
+
+.carregando-floco--3 {
+  top: 60%;
+  left: 17%;
+  width: 90px;
+}
+
+.carregando-floco--4 {
+  top: 58%;
+  left: 77%;
+  width: 70px;
+}
+
+
+/* ==========================================================================
+   4. FRIGUINHO
+   Dois canvas: o de baixo (escondido) recebe o desenho do Rive com o fundo cinza dele;
+   o de cima mostra o mesmo desenho com o cinza apagado (feito pelo script-carregando.js)
+   ========================================================================== */
+.friguinho {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  margin-bottom: 26px;
+}
+
+.friguinho-halo {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c-halo), transparent 66%);
+}
+
+.friguinho-fonte,
+.friguinho-tela {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.friguinho-fonte {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ==========================================================================
+   5. TEXTO E BARRA
+   ========================================================================== */
+.carregando-titulo {
+  margin: 0 0 10px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.carregando-texto {
+  margin: 0 0 34px;
+  color: var(--c-texto-suave);
+  font-size: 16px;
+}
+
+.barra {
+  width: min(100%, 266px);
+  height: 8px;
+  margin-bottom: 38px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--c-trilho);
+}
+
+.barra-cheia {
+  width: 2%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--c-barra);
+  transition: width 0.2s linear;
+}
+
+.carregando-dica {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--c-chip);
+  color: var(--c-texto-suave);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.carregando-dica strong {
+  color: var(--c-texto);
+  font-weight: 700;
+}
+
+
+/* ==========================================================================
+   6. MONTES DE NEVE
+   ========================================================================== */
+.carregando-monte {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 110px;
+  pointer-events: none;
+}
+
+.carregando-monte .m2 {
+  fill: #5B84CF;
+}
+
+.carregando-monte .m1 {
+  fill: #D2EAF8;
+}
+
+
+/* ==========================================================================
+   7. MOVIMENTO REDUZIDO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .neve-css::before,
+  .neve-css::after {
+    animation: none;
+  }
+
+  .carregando,
+  .barra-cheia {
+    transition: none;
+  }
+}

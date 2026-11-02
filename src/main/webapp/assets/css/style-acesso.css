@@ -1,0 +1,374 @@
+/*
+    style-acesso.css - CSS das telas de acesso (entrar, criar conta e criar senha)
+    1. Geral (cores, página, rodapé)
+    2. Cartão e formulário (campos, botões, links)
+    3. Telas de acesso
+    4. Responsivo */
+
+
+/* 1. */
+:root {
+    --azul: #2552c8;
+    --fundo-cartao: #1a1919;
+    --borda: #2d2c40;
+    --texto: #f0f6f8;
+    --texto-suave: #5b6785;
+    --vidro: rgba(37, 82, 200, 0.2);
+    --erro: #ff6b6b;
+    --sucesso: #5ad28a;
+}
+
+* {
+    box-sizing: border-box; /* organizo padding e borda */
+}
+
+body {
+  position: relative;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Sarabun", Arial, sans-serif;
+  color: var(--texto);
+  background-image: url("../img/fundo-ondas.svg"), linear-gradient(90deg, #111324 55%, #0d1339); /* duas camadas, as ondas por cima e o degradê escuro por baixo */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+h1, h2, p, ul {
+    margin: 0;
+    padding: 0;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+button, input {
+    font-family:inherit;
+    font-size: inherit;
+    color: inherit
+}
+
+a {
+    color: inherit;
+}
+
+
+footer {                 /* Rodapé de direitos */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 0 9% 27px;
+    font-size: 12px;
+    color: rgba(201, 222, 249, 0.67);
+}
+
+/* e-mail e Instagram do rodapé: abrem em outra aba */
+.rodape-contato {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+}
+
+.rodape-contato a {
+    text-decoration: none;
+}
+
+.rodape-contato a:hover {
+    text-decoration: underline;
+}
+
+
+.voltar {             /* Setinha redonda de voltar */
+  position: absolute;
+  top: 114px;
+  left: 9%;
+  width: 63px;
+  height: 63px;
+}
+
+.voltar img {
+    width: 63px;
+    height: 63px;
+}
+
+/* 2.    */
+
+.moldura {
+  padding: 30px;
+  background: var(--vidro);
+  border-radius: 35px;
+}
+
+/* Cartão escuro onde ficam o título e o formulário */
+.cartao {
+  padding: 54px;
+  background: var(--fundo-cartao);
+  border-radius: 28px;
+}
+
+.cartao h1 {
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+
+.subtitulo {
+  margin-bottom: 32px;
+  font-size: 16px;
+  color: var(--texto-suave);
+}
+
+form {
+  margin-bottom: 32px;
+}
+
+/* Cada campo = rótulo + caixa */
+.campo {
+  margin-bottom: 8px;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.caixa {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--fundo-cartao);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+}
+
+/* a borda fica azul quando o campo de dentro está selecionado */
+.caixa:focus-within {
+  border-color: var(--azul);
+}
+
+.caixa input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 15px;
+}
+
+.caixa input::placeholder {
+  color: var(--texto-suave);
+}
+
+/* quando o navegador preenche o campo sozinho (e-mail salvo), ele pinta o fundo de claro;
+   aqui o fundo volta a ser o do cartão e o texto continua claro */
+.caixa input:-webkit-autofill,
+.caixa input:-webkit-autofill:hover,
+.caixa input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--fundo-cartao) inset;
+  -webkit-text-fill-color: var(--texto);
+  caret-color: var(--texto);
+}
+
+/* botão do olhinho (mostrar/ocultar senha) */
+.olho {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.olho img {
+  width: 17px;
+  height: 17px;
+  margin: auto;
+}
+
+/* mensagens que o servidor manda (erro e sucesso) */
+.erro,
+.sucesso {
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.erro {
+  color: var(--erro);
+}
+
+.sucesso {
+  color: var(--sucesso);
+}
+
+/* linha com checkbox e/ou link */
+.opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.checkbox input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--azul);
+  color-scheme: dark; /* caixinha escura, combinando com o cartão */
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+/* os links dentro da frase dos termos ficam do tamanho do texto */
+.checkbox .link {
+  font-size: inherit;
+  font-weight: 400;
+}
+
+/* texto de baixo: "Já tem uma conta? Entrar" */
+.troca {
+  text-align: center;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.troca .link {
+  margin-left: 6px;
+}
+
+/* botões (servem para <button> e para <a>) */
+.botao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  margin-top: 24px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--azul);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--texto);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao:hover {
+  filter: brightness(1.15);
+}
+
+/* 3.     */
+
+.pagina {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 9% 40px 0;
+}
+
+.logo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+}
+
+.logo .floco {
+  width: 124px;
+}
+
+.logo .nome {
+  width: 188px;
+}
+
+.pagina .moldura {
+    flex: 0 1 739px;
+}
+
+/* 4.     */
+
+/* Tablet até 1000px: tudo vira uma coluna só */
+@media screen and (max-width: 1000px) {
+  .pagina {
+    flex-direction: column;
+    padding: 16px 16px 40px;
+  }
+
+  .logo {
+    flex: none;
+    gap: 16px;
+  }
+
+  .logo .floco {
+    width: 62px;
+  }
+
+  .logo .nome {
+    width: 120px;
+  }
+
+  .pagina .moldura {
+    flex: none;
+    width: 100%;
+    max-width: 739px;
+  }
+
+  /*  O botão voltar deixa de flutuar e entra no fluxo da página */
+
+  .voltar {
+    position: static;
+    margin: 16px;
+  }
+
+  footer {
+    padding: 0 16px 24px;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* Celular até 600px: menos espaço e letras menores */
+@media screen and (max-width: 600px) {
+  .moldura {
+    padding: 10px;
+  }
+
+  .cartao {
+    padding: 20px;
+  }
+
+  .cartao h1 {
+    font-size: 26px;
+  }
+
+  .voltar,
+  .voltar img {
+    width: 48px;
+    height: 48px;
+  }
+}

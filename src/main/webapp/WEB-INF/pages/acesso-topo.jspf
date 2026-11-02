@@ -1,0 +1,24 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- topo comum das telas de acesso: head, setinha de voltar, logo e abertura do cartão ( usa tituloPagina e urlVoltar ) --%>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${tituloPagina}"/></title>
+    <link rel="icon" type="image/svg+xml" href="${ctx}/assets/img/favicon.svg?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${ctx}/assets/css/style-acesso.css">
+    <link rel="stylesheet" href="${ctx}/assets/css/style-carregando.css">
+  </head>
+  <body>
+    <a class="voltar" href="${urlVoltar}" aria-label="Voltar"><img src="${ctx}/assets/img/icone-voltar.svg" alt=""></a>
+    <main class="pagina">
+      <div class="logo">
+        <img class="floco" src="${ctx}/assets/img/floco.svg" alt="">
+        <img class="nome" src="${ctx}/assets/img/frigus-texto.svg" alt="Frigus">
+      </div>
+      <div class="moldura">
+        <div class="cartao">
