@@ -11,6 +11,7 @@
     <link rel="icon" type="image/svg+xml" href="${ctx}/assets/img/favicon.svg?v=2">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${ctx}/assets/css/style-acesso.css">
+    <link rel="stylesheet" href="${ctx}/assets/css/style-carregando.css">
   </head>
   <body>
     <a class="voltar" href="${urlVoltar}" aria-label="Voltar"><img src="${ctx}/assets/img/icone-voltar.svg" alt=""></a>

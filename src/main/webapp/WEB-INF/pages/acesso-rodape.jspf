@@ -3,7 +3,9 @@
         </div>
       </div>
     </main>
+<%@ include file="carregando.jspf" %>
     <footer>© 2026 Frigus. Todos os direitos reservados.</footer>
     <script src="${pageContext.request.contextPath}/assets/js/script-acesso.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/script-carregando.js"></script>
   </body>
 </html>
