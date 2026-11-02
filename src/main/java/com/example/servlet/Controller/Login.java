@@ -115,6 +115,7 @@ public class Login extends HttpServlet {
                 HttpSession session = req.getSession();
                 req.changeSessionId();
                 session.setAttribute("admin", superAdmin.getEmail());
+                session.setAttribute("adminNome", superAdmin.getNome());
                 resp.sendRedirect(req.getContextPath() + url_visao_geral);
                 break;
             }
