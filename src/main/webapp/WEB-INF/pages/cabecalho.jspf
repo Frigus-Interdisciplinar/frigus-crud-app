@@ -1,7 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%-- topo comum das telas do painel: head, menu lateral e barra de cima ( usa menuAtivo e tituloPagina ) --%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<%-- nome do admin vem da sessão ( gravado no login ); as iniciais são as primeiras letras das duas primeiras palavras --%>
+<c:set var="nomeAdmin" value="${empty sessionScope.adminNome ? 'Superadministrador' : sessionScope.adminNome}"/>
+<c:set var="partesNome" value="${fn:split(fn:trim(nomeAdmin), ' ')}"/>
+<c:set var="iniciais" value="${fn:length(partesNome) > 1 ? fn:toUpperCase(fn:substring(partesNome[0], 0, 1).concat(fn:substring(partesNome[1], 0, 1))) : fn:toUpperCase(fn:substring(partesNome[0], 0, 2))}"/>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -74,9 +79,9 @@
         <hr style="opacity: 20%;">
         <hr style="opacity: 20%;">
         <div class="caixa-perfil">
-            <span class="avatar-iniciais" aria-hidden="true">SA</span>
+            <span class="avatar-iniciais" aria-hidden="true">${iniciais}</span>
             <div class="info-perfil">
-                <p class="titulo-perfil">Superadministrador</p>
+                <p class="titulo-perfil"><c:out value="${nomeAdmin}"/></p>
                 <p class="titulo-menu">Acesso total</p>
             </div>
         </div>
@@ -85,8 +90,8 @@
     <header class="header-app">
         <details class="perfil-header">
             <summary>
-                <span class="avatar-iniciais" aria-hidden="true">SA</span>
-                <span>Superadministrador</span>
+                <span class="avatar-iniciais" aria-hidden="true">${iniciais}</span>
+                <span><c:out value="${nomeAdmin}"/></span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>

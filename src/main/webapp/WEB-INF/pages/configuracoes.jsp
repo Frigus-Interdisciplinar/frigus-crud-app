@@ -18,7 +18,7 @@
             <!-- Perfil -->
             <section class="cartao-config">
                 <div class="cartao-config-topo">
-                    <span class="avatar-iniciais avatar-grande" aria-hidden="true">SA</span>
+                    <span class="avatar-iniciais avatar-grande" aria-hidden="true">${iniciais}</span>
                     <div>
                         <h2 class="cartao-config-nome"><c:out value="${conta.nome}"/></h2>
                         <p class="cartao-config-email"><c:out value="${conta.email}"/></p>
