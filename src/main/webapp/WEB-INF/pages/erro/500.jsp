@@ -15,7 +15,9 @@
 
     <link rel="icon" type="image/svg+xml" href="${ctx}/assets/img/favicon.svg?v=2">
     <link rel="stylesheet" href="${ctx}/assets/css/style-erro.css">
+    <link rel="stylesheet" href="${ctx}/assets/css/style-carregando.css">
     <script src="${ctx}/assets/js/script-erro.js" defer></script>
+    <script src="${ctx}/assets/js/script-carregando.js" defer></script>
 </head>
 <body>
     <div class="scene t-sky">
