@@ -165,29 +165,29 @@
    Dois canvas: o de baixo (escondido) recebe o desenho do Rive com o fundo cinza dele;
    o de cima mostra o mesmo desenho com o cinza apagado (feito pelo script-carregando.js)
    ========================================================================== */
-.friguinho {
+.carregando-friguinho {
   position: relative;
   width: 230px;
   height: 230px;
   margin-bottom: 26px;
 }
 
-.friguinho-halo {
+.carregando-friguinho-halo {
   position: absolute;
   inset: -12%;
   border-radius: 50%;
   background: radial-gradient(circle, var(--c-halo), transparent 66%);
 }
 
-.friguinho-fonte,
-.friguinho-tela {
+.carregando-friguinho-fonte,
+.carregando-friguinho-tela {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.friguinho-fonte {
+.carregando-friguinho-fonte {
   opacity: 0;
   pointer-events: none;
 }

@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
       '<div class="carregando-flocos" aria-hidden="true">' + flocos + '</div>' +
       '<div class="neve-css" aria-hidden="true"></div>' +
       '<div class="carregando-centro">' +
-        '<div class="friguinho" aria-hidden="true">' +
-          '<div class="friguinho-halo"></div>' +
-          '<canvas class="friguinho-fonte" width="500" height="500"></canvas>' +
-          '<canvas class="friguinho-tela" width="500" height="500"></canvas>' +
+        '<div class="carregando-friguinho" aria-hidden="true">' +
+          '<div class="carregando-friguinho-halo"></div>' +
+          '<canvas class="carregando-friguinho-fonte" width="500" height="500"></canvas>' +
+          '<canvas class="carregando-friguinho-tela" width="500" height="500"></canvas>' +
         '</div>' +
         '<h2 class="carregando-titulo">Carregando...</h2>' +
         '<p class="carregando-texto">O Friguinho está organizando a sua geladeira.</p>' +
@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ----- 4. Friguinho ----- */
 
-  const fonte = tela.querySelector('.friguinho-fonte');
-  const vista = tela.querySelector('.friguinho-tela');
+  const fonte = tela.querySelector('.carregando-friguinho-fonte');
+  const vista = tela.querySelector('.carregando-friguinho-tela');
   const ctxFonte = fonte.getContext('2d', { willReadFrequently: true });
   const ctxVista = vista.getContext('2d');
   let rive = null;
