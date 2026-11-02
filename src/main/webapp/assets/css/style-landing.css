@@ -1,0 +1,239 @@
+/* ==========================================================================
+   1. VARIÁVEIS
+   ========================================================================== */
+:root{
+    --vidro-nav: #00000005;
+    --vidro-nav2: #F0F6F870;
+    --borda-nav: #ffffff9f;
+    --cor-1: #2552C8;
+    --cor-2: #131C55;
+    --cor-3: #1F5F97;
+    --cor-4: #70A2D7;
+    --cor-5: #C9DEF9;
+    --cor-6: #F9C968;
+    --cor-7: #F8F8F8;
+    --cor-8: #1A1919;
+    --header: #1a19192c;
+    --transparente: #00000000;
+    --promo: #1a191986;
+}
+
+
+/* ==========================================================================
+   2. RESET E UTILITÁRIOS
+   ========================================================================== */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.padding{
+  padding: 90px;
+}
+
+/* ==========================================================================
+   3. TIPOGRAFIA
+   ========================================================================== */
+
+/* ----- 3.1 Títulos ----- */
+.titulo{
+  color: var(--cor-7);
+  font-size: 48px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+}
+
+.titulo-a{
+  color: var(--cor-1);
+  font-size: 38px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  text-align: center;
+}
+
+.titulo-a-sem-center{
+  color: var(--cor-1);
+  font-size: 35px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+}
+
+.titulo-b-sem-center{
+  color: var(--cor-7);
+  font-size: 37.94px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+}
+
+
+.titulo-a-escuro{
+  color: var(--cor-2);
+  font-size: 30.36px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+}
+
+
+.titulo-maior-b{
+  color: var(--cor-7);
+  font-size: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+}
+
+.titulo-menor-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 20.4px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.titulo-menor-b{
+  color: var(--cor-7);
+  font-size: 18px;
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 300;
+
+}
+
+/* ----- 3.2 Subtítulos ----- */
+.subtitulo-p{
+  color: var(--cor-8);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 21.5px;
+  text-align: center;
+}
+
+.subtitulo-a{
+  color: var(--cor-1);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 21.5px;
+  font-weight: bolder;
+}
+
+.subtitulo-a5{
+  color: var(--cor-5);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 21.5px;
+  font-weight: bolder;
+}
+
+.subtitulo-b{
+  color: var(--cor-7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 21.5px;
+  font-weight: bolder;
+}
+
+.subtitulo-b2{
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+/* ----- 3.3 Textos corridos ----- */
+.texto-maior-b{
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 16px;
+}
+
+.texto-maior-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 16px;
+}
+
+.texto{
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14.65px;
+  font-weight: 100;
+}
+
+.texto-maior-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 19.81px;
+  font-weight: 100;
+}
+
+
+.texto-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.texto-icones{
+  font-family: 'Sarabun' , sans-serif;
+  font-size: 15.91px;
+  font-weight: lighter;
+  text-align: center;
+}
+
+.texto-menor-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13.70px;
+}
+
+.texto-menor2-p{
+  color: var(--cor-8);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14.50px;
+  text-align: center;
+}
+
+.texto-menor-b{
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+}
+
+.texto-menor-a{
+  color: var(--cor-5);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13.70px;
+}
+
+.texto-pequeno-b{
+  color: var(--cor-7);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ----- 3.4 Textos com degradê ----- */
+.texto-degrade {
+  background: linear-gradient(100deg, var(--cor-1), var(--cor-2));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.texto-degrade2 {
+  background: linear-gradient(70deg, var(--cor-4), var(--cor-7));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-size: 50px;
+  font-family: 'Montserrat', sans-serif;
+  white-space: nowrap;
+}
+
+
