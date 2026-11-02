@@ -1410,8 +1410,13 @@ body > :not(.hero):not(header) {
   z-index: 10;
 }
 
+/* Onde a forma branca começa: a distância até o fim da primeira tela é medida pela LARGURA da tela
+   (43.92vw = os 600px do desenho de 1366px de largura), do mesmo jeito que a própria forma, que escala
+   pela largura (aspect-ratio 1366/726). Assim, em qualquer monitor, zoom ou escala do Windows, a forma
+   branca e a primeira tela mantêm a mesma proporção do desenho. O max() evita margem negativa em telas
+   muito largas e baixas. */
 .hero + .forma-branca-pg-inicial {
-  margin-top: calc(100vh - 600px);
+  margin-top: max(0px, calc(100vh - 43.92vw));
 }
 
 /* Emenda entre a forma branca e a seção de baixo: a seção de baixo passa a pintar 2px do mesmo branco
