@@ -1985,3 +1985,271 @@ body > dialog.janela-legal[open] {
 html.travado { overflow: hidden; }
 
 
+/* ==========================================================================
+   19. RESPONSIVO (TUDO que é responsivo fica aqui, sempre por último)
+   ========================================================================== */
+
+/* ----- 19.1 Media queries gerais ----- */
+@media (max-width: 960px) {
+  header {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .nav {
+    order: 3;
+    width: 275px;
+    justify-content: center;
+  }
+
+  .nav a {
+    padding: 8px 16px;
+    font-size: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  .logo span { font-size: 1.6rem; }
+  .botao { padding: 12px 22px; }
+}
+
+@media (max-width: 700px) {
+  .botoes-legais { flex-direction: column; align-items: center; }
+  .botao-legal { width: 100%; }
+}
+
+/* ----- 19.2 Larguras fluidas ----- */
+header,
+.fundoinicial,
+.fundo-inicial-sobre-nos,
+.fundo-inicial-suporte,
+.fundo-geral,
+.fundo-geral2,
+.fundo-escuro,
+.img-obtenha,
+.forma-funcionalidades,
+.forma-branca-dp-obter,
+.fundo-nossos-valores,
+.forma-nossa-missao,
+.fundo-nossos-planos,
+.forma-branca-faq,
+.fundo-equipe,
+.hero {
+  width: 100%;
+  max-width: 100%;
+}
+
+html, body { max-width: 100%; overflow-x: hidden; }
+img, svg { max-width: 100%; }
+
+/* ----- 19.3 Alturas mínimas e fundos ----- */
+.fundo-inicial-sobre-nos,
+.fundo-inicial-suporte {
+  height: auto;
+  min-height: clamp(520px, 70vw, 900px);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+.fundo-inicial-sobre-nos { min-height: 100vh; }
+.fundo-inicial-suporte   { padding-bottom: 60px; }
+
+.forma-funcionalidades,
+.fundo-nossos-planos { height: auto; min-height: 859px; background-size: cover; }
+.forma-branca-pg-inicial { height: 859.44px; }
+
+/* Telas largas: mostra só o trecho útil do SVG (a curva + um pouco de branco),
+   sempre na mesma escala da largura. Assim o espaço entre a curva e
+   "Funcionalidades" não cresce junto com o monitor. */
+@media (min-width: 1025px) {
+  .forma-branca-pg-inicial {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1366 / 726;
+    background-size: 100% auto;
+    background-position: 50% -4.1vw;
+  }
+}
+
+.forma-nossa-missao {
+  height: auto;
+  min-height: 850px;
+  background-size: cover;
+  background-position: center;
+}
+.fundo-nossos-valores { height: auto; min-height: 1421px; }
+.img-obtenha { height: auto; min-height: 500px; }
+.obtenhaPromo { min-height: 500px; }
+
+.caixa-funcionalidade,
+.caixa-sustentabilidade { flex-wrap: wrap; justify-content: center; }
+.caixa-funcionalidade { gap: 20px; }
+.caixa-sustentabilidade { gap: 40px; }
+.caixa-azul-sustentabilidade {
+  width: 100%;
+  max-width: 1088px;
+  height: auto;
+  margin: 0 auto;
+  padding: 20px clamp(20px, 8vw, 143px);
+}
+.caixa-nossa-missao { width: 100%; max-width: 1124px; height: auto; margin: 0 auto; }
+.caixa-nossa-missao-informação { width: auto; flex: 1 1 auto; height: auto; padding: clamp(24px, 6vw, 90px); }
+.caixa-nossa-missao img { max-width: 100%; width: 100%; height: 100%; object-fit: cover; display: block; }
+.caixa-nossa-missao > div:not(.caixa-nossa-missao-informação) { width: 285px; flex-shrink: 0; border-radius: 0 50px 50px 0; overflow: hidden; }
+.caixa-nossa-missao-informação .texto-p { font-size: 17px; }
+.caixa-planos { flex-wrap: wrap; }
+.caixa-plano { width: 299px; max-width: 100%; height: 472px; }
+.caixa-plano-comercial { width: 808px; max-width: 100%; height: auto; min-height: 522px; }
+.botao-plano { margin-top: 24px; }
+.caixa-circulos { flex-wrap: wrap; row-gap: 30px; }
+.botoes-legais { flex-wrap: wrap; }
+.botao-legal { width: min(490px, 100%); }
+.celular img { width: 100%; max-width: 600px; height: auto; }
+.caixa-botao-pg-inicial { width: 425px; max-width: 100%; }
+
+@media (min-width: 1025px) {
+  .celular img { width: 175%; max-width: none; }
+  .caixa-nossa-missao-informação { flex: 1 1 0; min-width: 0; height: 507px; }
+  .caixa-nossa-missao-informação .titulo-a-sem-center { font-size: 37.94px; }
+}
+
+@media (min-width: 1280px) {
+  .caixa-sustentabilidade { gap: 102px; }
+}
+
+/* ----- 19.4 Tipografia fluida ----- */
+.titulo           { font-size: clamp(30px, 5vw, 48px); }
+.titulo-maior-b   { font-size: clamp(30px, 5vw, 50px); }
+.texto-degrade2   { font-size: clamp(30px, 5vw, 50px); }
+.titulo-a         { font-size: clamp(26px, 3.6vw, 37.94px); }
+.titulo-a-sem-center,
+.titulo-b-sem-center { font-size: clamp(24px, 3.2vw, 36px); }
+.texto-maior-p    { font-size: clamp(16px, 1.8vw, 19.81px); }
+
+/* ----- 19.5 Tablet (até 1024px) ----- */
+@media (max-width: 1024px) {
+  .padding { padding: 60px 32px; }
+  header { padding: 16px 24px; }
+  .rodape-colunas { grid-template-columns: repeat(3, 1fr); row-gap: 40px; }
+  .rodape-lista li { margin-bottom: 20px; }
+
+  /* hero */
+  .hero {
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+    padding: 140px 32px 60px;
+    height: auto;
+    min-height: 100vh;
+  }
+  .hero .padding { text-align: center; }
+  .caixa-botao-pg-inicial { margin: 0 auto; }
+  .celular { flex: 0 0 auto; margin: 0; }
+  .hero + .forma-branca-pg-inicial { margin-top: calc(100vh - 300px); }
+
+  /* quem somos */
+  .fundo-inicial-sobre-nos {
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+    padding: 140px 32px 160px;
+    text-align: center;
+  }
+  .friguinho { width: min(420px, 80vw); }
+
+  /* missão */
+  .forma-nossa-missao > div { padding: 60px 32px !important; }
+  .caixa-nossa-missao { flex-direction: column; align-items: center; }
+  .caixa-nossa-missao-informação { border-radius: 30px; }
+
+  /* valores */
+  .fundo-nossos-valores { padding: 80px 32px; }
+  .caixa-nossos-valores-info,
+  .caixa-nossos-valores-info:nth-child(even) {
+    padding: 0 16px;
+    gap: 32px;
+    justify-content: center;
+    height: auto;
+    min-height: 200px;
+  }
+
+  /* promoção */
+  .obtenhaPromo > div { padding: 120px 32px 60px !important; }
+}
+
+/* ----- 19.6 Mobile (até 700px) ----- */
+@media (max-width: 700px) {
+  .padding { padding: 48px 20px; }
+
+  /* cabeçalho */
+  header { height: auto; padding: 12px 16px; gap: 8px; }
+  .caixa-itens-header { flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+  .logo img { height: 40px; width: auto; }
+  .nav { order: 3; width: 100%; justify-content: space-between; }
+  .nav a { flex: 1; text-align: center; padding: 8px 6px; font-size: 0.85rem; }
+  .botao-azul { height: 40px; padding: 8px 14px; }
+  .botao-claro { width: auto; padding: 8px 16px; height: 36px; }
+
+  /* topos das páginas */
+  .fundo-inicial-suporte > div { padding-top: 200px !important; padding-left: 16px; padding-right: 16px; }
+  .fundo-inicial-sobre-nos { min-height: 100vh; padding: 130px 20px 140px; }
+  .fundo-inicial-suporte { min-height: 520px; }
+  .quem-somos-texto br { display: none; }
+
+  /* hero */
+  .hero { padding: 150px 20px 40px; }
+  .hero br { display: none; }
+  .caixa-botao-pg-inicial { flex-direction: column; width: 100%; }
+  .botao-pagina-inicial-azul,
+  .botao-pagina-inicial-branco { width: 100%; padding: 17px 20px; }
+  .hero + .forma-branca-pg-inicial { margin-top: 0; height: 300px; min-height: 0; }
+
+  /* seções */
+  .forma-funcionalidades > div { padding: 40px 16px !important; }
+  .alternante-pg-inicial { max-width: 100%; margin: 20px 0; }
+  .alternante-pg-inicial a { min-width: 0; flex: 1; padding: 8px 6px; }
+  .caixa-funcionalidade-informação { width: 100%; max-width: 340px; height: auto; min-height: 338px; }
+  .caixa-sustetabilidade-informação { width: 100%; max-width: 340px; height: auto; min-height: 200px; }
+  .caixa-azul-sustentabilidade { padding: 24px 16px; }
+  .caixa-azul-informação { width: 100%; height: 170px; }
+  .caixa-apoio { white-space: normal; }
+  .caixa-elementos-circulos { width: 45%; }
+  .texto-degrade2 { white-space: normal; }
+  .botao-obter-agora { width: 100%; max-width: 253px; }
+
+  /* planos */
+  .caixa-plano, .caixa-plano-comercial { width: 100%; padding: 22px; }
+  .caixa-plano-comercial > *:not(.img-comercial) { max-width: 100%; }
+  .img-comercial { display: none; }
+  .plano-escuro { margin-top: 24px; }
+
+  /* nossos valores */
+  .caixa-nossos-valores-info,
+  .caixa-nossos-valores-info:nth-child(even) { flex-direction: column; text-align: center; gap: 16px; padding: 24px 0; }
+  .caixa-nossos-valores-info:nth-child(even) { flex-direction: column-reverse; }
+  .caixa-nossos-valores-info img { width: 110px; }
+
+  /* busca e FAQ */
+  .busca { height: 60px; padding: 6px; }
+  .busca__botao { width: 56px; }
+  .busca__botao img { width: 36px; height: 36px; }
+  .busca__campo { padding: 0 14px; }
+  .forma-branca-faq::before { background-size: cover; }
+  .faq__item summary { height: auto; min-height: 83.48px; padding: 20px; font-size: 15px; }
+  .faq__item p { padding: 16px 20px 22px; font-size: 15px; }
+  .botoes-legais { flex-direction: column; align-items: center; gap: 16px; }
+  .botao-legal { width: 100%; font-size: 16px; }
+
+  /* equipe (carrossel) */
+  .fundo-equipe { --equipe-w: 200px; --equipe-raio: 560px; --equipe-passo: 30deg; padding-top: 48px; }
+  .equipe-tags span { white-space: normal; text-align: center; padding: 10px 16px; font-size: 14px; }
+  .equipe-nome strong { font-size: 20px; }
+
+  /* rodapé */
+  .rodape-colunas { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
+  .rodape-titulo { margin-bottom: 20px; }
+  .rodape-copy { margin-top: 40px; }
+}
+
+@media (max-width: 420px) {
+  .rodape-colunas { grid-template-columns: 1fr; }
+  .caixa-elementos-circulos { width: 100%; }
+}
