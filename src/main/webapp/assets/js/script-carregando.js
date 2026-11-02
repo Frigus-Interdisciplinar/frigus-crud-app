@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
       '<div class="carregando-flocos" aria-hidden="true">' + flocos + '</div>' +
       '<div class="neve-css" aria-hidden="true"></div>' +
       '<div class="carregando-centro">' +
-        '<div class="friguinho" aria-hidden="true">' +
-          '<div class="friguinho-halo"></div>' +
-          '<canvas class="friguinho-fonte" width="500" height="500"></canvas>' +
-          '<canvas class="friguinho-tela" width="500" height="500"></canvas>' +
+        '<div class="carregando-friguinho" aria-hidden="true">' +
+          '<div class="carregando-friguinho-halo"></div>' +
+          '<canvas class="carregando-friguinho-fonte" width="500" height="500"></canvas>' +
+          '<canvas class="carregando-friguinho-tela" width="500" height="500"></canvas>' +
         '</div>' +
         '<h2 class="carregando-titulo">Carregando...</h2>' +
         '<p class="carregando-texto">O Friguinho está organizando a sua geladeira.</p>' +
@@ -100,11 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const ATRASO_MS = 120;
   let adiar = 0;
 
-  function sair() {
+  // imediato = true mostra na hora (ex.: botão Área restrita, que pode demorar quando o servidor está acordando)
+  function sair(imediato) {
     // guarda a hora de saída para medir quanto a próxima página demora
     try { sessionStorage.setItem('carregandoInicio', String(Date.now())); } catch (e) { /* sem armazenamento, segue sem medir */ }
     clearTimeout(adiar);
-    adiar = setTimeout(mostrar, ATRASO_MS);
+    if (imediato === true) mostrar();
+    else adiar = setTimeout(mostrar, ATRASO_MS);
   }
 
   // clicou num link que leva para outra página
@@ -117,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const destino = new URL(link.href, window.location.href);
     if (destino.origin !== window.location.origin) return;
     if (link.getAttribute('href').startsWith('#')) return;
-    sair();
+    sair(link.dataset.carregando === 'agora');
   });
 
   // enviou um formulário (cadastro, login, filtros, salvar, excluir)
@@ -183,8 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ----- 4. Friguinho ----- */
 
-  const fonte = tela.querySelector('.friguinho-fonte');
-  const vista = tela.querySelector('.friguinho-tela');
+  const fonte = tela.querySelector('.carregando-friguinho-fonte');
+  const vista = tela.querySelector('.carregando-friguinho-tela');
   const ctxFonte = fonte.getContext('2d', { willReadFrequently: true });
   const ctxVista = vista.getContext('2d');
   let rive = null;

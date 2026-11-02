@@ -291,7 +291,8 @@ body {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  width: 500px;
+  /* cresce junto com a largura da tela (a sombra e o pinguim acompanham, pois são medidos em %) */
+  width: clamp(420px, 33vw, 640px);
   aspect-ratio: 1;
 }
 
@@ -301,7 +302,7 @@ body {
   position: absolute;
   left: 50%;
   bottom: 12%;
-  width: 68%;
+  width: 73%;
   height: 9%;
   transform: translateX(-50%);
   border-radius: 50%;
@@ -797,13 +798,14 @@ header{
   top: 0;
   left: 0;
   inset: 0;
-  width: 1290px;
+  /* nunca passa da largura da tela (em 1280px o celular ficava cortado) e a margem lateral encolhe junto */
+  width: min(100vw, 1290px);
   height: 100vh;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 90px;
+  padding: 90px clamp(16px, 6vw, 90px);
   overflow: hidden;
   z-index: -2;
   background: var(--cor-2);
@@ -826,6 +828,14 @@ header{
   flex: 0 0 420px;
   margin-top: 90px;
   margin-left: -100px;
+}
+
+/* Em telas entre 1025px e 1365px (laptop com zoom, projetor) os celulares encolhem junto com a largura:
+   50vw - 263px dá exatamente 420px em 1366px e vai diminuindo de forma contínua, sem salto */
+@media (min-width: 1025px) and (max-width: 1365px) {
+  .celular {
+    flex-basis: calc(50vw - 263px);
+  }
 }
 
 .celular img {
@@ -1409,8 +1419,22 @@ body > :not(.hero):not(header) {
   z-index: 10;
 }
 
+/* Onde a forma branca começa: a distância até o fim da primeira tela é medida pela LARGURA da tela
+   (43.92vw = os 600px do desenho de 1366px de largura), do mesmo jeito que a própria forma, que escala
+   pela largura (aspect-ratio 1366/726). Assim, em qualquer monitor, zoom ou escala do Windows, a forma
+   branca e a primeira tela mantêm a mesma proporção do desenho. O max() evita margem negativa em telas
+   muito largas e baixas. */
 .hero + .forma-branca-pg-inicial {
-  margin-top: calc(100vh - 600px);
+  margin-top: max(0px, calc(100vh - 43.92vw));
+}
+
+/* Emenda entre a forma branca e a seção de baixo: a seção de baixo passa a pintar 2px do mesmo branco
+   da forma (#F0F6F8) por cima da emenda. Assim, se sobrar uma fresta de meio pixel (zoom ou escala do
+   Windows), ela aparece branca e não mostra o hero que fica fixo atrás. */
+.fundoinicial + .fundo-geral {
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 -2px 0 #F0F6F8;
 }
 
 
