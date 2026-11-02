@@ -1,12 +1,59 @@
 /* ==========================================================================
    SCRIPT DA TELA DE CARREGAMENTO
-   1. Quando mostrar (a pessoa trocou de tela)
-   2. Barra de progresso
-   3. Friguinho (animação do Rive)
+   Basta colocar este script e o style-carregando.css em qualquer página:
+   a tela é montada aqui mesmo, então todas as páginas usam o mesmo código.
+   1. Montagem da tela
+   2. Quando mostrar (a pessoa trocou de tela)
+   3. Barra de progresso
+   4. Friguinho (animação do Rive)
    ========================================================================== */
+
+// guarda quem é este script para descobrir onde ficam as imagens e a animação (funciona em qualquer página)
+const SCRIPT_CARREGANDO = document.currentScript;
+
 document.addEventListener('DOMContentLoaded', () => {
-  const tela = document.getElementById('carregando');
-  if (!tela) return;
+  /* ----- 1. Montagem da tela ----- */
+
+  function montarTela() {
+    const existente = document.getElementById('carregando');
+    if (existente) return existente;
+
+    const raiz = SCRIPT_CARREGANDO ? SCRIPT_CARREGANDO.src.replace(/assets\/js\/script-carregando\.js.*$/, '') : '';
+    const flocos = ['carregando-floco--1', 'carregando-floco--2', 'carregando-floco--3', 'carregando-floco--4']
+      .map(classe => '<img class="carregando-floco ' + classe + '" src="' + raiz + 'assets/img/erro/floco-claro.svg" alt="">').join('');
+
+    const caixa = document.createElement('div');
+    caixa.className = 'carregando';
+    caixa.id = 'carregando';
+    caixa.hidden = true;
+    caixa.setAttribute('role', 'status');
+    caixa.setAttribute('aria-live', 'polite');
+    caixa.dataset.riv = raiz + 'assets/animacoes/friguinho.riv';
+    caixa.innerHTML =
+      '<div class="carregando-flocos" aria-hidden="true">' + flocos + '</div>' +
+      '<div class="neve-css" aria-hidden="true"></div>' +
+      '<div class="carregando-centro">' +
+        '<div class="friguinho" aria-hidden="true">' +
+          '<div class="friguinho-halo"></div>' +
+          '<canvas class="friguinho-fonte" width="500" height="500"></canvas>' +
+          '<canvas class="friguinho-tela" width="500" height="500"></canvas>' +
+        '</div>' +
+        '<h2 class="carregando-titulo">Carregando...</h2>' +
+        '<p class="carregando-texto">O Friguinho está organizando a sua geladeira.</p>' +
+        '<div class="barra" role="progressbar" aria-label="Progresso do carregamento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+          '<div class="barra-cheia"></div>' +
+        '</div>' +
+        '<p class="carregando-dica"><strong>Dica</strong><span class="dica-texto"></span></p>' +
+      '</div>' +
+      '<svg class="carregando-monte" viewBox="0 0 1440 140" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path class="m2" d="M0 66C180 18 360 22 540 60S900 34 1100 40 1360 70 1440 48V140H0Z"/>' +
+        '<path class="m1" d="M0 100C200 62 380 82 600 96S1000 70 1200 86 1400 100 1440 92V140H0Z"/>' +
+      '</svg>';
+    document.body.appendChild(caixa);
+    return caixa;
+  }
+
+  const tela = montarTela();
 
   const barra = tela.querySelector('.barra');
   const barraCheia = tela.querySelector('.barra-cheia');
@@ -24,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'A visão geral mostra tudo que está cadastrado em um lugar só.'
   ];
 
-  /* ----- 1. Quando mostrar ----- */
+  /* ----- 2. Quando mostrar ----- */
 
   let visivel = false;
 
@@ -49,16 +96,39 @@ document.addEventListener('DOMContentLoaded', () => {
     pararFriguinho();
   }
 
-  // qualquer saída da página (link, formulário, filtro que envia sozinho) mostra a tela,
-  // mas só se a troca demorar mais de 0,25 s (quando é rápida, a tela nem pisca)
+  // a tela aparece quando a troca demora mais que isso (se a página nova abrir antes, ela nem pisca)
+  const ATRASO_MS = 120;
   let adiar = 0;
 
-  window.addEventListener('beforeunload', () => {
+  function sair() {
     // guarda a hora de saída para medir quanto a próxima página demora
     try { sessionStorage.setItem('carregandoInicio', String(Date.now())); } catch (e) { /* sem armazenamento, segue sem medir */ }
     clearTimeout(adiar);
-    adiar = setTimeout(mostrar, 250);
+    adiar = setTimeout(mostrar, ATRASO_MS);
+  }
+
+  // clicou num link que leva para outra página
+  document.addEventListener('click', e => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const link = e.target.closest('a[href]');
+    if (!link || link.hasAttribute('download')) return;
+    if (link.target && link.target !== '_self') return;
+
+    const destino = new URL(link.href, window.location.href);
+    if (destino.origin !== window.location.origin) return;
+    if (link.getAttribute('href').startsWith('#')) return;
+    sair();
   });
+
+  // enviou um formulário (cadastro, login, filtros, salvar, excluir)
+  document.addEventListener('submit', e => {
+    if (e.defaultPrevented) return;
+    if (e.target.target && e.target.target !== '_self') return;
+    sair();
+  });
+
+  // qualquer outra saída (ex.: filtro que envia sozinho pelo script)
+  window.addEventListener('beforeunload', sair);
 
   // voltar pelo botão do navegador pode trazer a página antiga com a tela ainda aberta
   window.addEventListener('pageshow', e => {
@@ -68,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // para quem quiser chamar de outro lugar (ex.: testes)
   window.Carregando = { mostrar, esconder };
 
-  /* ----- 2. Barra de progresso ----- */
+  /* ----- 3. Barra de progresso ----- */
 
   // o navegador não avisa quanto falta enquanto o servidor busca no banco;
   // por isso a barra anda pela média do tempo das últimas trocas de tela (sobe rápido e desacelera, sem chegar a 100%)
@@ -111,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelAnimationFrame(quadroBarra);
   }
 
-  /* ----- 3. Friguinho ----- */
+  /* ----- 4. Friguinho ----- */
 
   const fonte = tela.querySelector('.friguinho-fonte');
   const vista = tela.querySelector('.friguinho-tela');
