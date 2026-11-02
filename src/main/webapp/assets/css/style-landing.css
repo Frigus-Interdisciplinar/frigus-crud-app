@@ -470,12 +470,6 @@ background: url(../img/landing/img-fundo-obtenhaPromo.svg) center / cover no-rep
   justify-items: center;
 }
 
-.fundo-nossos-planos{
-  width: 1268.5px;
-  height: 859.44px;
-  background: url(../img/landing/forma-branca-nossos-planos.svg) center / cover no-repeat;
-}
-
 /* ----- Forma branca + FAQ ----- */
 .forma-branca-faq {
   position: relative;
