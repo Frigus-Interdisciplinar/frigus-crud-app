@@ -3,7 +3,13 @@
         </div>
       </div>
     </main>
-    <footer>© 2026 Frigus. Todos os direitos reservados.</footer>
+    <footer>
+      <span>© 2026 Frigus. Todos os direitos reservados.</span>
+      <span class="rodape-contato">
+        <a href="mailto:frigus.ofc@gmail.com" target="_blank" rel="noopener noreferrer">frigus.ofc@gmail.com</a>
+        <a href="https://instagram.com/frigus.app" target="_blank" rel="noopener noreferrer">Instagram: frigus.app</a>
+      </span>
+    </footer>
     <script src="${pageContext.request.contextPath}/assets/js/script-acesso.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/script-carregando.js"></script>
   </body>
