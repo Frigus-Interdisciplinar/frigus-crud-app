@@ -1,17 +1,565 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Frigus</title>
-    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg?v=2">
-    <link rel="stylesheet" href="assets/css/estilo.css">
-    <link rel="stylesheet" href="assets/css/style-carregando.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Página Inicial</title>
+ 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@600&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="assets/css/style-landing.css">
+ 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="assets/js/landing/neve.js" defer></script>
+ 
 </head>
-<body class="inicio">
-    <div class="cartao">
-        <h1>Frigus</h1>
-        <a class="botao" href="admin/visao-geral">Área restrita</a>
+<body>
+    <div>
+        <header class="header">
+            <div class="caixa-itens-header">
+                <a class="logo" href="index.html">
+                    <img src="assets/img/landing/Logo.svg" alt="">
+                </a>
+ 
+                <nav class="nav" aria-label="Principal">
+                    <a href="index.html" aria-current="page">Página inicial</a>
+                    <a href="sobre-nos.html">Sobre nós</a>
+                    <a href="suporte.html">Suporte</a>
+                </nav>
+ 
+                <div class="acoes">
+                    <a class="botao botao-claro " href="http://frigus-web.vercel.app/login">
+                        <span class="texto-degrade">Entrar</span>
+                    </a>
+                    <a class="botao botao-azul" href="http://frigus-web.vercel.app/register">Fazer parte</a>
+                </div>
+            </div>
+        </header>
+ 
+        <div class="fundoinicial">
+            <section class="hero">
+                <canvas class="hero-neve" aria-hidden="true"></canvas>
+                <div class=" padding">
+                    <h1 class="titulo-maior-b">
+                        Inteligência para <span class="texto-degrade2">conservar</span>
+                        <br> Eficiência para <span class="texto-degrade2">durar</span>
+                    </h1>
+                    <br><br><br>
+                    <p class="titulo-menor-b">
+                        Um aplicativo inteligente que ajuda você a organizar
+                        a sua geladeira de <br> forma simples e prática.
+                    </p>
+                    <br><br><br>
+                    <div>
+                        <div class=" caixa-botao-pg-inicial acoes">
+                            <a class="botao botao-pagina-inicial-branco" href="http://frigus-web.vercel.app/login">Entrar</a>
+                            <a class="botao botao-pagina-inicial-azul" href="http://frigus-web.vercel.app/register">Fazer parte</a>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="celular">
+                    <img src="assets/img/landing/celulares.svg" alt="">
+                </div>
+ 
+            </section>
+ 
+            <div class="forma-branca-pg-inicial"></div>
+ 
+        </div>
+ 
+        <div  class="fundo-geral">
+            <div id="Funcionalidades" class=" alternador forma-funcionalidades">
+            <div style="padding: 60px;">
+                <div>
+                    <p class="titulo-menor-p">FUNCIONALIDADES</p>
+                    <h3 class="titulo-a">Um sistema, <br> duas possibilidades</h3>
+                </div>
+ 
+                <div class="alternante-pg-inicial" aria-label="Principal">
+ 
+                    <a href="#" aria-current="page" data-alvo="casa">Para sua casa</a>
+ 
+                    <a href="#" data-alvo="comercio">Para seu comércio</a>
+                </div>
+ 
+                <br><br><br>
+ 
+                <div data-painel="casa">
+                    <h4 class="titulo-menor-p">Funcionalidades para sua casa</h4>
+                    <p style="margin-top: 7px;">
+                        <p class="texto-menor2-p">Tudo no lugar, nada se perde, sua rotina funciona melhor.</p></p>
+                    </p>
+                    <br><br>
+                    <div class="caixa-funcionalidade">
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Monitoramento e notificação</h4>
+                                <br>
+                                <p class="texto-menor-p">Veja o estado atual de seus produtos em tempo real e a longa distância.</p>
+                                <br><br>
+                                <p class="img-funcionalidades">
+                                    <img src="assets/img/landing/monitoramento-notificação.svg" alt="" >
+                                </p>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Lista de compras inteligente</h4>
+                                <br>
+                                <p class="texto-menor-p">Compre apenas o necessário.
+                                    Economize tempo e evite desperdícios.</p>
+                                <br>
+                                <p class="img-funcionalidades">
+                                    <img src="assets/img/landing/lista-compra.svg" alt="" >
+                                </p>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Sugestão de <br> receitas</h4>
+                                <br>
+                                <p class="texto-menor-p">Receitas personalizadas com os ingredientes que você tem disponível.</p>
+                                <br><br>
+                                <p class="img-funcionalidades">
+                                    <img src="assets/img/landing/homem-cortando-pepino.svg" alt="" >
+                                </p>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Geladeira em <br> família</h4>
+                                <br>
+                                <p class="texto-menor-p">Compartilhe e modifique a sua geladeira com seus familiares.</p>
+                                <br><br>
+                                <p class="img-funcionalidades">
+                                    <img src="assets/img/landing/familia-cozinha.svg" alt="" >
+                                </p>
+ 
+                            </div>
+                        </div>
+ 
+                    </div>
+                </div>
+ 
+                <!--Mudança de opções de casa para comercio-->
+ 
+                <div data-painel="comercio">
+                    <h4 class="titulo-menor-p">Funcionalidades para seu comercio</h4>
+                    <p style="margin-top: 7px;">
+                        <p class="texto-menor2-p">Controle, eficiência e economia que impulsionam seu negócio.</p>
+                    </p>
+ 
+                    <br><br>
+                    <div class="caixa-funcionalidade">
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Conheça o Money <br>Saving </h4>
+                                <br>
+                                <p class="texto-menor-p">Acesse relatórios estatísticos que comparam suas compras mensais.</p>
+                                <br><br>
+                                <p class="img-funcionalidades">
+                                    <img src="assets/img/landing/money-saving.svg" alt="" >
+                                </p>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Lista de compras inteligente</h4>
+                                <br>
+                                <p class="texto-menor-p">Controle seu estoque comprando na medida certa, reduzindo custos e evitando perdas de produtos..</p>
+                                <br>
+                                <a href="#" class="img-funcionalidades">
+                                    <img src="assets/img/landing/lista-compra-comercio.svg" alt="" >
+                                </a>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Sugestão de <br> receitas</h4>
+                                <br>
+                                <p class="texto-menor-p">Receitas sob medida para aproveitar os alimentos disponíveis.</p>
+                                <br><br>
+                                <a href="#" class="img-funcionalidades">
+                                    <img src="assets/img/landing/cozinha-comercio.svg" alt="" >
+                                </a>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-funcionalidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Gerencie sem <br>nenhum limite</h4>
+                                <br>
+                                <p class="texto-menor-p">Cadastre produtos, geladeiras e membros com acesso de forma ilimitada.</p>
+                                <br>
+                                <a href="#" class="img-funcionalidades">
+                                    <img src="assets/img/landing/escada-band-amarela.svg" alt="" >
+                                </a>
+ 
+                            </div>
+                        </div>
+ 
+                    </div>
+                </div>
+            </div>
+            </div>
+ 
+            <div class="img-obtenha">
+                <div class="obtenhaPromo">
+                    <h1 class="titulo">
+                        Obtenha Promoção
+                    </h1>
+                    <br>
+                    <p class="texto">
+                        O Frigus trabalha com a ajuda de empresas alimentícias patrocinadoras que oferecem a nossos <br> usuários uma visibilidade exclusiva de seus produtos, juntamente com promoções e ofertas.
+                    </p>
+                    <br>
+                    <p class="texto-maior-b">É uma empresa alimentícia que está interessada?</p>
+                    <p class="texto">
+                        Mande um e-mail para a nossa equipe: <a href="mailto:frigus.ofc@gmail.com" style="color: var(--cor-4);"><b>frigus.ofc@gmail.com</b></a>
+                    </p>
+                </div>
+            </div>
+            
+ 
+            <div class="forma-branca-dp-obter">
+                <div class="padding">
+                    <div>
+                        <h3 class="titulo-a">Como Funciona</h3>
+                    </div>
+                    <br><br><br><br><br>
+                    <div class="caixa-como-funciona">
+ 
+                        <div>
+                            <img src="assets/img/landing/celular-clique-botão.svg" alt="">
+                            <p class="texto-icones">
+                                Clique no botão para <br> escanear o QR Code
+                            </p>
+                        </div>
+ 
+ 
+                        <div>
+                            <img src="assets/img/landing/celular-qr-code.svg" alt="">
+                            <p class="texto-icones">
+                                Escaneie o <br> QR Code da nota fiscal
+                            </p>
+                        </div>
+ 
+                        <div>
+                            <img src="assets/img/landing/celular-quantidade.svg" alt="">
+                            <p class="texto-icones">
+                                Confirme a quantidade <br> dos produtos
+                            </p>
+ 
+                        </div>
+ 
+                        <div>
+                            <img src="assets/img/landing/celular-pronto-ja-registrou.svg" alt="">
+                            <p class="texto-icones">
+                                Pronto! Você já registrou <br> todos na sua geladeira
+                            </p>
+ 
+                        </div>
+ 
+ 
+                    </div>
+ 
+                    <br><br><br><br><br>
+ 
+                    <div class="botao botao-obter-agora">
+                        <a href="#Planos" style="color:var(--cor-7); text-decoration: none;">Obter agora</a>
+                    </div>
+ 
+                </div>
+ 
+                <div id="Vantagens" class="padding">
+                    <div>
+                        <p  class="titulo-menor-p">VANTAGENS & BENEFICIOS</p>
+                        <h3 class="titulo-a">Sustentabilidade e <br> economia</h3>
+                    </div>
+ 
+                    <br><br><br><br><br>
+ 
+                    <div class="caixa-funcionalidade">
+                        <div class="caixa-sustetabilidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Monitoramento e notificação</h4>
+                                <br>
+                                <p class="texto-menor-p">Veja o estado atual de seus produtos em tempo real e a longa distância.</p>
+                                <br>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-sustetabilidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Lista de compras inteligente</h4>
+                                <br>
+                                <p class="texto-menor-p">Compre apenas o necessário.
+                                    Economize tempo e evite desperdícios.</p>
+                                <br>
+ 
+                            </div>
+                        </div>
+ 
+                        <div class="caixa-sustetabilidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Sugestão de <br> receitas</h4>
+                                <br>
+                                <p class="texto-menor-p">Receitas personalizadas com os ingredientes que você tem disponível.</p>
+                                <br>
+ 
+                            </div>
+                        </div>
+ 
+                        <div  class="caixa-sustetabilidade-informação">
+                            <div>
+                                <h4 class="subtitulo-a">Geladeira em <br> família</h4>
+                                <br>
+                                <p class="texto-menor-p">Compartilhe e modifique a sua geladeira com seus familiares.</p>
+                                <br>
+ 
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <br><br><br><br><br>
+ 
+ 
+                    <div class="caixa-azul-sustentabilidade">
+                        <div class="caixa-sustentabilidade">
+ 
+                            <div class="caixa-azul-informação item-garfo">
+                                <div class="caixa-apoio">
+                                    <p class="titulo">46 mi</p>
+                                    <p class="texto-pequeno-b">de toneladas de alimento <br> desperdiçadas pelo Brasil por ano</p>
+                                </div>
+                            </div>
+                            <div class="caixa-azul-informação item-casa">
+                                <div class="caixa-apoio">
+                                    <p class="titulo">60%</p>
+                                    <p class="texto-pequeno-b">de todo o desperdício no Brasil <br> acontece dentro de domicílios</p>
+                                </div>
+                            </div>
+ 
+                            <div class="caixa-azul-informação item-sacola">
+                                <div class="caixa-apoio">
+                                    <p class="titulo">10ª</p>
+                                    <p class="texto-pequeno-b">posição entre os países que mais <br> desperdiçam alimento no mundo</p>
+                                </div>
+                            </div>
+ 
+                        </div>
+                    </div>
+                </div>
+ 
+ 
+                <div id="Planos" class="padding alternador">
+                    <div>
+                        <h3 class="titulo-a">Planos</h3>
+                    </div>
+ 
+                    <div class="alternante-pg-inicial" aria-label="Principal">
+                        <a href="#" aria-current="page" data-alvo="casa">Para sua casa</a>
+                        <a href="#" data-alvo="comercio">Para seu comércio</a>
+                    </div>
+ 
+                    <br><br><br>
+ 
+                    <div data-painel="casa">
+                        <div class="caixa-planos">
+ 
+                            <!-- FREE -->
+                            <div class="caixa-plano">
+                                <h4 class="titulo-a-escuro">Free</h4>
+                                <p class="plano-sub">Conheça o Frigus</p>
+                                <p class="plano-preco">R$ 0<span class="plano-centavos">,00</span><span class="plano-periodo">/mês</span></p>
+ 
+                                <ul class="plano-lista">
+                                    <li>Inclua até <b>2</b> membros na família</li>
+                                    <li>Insira até <b>40</b> produtos na geladeira</li>
+                                    <li>Cadastre <b>1</b> geladeira</li>
+                                </ul>
+ 
+                                <p class="plano-aviso">Para obter mais funcionalidades e para um aproveitamento mais completo, assine algum de nossos planos pagos.</p>
+ 
+                                <a class="botao botao-plano" href="http://frigus-web.vercel.app/login">Obter de graça</a>
+                            </div>
+ 
+                            <!-- PLUS -->
+                            <div class="caixa-plano plano-escuro">
+                                <span class="plano-badge">mais popular</span>
+                                <h4 class="titulo-a-escuro">Plus</h4>
+                                <p class="plano-sub">Expanda os limites</p>
+                                <p class="plano-preco">R$ 29<span class="plano-centavos">,90</span><span class="plano-periodo">/mês</span></p>
+ 
+                                <ul class="plano-lista">
+                                    <li>Inclua até <b>5</b> membros na família</li>
+                                    <li>Insira <b>ilimitados</b> produtos na geladeira</li>
+                                    <li>Cadastre até <b>3</b> geladeiras</li>
+                                </ul>
+ 
+                                <ul class="plano-lista plano-lista-extra">
+                                    <li>Guarde seus próprios produtos</li>
+                                    <li>Salve e compartilhe receitas</li>
+                                    <li>Money Saving</li>
+                                </ul>
+ 
+                                <a class="botao botao-plano botao-plano-claro" href="http://frigus-web.vercel.app/login">Assinar Plus</a>
+                            </div>
+ 
+                            <!-- FAMÍLIA -->
+                            <div class="caixa-plano">
+                                <h4 class="titulo-a-escuro">Família</h4>
+                                <p class="plano-sub">Compartilhe sua geladeira</p>
+                                <p class="plano-preco">R$ 49<span class="plano-centavos">,90</span><span class="plano-periodo">/mês</span></p>
+ 
+                                <ul class="plano-lista">
+                                    <li>Inclua até <b>8</b> membros na família</li>
+                                    <li>Insira <b>ilimitados</b> produtos na geladeira</li>
+                                    <li>Cadastre até <b>3</b> geladeiras</li>
+                                </ul>
+ 
+                                <ul class="plano-lista plano-lista-extra">
+                                    <li>Guarde seus próprios produtos</li>
+                                    <li>Salve e compartilhe receitas</li>
+                                    <li>Money Saving</li>
+                                </ul>
+ 
+                                <a class="botao botao-plano" href="http://frigus-web.vercel.app/login">Assinar Plano Família</a>
+                            </div>
+ 
+                        </div>
+                    </div>
+ 
+                    <div data-painel="comercio">
+                        <div class="conteudo-comercial">
+                            <div class="caixa-plano-comercial plano-escuro">
+                                <h4 class="titulo-a-escuro">Comercial</h4>
+                                <p class="plano-sub">Perfeito para o seu negócio</p>
+                                <p class="plano-preco">R$ 99<span class="plano-centavos">,90</span><span class="plano-periodo">/mês</span></p>
+ 
+                                <ul class="plano-lista">
+                                    <li>Inclua <b>ilimitados</b> membros no plano</li>
+                                    <li>Insira <b>ilimitados</b> produtos na geladeira</li>
+                                    <li>Cadastre <b>ilimitadas</b> geladeiras</li>
+                                </ul>
+ 
+                                <ul class="plano-lista plano-lista-extra">
+                                    <li>Guarde seus próprios produtos</li>
+                                    <li>Salve e compartilhe receitas</li>
+                                    <li>Money Saving</li>
+                                </ul>
+ 
+                                <a class="botao botao-plano botao-plano-claro" href="http://frigus-web.vercel.app/login">Assinar Comercial</a>
+ 
+                                <img class="img-comercial" src="assets/img/landing/imagem-plano-comercial.svg" alt="">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </div>
+ 
+        </div>
     </div>
-    <script src="assets/js/script-carregando.js"></script>
+ 
+    <div class="padding fundo-escuro">
+        <div class="rodape-colunas">
+ 
+            <div>
+                <h4 class="subtitulo-a5 rodape-titulo">Frigus</h4>
+                <p class="texto-menor-a">Inteligência para conservar, <br> eficiência para durar.</p>
+            </div>
+ 
+            <div>
+                <h4 class="subtitulo-a5 rodape-titulo">Página inicial</h4>
+                <ul class="rodape-lista">
+                    <li><a class="texto-menor-a" href="#Funcionalidades">Funcionalidades</a></li>
+                    <li><a class="texto-menor-a" href="#Vantagens">Vantagens</a></li>
+                    <li><a class="texto-menor-a" href="#Planos">Planos</a></li>
+                </ul>
+            </div>
+ 
+            <div>
+                <h4 class="subtitulo-a5 rodape-titulo">Sobre nós</h4>
+                <ul class="rodape-lista">
+                    <li><a class="texto-menor-a" href="sobre-nos.html#quem-somos">Quem somos</a></li>
+                    <li><a class="texto-menor-a" href="sobre-nos.html#nossa-missao">Nossa missão</a></li>
+                    <li><a class="texto-menor-a" href="sobre-nos.html#nossos-valores">Nossos valores</a></li>
+                </ul>
+            </div>
+ 
+            <div>
+                <h4 class="subtitulo-a5 rodape-titulo">Suporte</h4>
+                <ul class="rodape-lista">
+                    <li><a class="texto-menor-a" href="suporte.html#central-de-ajuda">Central de ajuda</a></li>
+                    <li><a class="texto-menor-a" href="suporte.html#faq">Perguntas frequentes</a></li>
+                    <li><a class="texto-menor-a" href="suporte.html#privacidade">Privacidade</a></li>
+                </ul>
+            </div>
+ 
+            <div>
+                <h4 class="subtitulo-a5 rodape-titulo">Contato</h4>
+                <ul class="rodape-lista rodape-contato">
+                    <li class="texto-menor-a">E-mail: <a  href="mailto:frigus.ofc@gmail.com" style="text-decoration: none; color: var(--cor-5);" >frigus.ofc@gmail.com</a></li>
+                    <li class="texto-menor-a"><a href="https://instagram.com/frigus.app" style="text-decoration: none; color: var(--cor-5);" >Instagram: frigus.app</a></li>
+                </ul>
+            </div>
+ 
+        </div>
+ 
+        <div style="justify-content: space-between; display: flex;">
+            <p class="rodape-copy">© 2026 Frigus. Todos os direitos reservados.</p>
+
+            <div class="botao botao-rodape">
+                <a href="#" class="texto-botao-rodape">Área restrita</a>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        document.querySelectorAll('.alternador').forEach(secao => {
+            const links = secao.querySelectorAll('.alternante-pg-inicial a');
+            const paineis = secao.querySelectorAll('[data-painel]');
+ 
+            // Mostra apenas o painel inicial
+            const linkAtivo = secao.querySelector('.alternante-pg-inicial a[aria-current="page"]');
+ 
+            paineis.forEach(p => {
+                p.hidden = p.dataset.painel !== linkAtivo.dataset.alvo;
+            });
+ 
+            // Troca os painéis ao clicar
+            links.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+ 
+                    links.forEach(l => l.removeAttribute('aria-current'));
+                    link.setAttribute('aria-current', 'page');
+ 
+                    paineis.forEach(p => {
+                        p.hidden = p.dataset.painel !== link.dataset.alvo;
+                    });
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>
