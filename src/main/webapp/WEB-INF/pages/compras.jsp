@@ -295,11 +295,11 @@
                     <p class="popup-texto">Escolha se o dono é um usuário ou uma empresa.</p>
                     <div class="alternador">
                         <label class="alternador-opcao">
-                            <input type="radio" name="tipo-dono" value="usuario" checked disabled>
+                            <input type="radio" name="donoTipo" value="usuario" checked disabled>
                             <span>Usuário</span>
                         </label>
                         <label class="alternador-opcao">
-                            <input type="radio" name="tipo-dono" value="empresa" disabled>
+                            <input type="radio" name="donoTipo" value="empresa" disabled>
                             <span>Empresa</span>
                         </label>
                     </div>
