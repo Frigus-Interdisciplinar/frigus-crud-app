@@ -37,6 +37,12 @@ public class AuthFilter implements Filter {
             return;
         }
 
+        // protecao contra formulario enviado por outro site: um POST so vale se vier desta mesma pagina
+        if ("POST".equalsIgnoreCase(req.getMethod()) && !vemDoMesmoSite(req)){
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         // a mensagem de sucesso fica na sessao entre o redirect e a tela, aqui ela vai para a request e some da sessao
         Object sucesso = session.getAttribute("sucesso");
         if (sucesso != null){
@@ -52,5 +58,23 @@ public class AuthFilter implements Filter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    // o navegador manda Origin ( ou Referer ) nos POST: o endereço tem que ser o mesmo do site
+    private boolean vemDoMesmoSite(HttpServletRequest req){
+        String origem = req.getHeader("Origin");
+        if (origem == null || origem.isBlank()){
+            origem = req.getHeader("Referer");
+        }
+        // sem nenhum dos dois ( ex.: ferramentas de teste ) nao da para saber, deixa passar
+        if (origem == null || origem.isBlank()){
+            return true;
+        }
+        try {
+            String host = java.net.URI.create(origem).getAuthority();
+            return host != null && host.equalsIgnoreCase(req.getHeader("Host"));
+        } catch (IllegalArgumentException e){
+            return false;
+        }
     }
 }
