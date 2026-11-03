@@ -4,3 +4,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+# arquivos do IntelliJ (guardam o endereco do banco e configuracoes de cada pessoa)
+.idea/
+*.iml
