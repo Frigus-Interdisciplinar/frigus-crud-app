@@ -24,6 +24,11 @@ public class AuthFilter implements Filter {
         // acentos chegando certo em todos os servlets do admin
         req.setCharacterEncoding("UTF-8");
 
+        // as telas do painel nao ficam guardadas no navegador ( depois de sair, o botao Voltar nao mostra os dados )
+        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setDateHeader("Expires", 0);
+
         HttpSession session = req.getSession(false);
 
         // se nao tem admin na sessao tem que fazer login
