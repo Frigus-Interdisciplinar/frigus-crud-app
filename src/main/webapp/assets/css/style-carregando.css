@@ -284,3 +284,44 @@
     transition: none;
   }
 }
+
+
+/* ==========================================================================
+   7. TELAS BAIXAS (celular deitado)
+   O conteúdo encolhe um pouco e, se ainda não couber, a tela de carregamento rola
+   ========================================================================== */
+.carregando {
+  overflow-y: auto;
+}
+
+.carregando-centro {
+  margin: auto;
+  padding-block: 16px;
+}
+
+@media (max-height: 560px) {
+  .carregando-friguinho {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 12px;
+  }
+
+  .carregando-titulo {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .carregando-texto {
+    margin-bottom: 18px;
+  }
+
+  .barra {
+    margin-bottom: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .carregando-titulo {
+    font-size: 26px;
+  }
+}
