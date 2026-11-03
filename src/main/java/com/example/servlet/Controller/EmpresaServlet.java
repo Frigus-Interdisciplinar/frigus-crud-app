@@ -37,7 +37,6 @@ public class EmpresaServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_empresas = "/WEB-INF/pages/empresas.jsp";
-    private static final String jsp_empresas_form = "/WEB-INF/pages/empresas-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/empresas";
@@ -323,7 +322,7 @@ public class EmpresaServlet extends HttpServlet {
         if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novo");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_empresas_form : jsp_empresas).forward(req, resp);
+        req.getRequestDispatcher(jsp_empresas).forward(req, resp);
     }
 
     // volta para a tela do formulario com uma mensagem de erro

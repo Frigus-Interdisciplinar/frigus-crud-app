@@ -46,7 +46,6 @@ public class ComprasServlet extends HttpServlet {
 
     // caminhos das paginas
     private static final String jsp_compras = "/WEB-INF/pages/compras.jsp";
-    private static final String jsp_compras_form = "/WEB-INF/pages/compras-form.jsp";
 
     @Override
     public void init(){
@@ -481,7 +480,7 @@ public class ComprasServlet extends HttpServlet {
         if (req.getParameter("novoItem") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novoItem");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_compras_form : jsp_compras).forward(req, resp);
+        req.getRequestDispatcher(jsp_compras).forward(req, resp);
     }
 
     // nome do dono da lista de compras ( usuario ou empresa )

@@ -42,7 +42,6 @@ public class GeladeiraServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_geladeiras = "/WEB-INF/pages/geladeiras.jsp";
-    private static final String jsp_geladeiras_form = "/WEB-INF/pages/geladeiras-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/geladeiras";
@@ -326,7 +325,7 @@ public class GeladeiraServlet extends HttpServlet {
         if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novo");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_geladeiras_form : jsp_geladeiras).forward(req, resp);
+        req.getRequestDispatcher(jsp_geladeiras).forward(req, resp);
     }
 
     // volta para a tela do formulario com uma mensagem de erro
