@@ -224,8 +224,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // mostra só o campo da opção escolhida e desativa o outro, pra não travar a validação
   document.addEventListener('change', e => {
     if (!e.target.matches('.alternador input')) return;
+    // só vale o botão que está marcado (ao preencher o pop-up o script avisa todos os botões do grupo)
+    if (e.target.type === 'radio' && !e.target.checked) return;
 
-    e.target.closest('form').querySelectorAll('[data-opcao]').forEach(campo => {
+    // o pop-up de detalhes não é um <form>, então procura também a gaveta
+    const area = e.target.closest('form, .gaveta-form');
+    if (!area) return;
+
+    area.querySelectorAll('[data-opcao]').forEach(campo => {
       const ativo = campo.dataset.opcao === e.target.value;
       campo.hidden = !ativo;
       campo.querySelectorAll('select, input').forEach(item => item.disabled = !ativo);
