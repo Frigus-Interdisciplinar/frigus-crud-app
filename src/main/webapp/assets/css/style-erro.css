@@ -787,3 +787,86 @@ button:focus-visible {
     transition: none;
   }
 }
+
+
+/* ==========================================================================
+   8. ROLAGEM EM TELAS BAIXAS
+   A tela continua ocupando a altura toda, mas se o conteúdo não couber
+   (celular deitado, janela baixa, zoom) a página rola em vez de cortar.
+   ========================================================================== */
+html,
+body {
+  height: auto;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.scene {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* a ilustração sempre tem um tamanho mínimo, então nunca some nem empurra o texto para fora */
+.stage {
+  grid-template-rows: minmax(280px, 1fr);
+}
+
+.copy {
+  padding-block: 8px;
+}
+
+/* a dica volta a aparecer: com rolagem ela não precisa mais ser escondida */
+@media (max-height: 560px) and (min-width: 760px) {
+  .tip {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 759px) {
+  .stage {
+    grid-template-rows: minmax(220px, 1fr) auto;
+  }
+}
+
+@media (max-width: 759px) and (max-height: 640px) {
+  .tip {
+    display: inline-flex;
+  }
+}
+
+/* celular deitado: texto e pinguim lado a lado, com a ilustração menor */
+@media (max-height: 500px) and (min-width: 560px) {
+  .stage {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: minmax(240px, 1fr);
+    padding-block: 8px 40px;
+  }
+
+  .pg {
+    order: 0;
+  }
+
+  .title {
+    font-size: clamp(1.8rem, 4.6vw, 2.4rem);
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .copy {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .actions .btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

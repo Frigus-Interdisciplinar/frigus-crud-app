@@ -74,67 +74,69 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-frigorifico">
-                <thead>
-                    <tr>
-                        <th>Frigorífico</th>
-                        <th>Empresa</th>
-                        <th>Endereço</th>
-                        <th>CEP</th>
-                        <th>Produtos</th>
-                        <th>Itens</th>
-                        <th>Alertas</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${frigorificos}" var="f">
-                        <c:set var="numeros" value="${ocupacao[f.idFrigorifico]}"/>
-                        <c:set var="vencidos" value="${empty numeros ? 0 : numeros[2]}"/>
-                        <c:set var="aVencer" value="${empty numeros ? 0 : numeros[3]}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-frigorifico">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${f.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${f.tipo}"/></div></td>
-                            <td><div class="titulo-cards"><c:out value="${f.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${f.empresa.email}"/></div></td>
-                            <td><div class="titulo-cards"><c:out value="${f.endereco.rua}, ${f.endereco.numero}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${f.endereco.bairro} — ${f.endereco.cidade}/${f.endereco.uf}"/></div></td>
-                            <td><c:out value="${f.endereco.cep}"/></td>
-                            <td>${empty numeros ? 0 : numeros[0]}</td>
-                            <td><div>${empty numeros ? 0 : numeros[1]}</div>
-                                <div class="texto-pequeno-cards">itens</div></td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${vencidos + aVencer > 0}"><span class="alerta">${vencidos} vencidos · ${aVencer} a vencer</span></c:when>
-                                    <c:otherwise><span class="sem-alerta">Sem alertas</span></c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-empresa="<c:out value='${f.empresa.nome} · ${f.empresa.email}'/>" data-tipo="<c:out value='${f.tipo}'/>" data-unidade="<c:out value='${f.nome}'/>"
-                                        data-cep="<c:out value='${f.endereco.cep}'/>" data-pais="<c:out value='${f.endereco.pais}'/>" data-rua="<c:out value='${f.endereco.rua}'/>"
-                                        data-numero="<c:out value='${f.endereco.numero}'/>" data-bairro="<c:out value='${f.endereco.bairro}'/>" data-cidade="<c:out value='${f.endereco.cidade}'/>" data-uf="<c:out value='${f.endereco.uf}'/>">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-id-frigorifico="${f.idFrigorifico}" data-cnpj="${f.empresa.cnpj}" data-tipo="<c:out value='${f.tipo}'/>" data-nome-unidade="<c:out value='${f.nome}'/>"
-                                        data-cep="<c:out value='${f.endereco.cep}'/>" data-pais="<c:out value='${f.endereco.pais}'/>" data-rua="<c:out value='${f.endereco.rua}'/>"
-                                        data-numero="<c:out value='${f.endereco.numero}'/>" data-bairro="<c:out value='${f.endereco.bairro}'/>" data-cidade="<c:out value='${f.endereco.cidade}'/>" data-uf="<c:out value='${f.endereco.uf}'/>">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-id-frigorifico="${f.idFrigorifico}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Frigorífico</th>
+                            <th>Empresa</th>
+                            <th>Endereço</th>
+                            <th>CEP</th>
+                            <th>Produtos</th>
+                            <th>Itens</th>
+                            <th>Alertas</th>
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty frigorificos}">
-                        <tr><td colspan="8">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${frigorificos}" var="f">
+                            <c:set var="numeros" value="${ocupacao[f.idFrigorifico]}"/>
+                            <c:set var="vencidos" value="${empty numeros ? 0 : numeros[2]}"/>
+                            <c:set var="aVencer" value="${empty numeros ? 0 : numeros[3]}"/>
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${f.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${f.tipo}"/></div></td>
+                                <td><div class="titulo-cards"><c:out value="${f.empresa.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${f.empresa.email}"/></div></td>
+                                <td><div class="titulo-cards"><c:out value="${f.endereco.rua}, ${f.endereco.numero}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${f.endereco.bairro} — ${f.endereco.cidade}/${f.endereco.uf}"/></div></td>
+                                <td><c:out value="${f.endereco.cep}"/></td>
+                                <td>${empty numeros ? 0 : numeros[0]}</td>
+                                <td><div>${empty numeros ? 0 : numeros[1]}</div>
+                                    <div class="texto-pequeno-cards">itens</div></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${vencidos + aVencer > 0}"><span class="alerta">${vencidos} vencidos · ${aVencer} a vencer</span></c:when>
+                                        <c:otherwise><span class="sem-alerta">Sem alertas</span></c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-empresa="<c:out value='${f.empresa.nome} · ${f.empresa.email}'/>" data-tipo="<c:out value='${f.tipo}'/>" data-unidade="<c:out value='${f.nome}'/>"
+                                            data-cep="<c:out value='${f.endereco.cep}'/>" data-pais="<c:out value='${f.endereco.pais}'/>" data-rua="<c:out value='${f.endereco.rua}'/>"
+                                            data-numero="<c:out value='${f.endereco.numero}'/>" data-bairro="<c:out value='${f.endereco.bairro}'/>" data-cidade="<c:out value='${f.endereco.cidade}'/>" data-uf="<c:out value='${f.endereco.uf}'/>">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-id-frigorifico="${f.idFrigorifico}" data-cnpj="${f.empresa.cnpj}" data-tipo="<c:out value='${f.tipo}'/>" data-nome-unidade="<c:out value='${f.nome}'/>"
+                                            data-cep="<c:out value='${f.endereco.cep}'/>" data-pais="<c:out value='${f.endereco.pais}'/>" data-rua="<c:out value='${f.endereco.rua}'/>"
+                                            data-numero="<c:out value='${f.endereco.numero}'/>" data-bairro="<c:out value='${f.endereco.bairro}'/>" data-cidade="<c:out value='${f.endereco.cidade}'/>" data-uf="<c:out value='${f.endereco.uf}'/>">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-id-frigorifico="${f.idFrigorifico}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty frigorificos}">
+                            <tr><td colspan="8">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>

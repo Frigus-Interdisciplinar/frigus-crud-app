@@ -56,50 +56,54 @@
                 <button class="botao-limpar" type="button">Limpar filtros</button>
             </form>
 
-            <table class="tabela ">
-                <thead>
-                    <tr>
-                        <th>Usuário</th>
-                        <th>E-mail</th>
-                        <th>Plano</th>
-                        <th>Geladeiras</th>
-                        <th>Receitas</th>
-                        <th>Cadastro</th>
-                        <th></th>
-                    </tr>
-                </thead>
+            <div class="rolagem-tabela">
 
-                <tbody>
-                    <c:forEach items="${usuarios}" var="u">
+                <table class="tabela ">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${u.nome} ${u.sobrenome}"/></div></td>
-                            <td><c:out value="${u.email}"/></td>
-                            <td><span class="etiqueta-plano"><c:out value="${planosDosUsuarios[u.cpf]}"/></span></td>
-                            <td>${empty geladeirasPorUsuario[u.cpf] ? 0 : geladeirasPorUsuario[u.cpf]}</td>
-                            <td>${empty receitasPorUsuario[u.cpf] ? 0 : receitasPorUsuario[u.cpf]}</td>
-                            <td><c:out value="${u.dtCadastro}"/></td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-nome="<c:out value='${u.nome}'/>" data-sobrenome="<c:out value='${u.sobrenome}'/>"
-                                        data-email="<c:out value='${u.email}'/>" data-plano="<c:out value='${planosDosUsuarios[u.cpf]}'/>">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-cpf="${u.cpf}" data-nome="<c:out value='${u.nome}'/>" data-sobrenome="<c:out value='${u.sobrenome}'/>"
-                                        data-email="<c:out value='${u.email}'/>" data-plano="<c:out value='${planosDosUsuarios[u.cpf]}'/>">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-cpf="${u.cpf}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Usuário</th>
+                            <th>E-mail</th>
+                            <th>Plano</th>
+                            <th>Geladeiras</th>
+                            <th>Receitas</th>
+                            <th>Cadastro</th>
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty usuarios}">
-                        <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <tbody>
+                        <c:forEach items="${usuarios}" var="u">
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${u.nome} ${u.sobrenome}"/></div></td>
+                                <td><c:out value="${u.email}"/></td>
+                                <td><span class="etiqueta-plano"><c:out value="${planosDosUsuarios[u.cpf]}"/></span></td>
+                                <td>${empty geladeirasPorUsuario[u.cpf] ? 0 : geladeirasPorUsuario[u.cpf]}</td>
+                                <td>${empty receitasPorUsuario[u.cpf] ? 0 : receitasPorUsuario[u.cpf]}</td>
+                                <td><c:out value="${u.dtCadastro}"/></td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-nome="<c:out value='${u.nome}'/>" data-sobrenome="<c:out value='${u.sobrenome}'/>"
+                                            data-email="<c:out value='${u.email}'/>" data-plano="<c:out value='${planosDosUsuarios[u.cpf]}'/>">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-cpf="${u.cpf}" data-nome="<c:out value='${u.nome}'/>" data-sobrenome="<c:out value='${u.sobrenome}'/>"
+                                            data-email="<c:out value='${u.email}'/>" data-plano="<c:out value='${planosDosUsuarios[u.cpf]}'/>">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-cpf="${u.cpf}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty usuarios}">
+                            <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+
+            </div>
 
             <%@ include file="rodape-tabela.jspf" %>
         </div>

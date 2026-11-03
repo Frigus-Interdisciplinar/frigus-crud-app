@@ -24,7 +24,10 @@
     <link rel="stylesheet" href="${ctx}/assets/css/style-carregando.css">
 </head>
 <body>
-    <aside class="menu-lateral padding">
+    <%-- controle do menu em telas pequenas: a caixinha marcada abre a gaveta (funciona até sem JavaScript) --%>
+    <input type="checkbox" id="controle-menu" class="controle-menu" tabindex="-1" aria-hidden="true">
+
+    <aside class="menu-lateral padding" id="menu-lateral">
         <div class="logo">
             <img src="${ctx}/assets/icones/Logo.svg" alt="Logo">
         </div>
@@ -89,7 +92,18 @@
         </div>
     </aside>
 
+    <%-- fundo escuro atrás da gaveta: clicar nele fecha o menu --%>
+    <label class="fundo-menu" for="controle-menu" aria-hidden="true"></label>
+
     <header class="header-app">
+        <%-- três traços: só aparece em telas pequenas --%>
+        <label class="botao-menu" for="controle-menu" role="button" tabindex="0" aria-controls="menu-lateral" aria-expanded="false" aria-label="Abrir menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+        </label>
         <details class="perfil-header">
             <summary>
                 <span class="avatar-iniciais" aria-hidden="true">${iniciais}</span>
@@ -104,3 +118,42 @@
             </div>
         </details>
     </header>
+
+    <script>
+        /* menu hambúrguer: teclado (Enter/Espaço), Esc fecha, clicar num link fecha, e o aria-expanded acompanha */
+        (function () {
+            var controle = document.getElementById('controle-menu');
+            var botao = document.querySelector('.botao-menu');
+            var menu = document.getElementById('menu-lateral');
+            if (!controle || !botao || !menu) return;
+
+            function atualizar() {
+                botao.setAttribute('aria-expanded', controle.checked ? 'true' : 'false');
+                botao.setAttribute('aria-label', controle.checked ? 'Fechar menu' : 'Abrir menu');
+            }
+            function fechar() {
+                if (!controle.checked) return;
+                controle.checked = false;
+                atualizar();
+            }
+
+            controle.addEventListener('change', atualizar);
+            botao.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    controle.checked = !controle.checked;
+                    atualizar();
+                }
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && controle.checked) { fechar(); botao.focus(); }
+            });
+            menu.addEventListener('click', function (e) {
+                if (e.target.closest('a')) fechar();
+            });
+            // voltou para tela grande: a gaveta deixa de existir, então desmarca
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900) fechar();
+            });
+        })();
+    </script>

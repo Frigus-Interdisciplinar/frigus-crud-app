@@ -93,72 +93,74 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-produto">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Armazenamento</th>
-                        <th>Dono</th>
-                        <th>Qtd.</th>
-                        <th>Validade</th>
-                        <th>Status</th>
-                        <th>Lote</th>
-                        
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${linhas}" var="l">
-                        <c:set var="ehGeladeira" value="${l.tipoArmazenamento == 'geladeira'}"/>
-                        <c:set var="armaz" value="${ehGeladeira ? 'Geladeira' : 'Frigorífico'}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-produto">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${l.produto.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${l.produto.marca} · ${l.produto.categoria}"/></div></td>
-                            <td><span class="etiqueta-plano">${armaz}</span>
-                                <div class="texto-pequeno-cards"><c:out value="${l.armazenamento}"/></div></td>
-                            <td><div class="titulo-cards"><c:out value="${l.dono}"/></div>
-                                <div class="texto-pequeno-cards">${l.donoTipo == 'usuario' ? 'Usuário' : 'Empresa'}</div></td>
-                            <td>${l.quantidade} <c:out value="${l.produto.unidadeMedida}"/></td>
-                            <td><div>${l.dtValidade}</div>
-                                <div class="texto-pequeno-cards">
-                                    <c:choose>
-                                        <c:when test="${l.dias < 0}">venceu há ${-l.dias} dias</c:when>
-                                        <c:when test="${l.dias == 0}">vence hoje</c:when>
-                                        <c:otherwise>vence em ${l.dias} dias</c:otherwise>
-                                    </c:choose>
-                                </div></td>
-                            <td><span class="etiqueta-plano"><c:out value="${l.status}"/></span></td>
-                            <td>${l.lote}</td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-armazenamento="${l.tipoArmazenamento}" data-nome="<c:out value='${l.produto.nome}'/>" data-categoria="<c:out value='${l.produto.categoria}'/>"
-                                        data-marca="<c:out value='${l.produto.marca}'/>" data-descricao="<c:out value='${l.produto.descricao}'/>" data-unidade="<c:out value='${l.produto.unidadeMedida}'/>"
-                                        data-preco="<c:out value='${l.produto.preco}'/>" data-local="<c:out value='${armaz} ${l.armazenamento} · ${l.dono}'/>"
-                                        data-quantidade="${l.quantidade}" data-validade="${l.dtValidade}" data-lote="${l.lote}">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-armazenamento="${l.tipoArmazenamento}" data-id-produto-geladeira="${ehGeladeira ? l.idItem : ''}" data-id-produto-frigorifico="${ehGeladeira ? '' : l.idItem}"
-                                        data-nome-produto="<c:out value='${l.produto.nome}'/>" data-categoria="<c:out value='${l.produto.categoria}'/>" data-marca="<c:out value='${l.produto.marca}'/>"
-                                        data-descricao="<c:out value='${l.produto.descricao}'/>" data-unidade-medida="<c:out value='${l.produto.unidadeMedida}'/>" data-preco="<c:out value='${l.produto.preco}'/>"
-                                        data-id-geladeira="${ehGeladeira ? l.idArmazenamento : ''}" data-id-frigorifico="${ehGeladeira ? '' : l.idArmazenamento}"
-                                        data-quantidade="${l.quantidade}" data-dt-validade="${l.dtValidade}" data-lote="${l.lote}">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir"
-                                        data-armazenamento="${l.tipoArmazenamento}" data-id-produto-geladeira="${ehGeladeira ? l.idItem : ''}" data-id-produto-frigorifico="${ehGeladeira ? '' : l.idItem}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Produto</th>
+                            <th>Armazenamento</th>
+                            <th>Dono</th>
+                            <th>Qtd.</th>
+                            <th>Validade</th>
+                            <th>Status</th>
+                            <th>Lote</th>
+                            
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty linhas}">
-                        <tr><td colspan="8">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${linhas}" var="l">
+                            <c:set var="ehGeladeira" value="${l.tipoArmazenamento == 'geladeira'}"/>
+                            <c:set var="armaz" value="${ehGeladeira ? 'Geladeira' : 'Frigorífico'}"/>
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${l.produto.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${l.produto.marca} · ${l.produto.categoria}"/></div></td>
+                                <td><span class="etiqueta-plano">${armaz}</span>
+                                    <div class="texto-pequeno-cards"><c:out value="${l.armazenamento}"/></div></td>
+                                <td><div class="titulo-cards"><c:out value="${l.dono}"/></div>
+                                    <div class="texto-pequeno-cards">${l.donoTipo == 'usuario' ? 'Usuário' : 'Empresa'}</div></td>
+                                <td>${l.quantidade} <c:out value="${l.produto.unidadeMedida}"/></td>
+                                <td><div>${l.dtValidade}</div>
+                                    <div class="texto-pequeno-cards">
+                                        <c:choose>
+                                            <c:when test="${l.dias < 0}">venceu há ${-l.dias} dias</c:when>
+                                            <c:when test="${l.dias == 0}">vence hoje</c:when>
+                                            <c:otherwise>vence em ${l.dias} dias</c:otherwise>
+                                        </c:choose>
+                                    </div></td>
+                                <td><span class="etiqueta-plano"><c:out value="${l.status}"/></span></td>
+                                <td>${l.lote}</td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-armazenamento="${l.tipoArmazenamento}" data-nome="<c:out value='${l.produto.nome}'/>" data-categoria="<c:out value='${l.produto.categoria}'/>"
+                                            data-marca="<c:out value='${l.produto.marca}'/>" data-descricao="<c:out value='${l.produto.descricao}'/>" data-unidade="<c:out value='${l.produto.unidadeMedida}'/>"
+                                            data-preco="<c:out value='${l.produto.preco}'/>" data-local="<c:out value='${armaz} ${l.armazenamento} · ${l.dono}'/>"
+                                            data-quantidade="${l.quantidade}" data-validade="${l.dtValidade}" data-lote="${l.lote}">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-armazenamento="${l.tipoArmazenamento}" data-id-produto-geladeira="${ehGeladeira ? l.idItem : ''}" data-id-produto-frigorifico="${ehGeladeira ? '' : l.idItem}"
+                                            data-nome-produto="<c:out value='${l.produto.nome}'/>" data-categoria="<c:out value='${l.produto.categoria}'/>" data-marca="<c:out value='${l.produto.marca}'/>"
+                                            data-descricao="<c:out value='${l.produto.descricao}'/>" data-unidade-medida="<c:out value='${l.produto.unidadeMedida}'/>" data-preco="<c:out value='${l.produto.preco}'/>"
+                                            data-id-geladeira="${ehGeladeira ? l.idArmazenamento : ''}" data-id-frigorifico="${ehGeladeira ? '' : l.idArmazenamento}"
+                                            data-quantidade="${l.quantidade}" data-dt-validade="${l.dtValidade}" data-lote="${l.lote}">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir"
+                                            data-armazenamento="${l.tipoArmazenamento}" data-id-produto-geladeira="${ehGeladeira ? l.idItem : ''}" data-id-produto-frigorifico="${ehGeladeira ? '' : l.idItem}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty linhas}">
+                            <tr><td colspan="8">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>

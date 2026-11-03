@@ -44,51 +44,53 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-plano">
-                <thead>
-                    <tr>
-                        <th>Usuário</th>
-                        <th>Empresa</th>
-                        <th>Plano</th>
-                        <th>Valor mensal</th>
-                        
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${assinaturas}" var="a">
-                        <c:set var="ehUsuario" value="${not empty a.usuario}"/>
-                        <c:set var="dono" value="${ehUsuario ? a.usuario.nome.concat(' ').concat(a.usuario.sobrenome).concat(' · ').concat(a.usuario.email) : a.empresa.nome.concat(' · ').concat(a.empresa.email)}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-plano">
+                    <thead>
                         <tr>
-                            <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${a.usuario.nome} ${a.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${a.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
-                            <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${a.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${a.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
-                            <td><span class="etiqueta-plano">${a.tipoAssinatura}</span></td>
-                            <td>R$ ${a.valor}</td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-plano="${a.tipoAssinatura} · R$ ${a.valor}">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-id-assinatura="${a.idAssinatura}" data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}"
-                                        data-cpf="${ehUsuario ? a.usuario.cpf : ''}" data-cnpj="${ehUsuario ? '' : a.empresa.cnpj}" data-plano="${a.tipoAssinatura}">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-id-assinatura="${a.idAssinatura}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Usuário</th>
+                            <th>Empresa</th>
+                            <th>Plano</th>
+                            <th>Valor mensal</th>
+                            
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty assinaturas}">
-                        <tr><td colspan="6">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${assinaturas}" var="a">
+                            <c:set var="ehUsuario" value="${not empty a.usuario}"/>
+                            <c:set var="dono" value="${ehUsuario ? a.usuario.nome.concat(' ').concat(a.usuario.sobrenome).concat(' · ').concat(a.usuario.email) : a.empresa.nome.concat(' · ').concat(a.empresa.email)}"/>
+                            <tr>
+                                <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${a.usuario.nome} ${a.usuario.sobrenome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${a.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
+                                <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${a.empresa.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${a.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
+                                <td><span class="etiqueta-plano">${a.tipoAssinatura}</span></td>
+                                <td>R$ ${a.valor}</td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-plano="${a.tipoAssinatura} · R$ ${a.valor}">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-id-assinatura="${a.idAssinatura}" data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}"
+                                            data-cpf="${ehUsuario ? a.usuario.cpf : ''}" data-cnpj="${ehUsuario ? '' : a.empresa.cnpj}" data-plano="${a.tipoAssinatura}">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-id-assinatura="${a.idAssinatura}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty assinaturas}">
+                            <tr><td colspan="6">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>
