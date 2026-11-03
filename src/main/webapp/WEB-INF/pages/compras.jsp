@@ -60,59 +60,61 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-compra">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Categoria</th>
-                        <th>Quantidade</th>
-                        <th>Lista de</th>
-                        <th>Usuário</th>
-                        <th>Empresa</th>
-                        
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${itensLista}" var="i">
-                        <c:set var="lista" value="${i.listaCompras}"/>
-                        <c:set var="ehUsuario" value="${not empty lista.usuario}"/>
-                        <c:set var="dono" value="${ehUsuario ? lista.usuario.nome.concat(' ').concat(lista.usuario.sobrenome) : lista.empresa.nome}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-compra">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${i.produto.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${i.produto.marca}"/></div></td>
-                            <td>${i.produto.categoria}</td>
-                            <td>${i.quantidade} <c:out value="${i.produto.unidadeMedida}"/></td>
-                            <td>${lista.dtLista}</td>
-                            <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${lista.usuario.nome} ${lista.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${lista.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
-                            <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${lista.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${lista.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-produto="<c:out value='${i.produto.nome}'/>"
-                                        data-marca="<c:out value='${i.produto.marca}'/>" data-data="${lista.dtLista}" data-quantidade="${i.quantidade}" data-unidade="<c:out value='${i.produto.unidadeMedida}'/>">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-id-produto-lista="${i.idProdutoLista}" data-id-compra="${lista.idLista}" data-nome="<c:out value='${i.produto.nome}'/>"
-                                        data-categoria="${i.produto.categoria}" data-preco="<c:out value='${i.produto.preco}'/>" data-marca="<c:out value='${i.produto.marca}'/>"
-                                        data-descricao="<c:out value='${i.produto.descricao}'/>" data-unidade-medida="<c:out value='${i.produto.unidadeMedida}'/>" data-quantidade="${i.quantidade}">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-id-produto-lista="${i.idProdutoLista}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Item</th>
+                            <th>Categoria</th>
+                            <th>Quantidade</th>
+                            <th>Lista de</th>
+                            <th>Usuário</th>
+                            <th>Empresa</th>
+                            
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty itensLista}">
-                        <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${itensLista}" var="i">
+                            <c:set var="lista" value="${i.listaCompras}"/>
+                            <c:set var="ehUsuario" value="${not empty lista.usuario}"/>
+                            <c:set var="dono" value="${ehUsuario ? lista.usuario.nome.concat(' ').concat(lista.usuario.sobrenome) : lista.empresa.nome}"/>
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${i.produto.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${i.produto.marca}"/></div></td>
+                                <td>${i.produto.categoria}</td>
+                                <td>${i.quantidade} <c:out value="${i.produto.unidadeMedida}"/></td>
+                                <td>${lista.dtLista}</td>
+                                <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${lista.usuario.nome} ${lista.usuario.sobrenome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${lista.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
+                                <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${lista.empresa.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${lista.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-produto="<c:out value='${i.produto.nome}'/>"
+                                            data-marca="<c:out value='${i.produto.marca}'/>" data-data="${lista.dtLista}" data-quantidade="${i.quantidade}" data-unidade="<c:out value='${i.produto.unidadeMedida}'/>">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-id-produto-lista="${i.idProdutoLista}" data-id-compra="${lista.idLista}" data-nome="<c:out value='${i.produto.nome}'/>"
+                                            data-categoria="${i.produto.categoria}" data-preco="<c:out value='${i.produto.preco}'/>" data-marca="<c:out value='${i.produto.marca}'/>"
+                                            data-descricao="<c:out value='${i.produto.descricao}'/>" data-unidade-medida="<c:out value='${i.produto.unidadeMedida}'/>" data-quantidade="${i.quantidade}">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-id-produto-lista="${i.idProdutoLista}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty itensLista}">
+                            <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>

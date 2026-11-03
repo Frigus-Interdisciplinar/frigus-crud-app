@@ -78,67 +78,69 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-geladeira">
-                <thead>
-                    <tr>
-                        <th>Geladeira</th>
-                        <th>Usuário</th>
-                        <th>Ocupação</th>
-                        <th>Status</th>
-                        <th>Produtos</th>
-                        <th>Alertas</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${geladeiras}" var="g">
-                        <c:set var="numeros" value="${ocupacao[g.idGeladeira]}"/>
-                        <c:set var="vencidos" value="${empty numeros ? 0 : numeros[2]}"/>
-                        <c:set var="aVencer" value="${empty numeros ? 0 : numeros[3]}"/>
-                        <c:set var="dono" value="${g.usuario.nome} ${g.usuario.sobrenome} · ${g.usuario.email}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-geladeira">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="titulo-cards"><c:out value="${g.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${g.tipo}"/></div>
-                            </td>
-                            <td>
-                                <div class="titulo-cards"><c:out value="${g.usuario.nome} ${g.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${g.usuario.email}"/></div>
-                            </td>
-                            <td>
-                                <div>${empty numeros ? 0 : numeros[1]} de ${capacidade[g.idGeladeira] < 0 ? '∞' : capacidade[g.idGeladeira]}</div>
-                                <div class="texto-pequeno-cards">itens</div>
-                            </td>
-                            <td><span class="etiqueta-plano"><c:out value="${g.status}"/></span></td>
-                            <td>${empty numeros ? 0 : numeros[0]}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${vencidos + aVencer > 0}"><span class="alerta">${vencidos} vencidos · ${aVencer} a vencer</span></c:when>
-                                    <c:otherwise><span class="sem-alerta">Sem alertas</span></c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-usuario="<c:out value='${dono}'/>" data-nome="<c:out value='${g.nome}'/>" data-tipo="<c:out value='${g.tipo}'/>">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-id-geladeira="${g.idGeladeira}" data-cpf="${g.usuario.cpf}" data-nome="<c:out value='${g.nome}'/>" data-tipo="<c:out value='${g.tipo}'/>">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-id-geladeira="${g.idGeladeira}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Geladeira</th>
+                            <th>Usuário</th>
+                            <th>Ocupação</th>
+                            <th>Status</th>
+                            <th>Produtos</th>
+                            <th>Alertas</th>
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty geladeiras}">
-                        <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${geladeiras}" var="g">
+                            <c:set var="numeros" value="${ocupacao[g.idGeladeira]}"/>
+                            <c:set var="vencidos" value="${empty numeros ? 0 : numeros[2]}"/>
+                            <c:set var="aVencer" value="${empty numeros ? 0 : numeros[3]}"/>
+                            <c:set var="dono" value="${g.usuario.nome} ${g.usuario.sobrenome} · ${g.usuario.email}"/>
+                            <tr>
+                                <td>
+                                    <div class="titulo-cards"><c:out value="${g.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${g.tipo}"/></div>
+                                </td>
+                                <td>
+                                    <div class="titulo-cards"><c:out value="${g.usuario.nome} ${g.usuario.sobrenome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${g.usuario.email}"/></div>
+                                </td>
+                                <td>
+                                    <div>${empty numeros ? 0 : numeros[1]} de ${capacidade[g.idGeladeira] < 0 ? '∞' : capacidade[g.idGeladeira]}</div>
+                                    <div class="texto-pequeno-cards">itens</div>
+                                </td>
+                                <td><span class="etiqueta-plano"><c:out value="${g.status}"/></span></td>
+                                <td>${empty numeros ? 0 : numeros[0]}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${vencidos + aVencer > 0}"><span class="alerta">${vencidos} vencidos · ${aVencer} a vencer</span></c:when>
+                                        <c:otherwise><span class="sem-alerta">Sem alertas</span></c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-usuario="<c:out value='${dono}'/>" data-nome="<c:out value='${g.nome}'/>" data-tipo="<c:out value='${g.tipo}'/>">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-id-geladeira="${g.idGeladeira}" data-cpf="${g.usuario.cpf}" data-nome="<c:out value='${g.nome}'/>" data-tipo="<c:out value='${g.tipo}'/>">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-id-geladeira="${g.idGeladeira}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty geladeiras}">
+                            <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>

@@ -56,49 +56,51 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-empresa">
-                <thead>
-                    <tr>
-                        <th>Empresa</th>
-                        <th>E-mail</th>
-                        <th>Plano</th>
-                        <th>Frigoríficos</th>
-                        <th>Receitas</th>
-                        <th>Cadastro</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${empresas}" var="e">
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-empresa">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${e.nome}"/></div></td>
-                            <td><c:out value="${e.email}"/></td>
-                            <td><span class="etiqueta-plano"><c:out value="${planosDasEmpresas[e.cnpj]}"/></span></td>
-                            <td>${empty frigorificosPorEmpresa[e.cnpj] ? 0 : frigorificosPorEmpresa[e.cnpj]}</td>
-                            <td>${empty receitasPorEmpresa[e.cnpj] ? 0 : receitasPorEmpresa[e.cnpj]}</td>
-                            <td><c:out value="${e.dtCadastro}"/></td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-nome="<c:out value='${e.nome}'/>" data-email="<c:out value='${e.email}'/>" data-plano="<c:out value='${planosDasEmpresas[e.cnpj]}'/>">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-cnpj="${e.cnpj}" data-nome="<c:out value='${e.nome}'/>" data-email="<c:out value='${e.email}'/>" data-plano="<c:out value='${planosDasEmpresas[e.cnpj]}'/>">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-cnpj="${e.cnpj}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Empresa</th>
+                            <th>E-mail</th>
+                            <th>Plano</th>
+                            <th>Frigoríficos</th>
+                            <th>Receitas</th>
+                            <th>Cadastro</th>
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty empresas}">
-                        <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${empresas}" var="e">
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${e.nome}"/></div></td>
+                                <td><c:out value="${e.email}"/></td>
+                                <td><span class="etiqueta-plano"><c:out value="${planosDasEmpresas[e.cnpj]}"/></span></td>
+                                <td>${empty frigorificosPorEmpresa[e.cnpj] ? 0 : frigorificosPorEmpresa[e.cnpj]}</td>
+                                <td>${empty receitasPorEmpresa[e.cnpj] ? 0 : receitasPorEmpresa[e.cnpj]}</td>
+                                <td><c:out value="${e.dtCadastro}"/></td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-nome="<c:out value='${e.nome}'/>" data-email="<c:out value='${e.email}'/>" data-plano="<c:out value='${planosDasEmpresas[e.cnpj]}'/>">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-cnpj="${e.cnpj}" data-nome="<c:out value='${e.nome}'/>" data-email="<c:out value='${e.email}'/>" data-plano="<c:out value='${planosDasEmpresas[e.cnpj]}'/>">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-cnpj="${e.cnpj}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty empresas}">
+                            <tr><td colspan="7">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>

@@ -29,9 +29,22 @@
   box-sizing: border-box;
 }
 
+html{
+  -webkit-text-size-adjust: 100%;
+}
+
+/* a página rola normalmente (antes o body ficava travado com overflow: hidden e só o conteúdo rolava) */
 body{
+  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #F5F7FB;
-  overflow: hidden;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas{
+  max-width: 100%;
 }
 
 .padding{
@@ -164,7 +177,8 @@ nav a {
   justify-content: flex-start;
   gap: 10px;
   width: 210px;
-  height: 44px;
+  max-width: 100%;
+  min-height: 44px;
   padding: 5px 13px;
   font-family: 'Sarabun', sans-serif;
   font-size: 14px;
@@ -203,8 +217,18 @@ nav a:hover {
   align-items: center;
   gap: 10px;
   width: 210px;
-  height: 44px;
+  max-width: 100%;
+  min-height: 44px;
   padding: 5px 13px;
+}
+
+/* nome grande quebra a linha em vez de sair do menu */
+.info-perfil {
+  min-width: 0;
+}
+
+.info-perfil .titulo-perfil {
+  overflow-wrap: anywhere;
 }
 
 .circulos {
@@ -234,6 +258,7 @@ nav a:hover {
 
 .perfil-header {
   position: relative;
+  min-width: 0;
   font-family: 'Sarabun', sans-serif;
   font-weight: 600;
   color: var(--cor-8);
@@ -243,6 +268,7 @@ nav a:hover {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
   list-style: none;
   cursor: pointer;
 }
@@ -296,13 +322,17 @@ nav a:hover {
 ========================================================================== */
 .conteudo {
   margin-left: 238px;
-  height: 100vh;
-  height: 100dvh;
+  /* altura mínima de uma tela; se o conteúdo for maior, a própria página rola */
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   padding: calc(64px + 28px) 32px 32px;
-  overflow-x: hidden;
-  overflow-y: auto;
+}
+
+.conteudo > * {
+  min-width: 0;
 }
 
 .conteudo > .page-header,
@@ -324,8 +354,10 @@ nav a:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 6px;
   width: 100%;
-  height: 106px;
+  min-width: 0;
+  min-height: 106px;
   padding: 16px 20px;
   font-family: 'Sarabun', sans-serif;
   border-radius: 14px;
@@ -343,7 +375,8 @@ nav a:hover {
   flex: 1;
   min-height: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: minmax(0, 1fr);
+  /* as linhas crescem até caber o gráfico inteiro (nada é cortado em janelas baixas) */
+  grid-auto-rows: minmax(min-content, 1fr);
 }
 
 .cards-grandes-visao-geral{
@@ -383,6 +416,8 @@ nav a:hover {
 
 .grafico-destaque{
   display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   justify-content: space-between;
   align-items: baseline;
   margin: 18px 0 12px;
@@ -469,7 +504,7 @@ nav a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
+  min-height: 38px;
   padding: 0 16px;
   border: 0;
   border-radius: 8px;
@@ -671,6 +706,8 @@ nav a:hover {
 /* ----- Rodapé e paginação ----- */
 .rodape-tabela {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
@@ -776,6 +813,13 @@ nav a:hover {
 }
 
 /* ----- Botão fechado ----- */
+.dropdown-botao > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dropdown-botao {
   display: flex;
   align-items: center;
@@ -831,6 +875,7 @@ nav a:hover {
 /* ----- Lista aberta (o JS coloca no body) ----- */
 .dropdown-lista {
   z-index: 99999;
+  max-height: 60vh;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1006,9 +1051,21 @@ nav a:hover {
   overflow-wrap: anywhere;
 }
 
-/* a etiqueta fica numa linha só */
+/* a etiqueta fica numa linha só quando cabe; se a coluna for estreita, quebra dentro dela em vez de invadir a vizinha */
 .etiqueta-plano {
-  white-space: nowrap;
+  max-width: 100%;
+  height: auto;
+  min-height: 22px;
+  padding: 3px 10px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  /* 11px = metade da altura de uma linha: na linha única fica a mesma pílula de antes */
+  border-radius: 11px;
+}
+
+.etiqueta-plano::before {
+  flex-shrink: 0;
 }
 
 /* etiqueta pequena embaixo do texto principal (ex.: Geladeira / Cozinha) */
@@ -1082,6 +1139,7 @@ nav a:hover {
 }
 
 .cartao-config {
+  min-width: 0;
   padding: 24px;
   border: 1px solid #E1E7F1;
   border-radius: 14px;
@@ -1091,12 +1149,14 @@ nav a:hover {
 
 .cartao-config-topo {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
 }
 
 .cartao-config-nome {
+  overflow-wrap: anywhere;
   font-size: 17px;
   font-weight: 600;
   line-height: 130%;
@@ -1127,6 +1187,7 @@ nav a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 4px 16px;
   padding: 13px 0;
   border-top: 1px solid #E8ECF3;
   font-size: 13px;
@@ -1135,12 +1196,16 @@ nav a:hover {
 }
 
 .linha-dado strong {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
   font-weight: 600;
   color: var(--cor-8);
 }
 
 .botoes-config {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
 }
@@ -1148,8 +1213,9 @@ nav a:hover {
 .botao-secundario {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 38px;
+  min-height: 38px;
   padding: 0 16px;
   border: 1px solid #D5DCEA;
   border-radius: 8px;
@@ -1206,9 +1272,22 @@ nav a:hover {
   flex-wrap: wrap;
 }
 
-/* a tabela rola dentro da caixa quando não couber */
+/* a tabela rola para o lado dentro da caixa quando não couber (nada é cortado) */
 .rolagem-tabela {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #C9D5EA transparent;
+}
+
+.rolagem-tabela::-webkit-scrollbar {
+  height: 8px;
+}
+
+.rolagem-tabela::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: #C9D5EA;
 }
 
 .tabela { min-width: 760px; }
@@ -1225,6 +1304,12 @@ nav a:hover {
   min-height: 240px;
 }
 
+/* notebooks com sidebar: as tabelas mais largas pedem menos espaço mínimo */
+@media (max-width: 1366px) {
+  .tabela-produto { min-width: 960px; }
+  .tabela-frigorifico { min-width: 940px; }
+}
+
 /* ----- Tablet e celular: menu vira gaveta ----- */
 @media (max-width: 900px) {
   .menu-lateral {
@@ -1234,6 +1319,29 @@ nav a:hover {
   .controle-menu:checked ~ .menu-lateral {
     transform: translateX(0);
     box-shadow: 0 0 40px rgba(19, 28, 85, 0.35);
+  }
+
+  .menu-lateral {
+    width: min(238px, 85vw);
+    height: 100vh;
+    height: 100dvh;
+    overscroll-behavior: contain;
+  }
+
+  /* fechado, o menu não recebe foco do teclado */
+  .controle-menu:not(:checked) ~ .menu-lateral {
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  /* com o menu aberto a página de trás não rola junto */
+  body:has(.controle-menu:checked) {
+    overflow: hidden;
+  }
+
+  .botao-menu:focus-visible {
+    outline: 2px solid var(--cor-1);
+    outline-offset: 2px;
   }
 
   .fundo-menu {
@@ -1272,8 +1380,13 @@ nav a:hover {
 
   .header-app {
     left: 0;
+    gap: 12px;
     padding: 0 16px;
     justify-content: space-between;
+  }
+
+  .botao-menu {
+    flex-shrink: 0;
   }
 
   .conteudo {
@@ -1327,6 +1440,85 @@ nav a:hover {
   .botoes-config {
     flex-wrap: wrap;
   }
+
+  .linha-dado strong {
+    text-align: left;
+  }
+
+  /* topo da página: título em cima, botão "Adicionar" embaixo ocupando a largura */
+  .topo-pagina {
+    align-items: stretch;
+  }
+
+  .topo-pagina .botao-principal {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .rodape-tabela {
+    padding: 12px 16px;
+  }
+
+  .cards-grandes-visao-geral {
+    padding: 16px;
+  }
+
+  .card-grafico {
+    min-height: 300px;
+  }
+
+  .grafico-numero {
+    font-size: 24px;
+  }
+
+  /* pop-ups ocupam a tela toda e os botões quebram linha quando precisam */
+  .gaveta-topo,
+  .gaveta-corpo {
+    padding: 20px 16px;
+  }
+
+  .gaveta-rodape {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  .modal-botoes {
+    flex-wrap: wrap;
+  }
+
+  .modal-exclusao {
+    padding: 20px;
+  }
+}
+
+/* celulares estreitos: campos lado a lado viram um embaixo do outro */
+@media (max-width: 400px) {
+  .gaveta-linha {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-header summary {
+    gap: 8px;
+  }
+
+  .perfil-header span:not(.avatar-iniciais) {
+    max-width: 120px;
+  }
+}
+
+/* celular deitado (pouca altura): o cabeçalho fica mais baixo para sobrar espaço */
+@media (max-height: 500px) and (orientation: landscape) {
+  .header-app {
+    height: 56px;
+  }
+
+  .conteudo {
+    padding-top: calc(56px + 16px);
+  }
+
+  .card-grafico {
+    min-height: 300px;
+  }
 }
 
 
@@ -1350,6 +1542,11 @@ nav a:hover {
 .popup-fundo.aberto {
   display: flex;
   justify-content: flex-end;
+}
+
+/* com um pop-up aberto a página de trás não rola */
+body:has(.popup-fundo.aberto) {
+  overflow: hidden;
 }
 
 /* o de exclusão fica no meio da tela */
@@ -1380,6 +1577,7 @@ nav a:hover {
   width: 100%;
   max-width: 440px;
   height: 100%;
+  min-width: 0;
   background-color: var(--cor-7);
   animation: gaveta-entrando 0.25s ease;
 }
@@ -1430,6 +1628,8 @@ nav a:hover {
   align-content: start;
   gap: 16px;
   flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
   padding: 24px;
   overflow-y: auto;
 }
@@ -1509,6 +1709,9 @@ nav a:hover {
   gap: 10px;
   width: 100%;
   max-width: 360px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
   margin: 16px;
   padding: 24px;
   border-radius: 14px;

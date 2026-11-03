@@ -55,55 +55,57 @@
             </form>
 
             <!-- Tabela -->
-            <table class="tabela tabela-receita">
-                <thead>
-                    <tr>
-                        <th>Receita</th>
-                        <th>Usuário</th>
-                        <th>Empresa</th>
-                        <th>Ingredientes</th>
-                        <th>Criada em</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <!-- Linhas da tabela (uma por registro) -->
-                <tbody>
-                    <c:forEach items="${receitas}" var="r">
-                        <c:set var="ehUsuario" value="${not empty r.usuario}"/>
-                        <c:set var="qtdIng" value="${empty ingredientesPorReceita[r.idReceita] ? 0 : ingredientesPorReceita[r.idReceita]}"/>
-                        <c:set var="dono" value="${ehUsuario ? r.usuario.nome.concat(' ').concat(r.usuario.sobrenome).concat(' · ').concat(r.usuario.email) : r.empresa.nome.concat(' · ').concat(r.empresa.email)}"/>
+            <div class="rolagem-tabela">
+                <table class="tabela tabela-receita">
+                    <thead>
                         <tr>
-                            <td><div class="titulo-cards"><c:out value="${r.nome}"/></div>
-                                <div class="texto-pequeno-cards descricao-curta"><c:out value="${r.descricao}"/></div></td>
-                            <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${r.usuario.nome} ${r.usuario.sobrenome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${r.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
-                            <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${r.empresa.nome}"/></div>
-                                <div class="texto-pequeno-cards"><c:out value="${r.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
-                            <td>${qtdIng}</td>
-                            <td>${r.dtReceita}</td>
-                            <td class="botoes-tabela">
-                                <button class="botao-icone" type="button" aria-label="Visualizar"
-                                        data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-nome="<c:out value='${r.nome}'/>"
-                                        data-descricao="<c:out value='${r.descricao}'/>" data-passos="<c:out value='${r.modoPreparo}'/>" data-ingredientes="${qtdIng}">
-                                    <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Editar"
-                                        data-id-receita="${r.idReceita}" data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-cpf="${ehUsuario ? r.usuario.cpf : ''}" data-cnpj="${ehUsuario ? '' : r.empresa.cnpj}"
-                                        data-nome-receita="<c:out value='${r.nome}'/>" data-descricao-receita="<c:out value='${r.descricao}'/>" data-modo-preparo="<c:out value='${r.modoPreparo}'/>">
-                                    <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
-                                </button>
-                                <button class="botao-icone" type="button" aria-label="Excluir" data-id-receita="${r.idReceita}">
-                                    <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
-                                </button>
-                            </td>
+                            <th>Receita</th>
+                            <th>Usuário</th>
+                            <th>Empresa</th>
+                            <th>Ingredientes</th>
+                            <th>Criada em</th>
+                            <th></th>
                         </tr>
-                    </c:forEach>
-                    <c:if test="${empty receitas}">
-                        <tr><td colspan="6">Nenhum registro encontrado com esses filtros.</td></tr>
-                    </c:if>
-                </tbody>
-            </table>
+                    </thead>
+    
+                    <!-- Linhas da tabela (uma por registro) -->
+                    <tbody>
+                        <c:forEach items="${receitas}" var="r">
+                            <c:set var="ehUsuario" value="${not empty r.usuario}"/>
+                            <c:set var="qtdIng" value="${empty ingredientesPorReceita[r.idReceita] ? 0 : ingredientesPorReceita[r.idReceita]}"/>
+                            <c:set var="dono" value="${ehUsuario ? r.usuario.nome.concat(' ').concat(r.usuario.sobrenome).concat(' · ').concat(r.usuario.email) : r.empresa.nome.concat(' · ').concat(r.empresa.email)}"/>
+                            <tr>
+                                <td><div class="titulo-cards"><c:out value="${r.nome}"/></div>
+                                    <div class="texto-pequeno-cards descricao-curta"><c:out value="${r.descricao}"/></div></td>
+                                <td><c:if test="${ehUsuario}"><div class="titulo-cards"><c:out value="${r.usuario.nome} ${r.usuario.sobrenome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${r.usuario.email}"/></div></c:if><c:if test="${not ehUsuario}">—</c:if></td>
+                                <td><c:if test="${not ehUsuario}"><div class="titulo-cards"><c:out value="${r.empresa.nome}"/></div>
+                                    <div class="texto-pequeno-cards"><c:out value="${r.empresa.email}"/></div></c:if><c:if test="${ehUsuario}">—</c:if></td>
+                                <td>${qtdIng}</td>
+                                <td>${r.dtReceita}</td>
+                                <td class="botoes-tabela">
+                                    <button class="botao-icone" type="button" aria-label="Visualizar"
+                                            data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-dono="<c:out value='${dono}'/>" data-nome="<c:out value='${r.nome}'/>"
+                                            data-descricao="<c:out value='${r.descricao}'/>" data-passos="<c:out value='${r.modoPreparo}'/>" data-ingredientes="${qtdIng}">
+                                        <img src="${ctx}/assets/icones/icone-olho-aberto.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Editar"
+                                            data-id-receita="${r.idReceita}" data-dono-tipo="${ehUsuario ? 'usuario' : 'empresa'}" data-cpf="${ehUsuario ? r.usuario.cpf : ''}" data-cnpj="${ehUsuario ? '' : r.empresa.cnpj}"
+                                            data-nome-receita="<c:out value='${r.nome}'/>" data-descricao-receita="<c:out value='${r.descricao}'/>" data-modo-preparo="<c:out value='${r.modoPreparo}'/>">
+                                        <img src="${ctx}/assets/icones/icone-caneta.svg" alt="">
+                                    </button>
+                                    <button class="botao-icone" type="button" aria-label="Excluir" data-id-receita="${r.idReceita}">
+                                        <img src="${ctx}/assets/icones/icone-lixera.svg" alt="">
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty receitas}">
+                            <tr><td colspan="6">Nenhum registro encontrado com esses filtros.</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Rodapé com contagem e paginação -->
             <%@ include file="rodape-tabela.jspf" %>
