@@ -168,6 +168,8 @@ public class Login extends HttpServlet {
                     cookie.setMaxAge(manter_conectado);
                     cookie.setPath(req.getContextPath().isEmpty() ? "/" : req.getContextPath());
                     cookie.setHttpOnly(true);
+                    // atrás do proxy do Render o pedido chega por http; o cabeçalho diz se o navegador usou https
+                    cookie.setSecure(req.isSecure() || "https".equalsIgnoreCase(req.getHeader("X-Forwarded-Proto")));
                     resp.addCookie(cookie);
                 }
                 resp.sendRedirect(req.getContextPath() + url_visao_geral);
