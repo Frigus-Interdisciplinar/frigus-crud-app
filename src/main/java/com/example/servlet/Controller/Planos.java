@@ -38,7 +38,6 @@ public class Planos extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_planos = "/WEB-INF/pages/planos.jsp";
-    private static final String jsp_planos_form = "/WEB-INF/pages/planos-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/planos";
@@ -351,7 +350,7 @@ public class Planos extends HttpServlet {
         if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novo");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_planos_form : jsp_planos).forward(req, resp);
+        req.getRequestDispatcher(jsp_planos).forward(req, resp);
     }
 
     // volta para a tela do formulario com uma mensagem de erro

@@ -46,7 +46,6 @@ public class ReceitaServlet extends HttpServlet {
 
     // caminhos das paginas
     private static final String jsp_receitas = "/WEB-INF/pages/receitas.jsp";
-    private static final String jsp_receitas_form = "/WEB-INF/pages/receitas-form.jsp";
 
     @Override
     public void init(){
@@ -449,7 +448,7 @@ public class ReceitaServlet extends HttpServlet {
         if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novo");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_receitas_form : jsp_receitas).forward(req, resp);
+        req.getRequestDispatcher(jsp_receitas).forward(req, resp);
     }
 
     // nome do dono da receita ( usuario ou empresa )

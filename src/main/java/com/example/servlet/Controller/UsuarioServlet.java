@@ -39,7 +39,6 @@ public class UsuarioServlet extends HttpServlet {
 
     // caminho das paginas
     private static final String jsp_usuarios = "/WEB-INF/pages/usuarios.jsp";
-    private static final String jsp_usuarios_form = "/WEB-INF/pages/usuarios-form.jsp";
 
     // caminho para o servlet
     private static final String url_servlet = "/admin/usuarios";
@@ -387,7 +386,7 @@ public class UsuarioServlet extends HttpServlet {
         if (req.getParameter("novo") != null && req.getAttribute("modo") == null){
             req.setAttribute("modo", "novo");
         }
-        req.getRequestDispatcher(req.getAttribute("modo") != null ? jsp_usuarios_form : jsp_usuarios).forward(req, resp);
+        req.getRequestDispatcher(jsp_usuarios).forward(req, resp);
     }
 
     // volta para a tela do formulario com uma mensagem de erro

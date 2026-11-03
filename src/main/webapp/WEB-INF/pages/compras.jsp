@@ -213,6 +213,8 @@
             <form class="gaveta-form" method="post" action="${ctx}/admin/compras">
                 <input type="hidden" name="action" value="alterarItem">
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
+                <input type="hidden" name="idProdutoLista" value="">
+                <input type="hidden" name="descricao" value="">
                 <div class="gaveta-corpo">
                     <p class="gaveta-secao">Lista de compras</p>
                     <div class="filtro">
@@ -293,11 +295,11 @@
                     <p class="popup-texto">Escolha se o dono é um usuário ou uma empresa.</p>
                     <div class="alternador">
                         <label class="alternador-opcao">
-                            <input type="radio" name="tipo-dono" value="usuario" checked disabled>
+                            <input type="radio" name="donoTipo" value="usuario" checked disabled>
                             <span>Usuário</span>
                         </label>
                         <label class="alternador-opcao">
-                            <input type="radio" name="tipo-dono" value="empresa" disabled>
+                            <input type="radio" name="donoTipo" value="empresa" disabled>
                             <span>Empresa</span>
                         </label>
                     </div>
