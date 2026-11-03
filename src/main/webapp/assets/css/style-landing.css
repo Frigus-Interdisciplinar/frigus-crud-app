@@ -2271,3 +2271,570 @@ img, svg { max-width: 100%; }
   .rodape-colunas { grid-template-columns: 1fr; }
   .caixa-elementos-circulos { width: 100%; }
 }
+
+/* ==========================================================================
+   20. AJUSTES DE RESPONSIVIDADE (menu de três traços, rolagem e nada cortado)
+   Vem por último de propósito: só adapta o que já existe, sem mudar o visual
+   ========================================================================== */
+
+/* ----- 20.1 Base ----- */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* textos grandes quebram em vez de sair da tela */
+h1, h2, h3, h4, p, li, a, span, summary {
+  overflow-wrap: break-word;
+}
+
+/* rodapé: altura acompanha o conteúdo (antes ficava preso em 390px e cortava os links) */
+.fundo-escuro {
+  height: auto;
+  min-height: 390px;
+}
+
+.rodape-base {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+}
+
+.botao-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: 44px;
+}
+
+/* ----- 20.2 Menu do site: no computador, igual ao original ----- */
+.menu-site {
+  display: contents;
+}
+
+.botao-menu-site {
+  display: none;
+}
+
+/* ----- 20.3 Menu do site: telas menores viram três traços ----- */
+@media (max-width: 960px) {
+  header {
+    height: auto;
+    min-height: 72px;
+    padding: 12px 20px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .caixa-itens-header {
+    position: relative;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .logo img {
+    height: 44px;
+    width: auto;
+  }
+
+  .botao-menu-site {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgba(240, 246, 248, 0.18);
+    border-radius: 12px;
+    background: rgba(240, 246, 248, 0.10);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--cor-7);
+    cursor: pointer;
+  }
+
+  .botao-menu-site:focus-visible {
+    outline: 2px solid var(--cor-7);
+    outline-offset: 3px;
+  }
+
+  .botao-menu-site .traco {
+    transform-origin: 12px 12px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+  }
+
+  /* aberto: os três traços viram um X */
+  .menu-aberto .botao-menu-site .traco-1 { transform: translateY(6px) rotate(45deg); }
+  .menu-aberto .botao-menu-site .traco-2 { opacity: 0; }
+  .menu-aberto .botao-menu-site .traco-3 { transform: translateY(-6px) rotate(-45deg); }
+
+  /* painel que desce embaixo da barra */
+  .menu-site {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: min(340px, calc(100vw - 32px));
+    max-height: calc(100vh - 110px);
+    max-height: calc(100dvh - 110px);
+    padding: 14px;
+    overflow-y: auto;
+    border: 1px solid rgba(240, 246, 248, 0.18);
+    border-radius: 16px;
+    background: rgba(19, 28, 85, 0.96);
+    box-shadow: 0 18px 40px rgba(2, 12, 81, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  .menu-aberto .menu-site {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  /* navegação em lista */
+  .menu-site .nav {
+    order: 0;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .menu-site .nav a {
+    flex: none;
+    padding: 12px 16px;
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  /* botões Entrar e Fazer parte lado a lado, dividindo a largura */
+  .menu-site .acoes {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .menu-site .acoes .botao {
+    flex: 1 1 0;
+    width: auto;
+    height: 46px;
+    padding: 0 12px;
+  }
+}
+
+/* ----- 20.4 Hero da página inicial ----- */
+/* O hero fixo (efeito parallax) só funciona quando ele cabe inteiro na tela.
+   Em tablets, celulares (retrato e paisagem) e janelas baixas ele passa a rolar junto com a página,
+   assim o título, o texto e os botões nunca ficam escondidos. */
+@media (max-width: 1024px), (max-height: 699px) {
+  .hero {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    z-index: 0;
+  }
+
+  .hero .padding {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+  }
+
+  .celular {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* janelas largas porém baixas (notebook com zoom, celular deitado grande): continua lado a lado */
+@media (min-width: 1025px) and (max-height: 699px) {
+  .hero {
+    padding-top: 130px;
+    padding-bottom: 40px;
+  }
+
+  .hero .padding {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .celular {
+    flex: 0 1 420px;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .celular img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .hero {
+    padding-bottom: calc(40px + 14vw);
+  }
+
+  /* a parte transparente de cima da onda fica por cima do fim do hero
+     (46vw = ponto mais baixo da curva, assim não aparece faixa escura entre os dois) */
+  .hero + .forma-branca-pg-inicial {
+    margin-top: -46vw;
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    padding: 120px 32px calc(40px + 15vw);
+  }
+
+  .celular img {
+    width: min(100%, 520px);
+    margin: 0 auto;
+  }
+
+  /* onda branca: mantém a proporção do desenho e a parte transparente de cima cobre o fim do hero */
+  .hero + .forma-branca-pg-inicial {
+    height: auto;
+    min-height: 0;
+    margin-top: -50vw;
+    aspect-ratio: 1366 / 780;
+    background-size: 100% auto;
+    background-position: center top;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding: 104px 20px calc(24px + 15vw);
+  }
+
+  .hero .padding br {
+    display: none;
+  }
+
+  /* o título mantém a quebra entre as duas frases */
+  .hero .padding h1 br {
+    display: inline;
+  }
+
+  /* os <br> de espaçamento somem no celular; o espaço vem daqui */
+  .hero .titulo-menor-b {
+    margin: 20px 0 28px;
+  }
+
+  .caixa-botao-pg-inicial {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .botao-pagina-inicial-azul,
+  .botao-pagina-inicial-branco {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .caixa-botao-pg-inicial {
+    flex-direction: column;
+  }
+
+  .botao-pagina-inicial-azul,
+  .botao-pagina-inicial-branco {
+    width: 100%;
+    flex: none;
+  }
+}
+
+/* celular deitado: título e celulares lado a lado, menores */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  .hero {
+    flex-direction: row;
+    padding: 96px 24px calc(24px + 15vw);
+  }
+
+  .hero .padding {
+    flex: 1 1 55%;
+    text-align: left;
+  }
+
+  .hero .padding br {
+    display: none;
+  }
+
+  .hero .titulo-menor-b {
+    margin: 16px 0 20px;
+  }
+
+  .caixa-botao-pg-inicial {
+    margin: 0;
+  }
+
+  .celular {
+    flex: 1 1 45%;
+    min-width: 0;
+  }
+}
+
+/* ----- 20.5 Seções da página inicial ----- */
+/* "Como funciona": 4 celulares em linha no computador, 2 por linha no tablet/celular */
+.caixa-como-funciona {
+  flex-wrap: wrap;
+}
+
+.caixa-como-funciona > div {
+  flex: 0 1 220px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.caixa-como-funciona img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 700px) {
+  .caixa-como-funciona {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 16px;
+  }
+
+  .caixa-como-funciona > div {
+    flex: none;
+  }
+
+  .caixa-como-funciona img {
+    max-width: 140px;
+  }
+
+  .texto-icones br {
+    display: none;
+  }
+}
+
+/* cards de funcionalidades: as imagens nunca passam da largura do card */
+.caixa-funcionalidade-informação {
+  max-width: 100%;
+}
+
+.caixa-funcionalidade-informação > div {
+  min-width: 0;
+}
+
+.img-funcionalidades img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* alternador "Para sua casa | Para seu comércio" */
+.alternante-pg-inicial {
+  width: 100%;
+}
+
+/* promoção: o texto respira em telas menores */
+@media (max-width: 1024px) {
+  .obtenhaPromo {
+    height: auto;
+    padding: 120px 32px 60px;
+  }
+
+  .obtenhaPromo .texto br {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .obtenhaPromo {
+    padding: 72px 20px 48px;
+  }
+
+  .caixa-azul-informação {
+    background-size: auto 130px;
+  }
+
+  .caixa-sustentabilidade {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* planos: o card Comercial perde a imagem lateral sem sobrar espaço vazio */
+@media (max-width: 1024px) {
+  .caixa-planos {
+    gap: 40px 24px;
+  }
+
+  .caixa-plano-comercial {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .img-comercial {
+    display: none;
+  }
+
+  .caixa-plano-comercial > *:not(.img-comercial) {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  /* o card cresce com o conteúdo (texto nunca é cortado) */
+  .caixa-plano,
+  .caixa-plano.plano-escuro {
+    height: auto;
+    min-height: 0;
+    max-width: 360px;
+  }
+
+  .caixa-plano .botao-plano {
+    margin-top: 28px;
+  }
+
+  .plano-escuro {
+    margin-top: 0;
+  }
+}
+
+/* rodapé */
+@media (max-width: 700px) {
+  .rodape-base {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rodape-copy {
+    margin-top: 32px;
+  }
+}
+
+/* ----- 20.6 Sobre nós ----- */
+@media (max-width: 1024px) {
+  .fundo-inicial-sobre-nos {
+    padding: 120px 32px 160px;
+  }
+
+  .subtitulo-b2 br {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .fundo-inicial-sobre-nos {
+    padding: 104px 20px 120px;
+  }
+
+  .subtitulo-b2 {
+    font-size: 17px;
+  }
+
+  .forma-nossa-missao {
+    min-height: 0;
+  }
+
+  .forma-nossa-missao > div {
+    padding: 48px 16px !important;
+  }
+
+  .caixa-nossa-missao > div:not(.caixa-nossa-missao-informação) {
+    width: 100%;
+    max-height: 220px;
+    border-radius: 0 0 30px 30px;
+  }
+
+  .caixa-nossa-missao-informação {
+    border-radius: 30px 30px 0 0;
+  }
+
+  .caixa-nossa-missao-informação br {
+    display: none;
+  }
+
+  .caixa-nossa-missao-informação .texto-p {
+    margin-top: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+}
+
+/* celular deitado: pinguim ao lado do texto */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  .fundo-inicial-sobre-nos {
+    flex-direction: row;
+    min-height: 0;
+    padding: 96px 24px 100px;
+    text-align: left;
+  }
+
+  .friguinho {
+    width: min(260px, 36vw);
+  }
+}
+
+/* nossa equipe: a roleta não deixa os cartões vizinhos criarem rolagem lateral */
+.fundo-equipe,
+.equipe-carrossel {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ----- 20.7 Suporte ----- */
+@media (max-width: 1024px) {
+  .fundo-inicial-suporte > div {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 700px) {
+  .faq__item summary {
+    justify-content: space-between;
+  }
+
+  .faq__item summary::after {
+    flex-shrink: 0;
+  }
+
+  #privacidade .texto-maior-p p {
+    line-height: 1.6;
+  }
+
+  #privacidade .texto-maior-p p + p,
+  #privacidade .texto-maior-p p {
+    padding-top: 24px !important;
+  }
+
+  .forma-branca-faq .padding > div[style] {
+    padding-top: 48px !important;
+  }
+}
+
+/* janela de termos/privacidade no celular deitado */
+@media (max-height: 500px) {
+  .janela-legal {
+    height: calc(100vh - 24px);
+    height: calc(100dvh - 24px);
+  }
+
+  .janela-legal-topo,
+  .janela-legal-rodape {
+    padding: 12px 20px;
+  }
+}

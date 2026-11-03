@@ -23,20 +23,32 @@
         <header class="header">
             <div class="caixa-itens-header">
                 <a class="logo" href="index.html">
-                    <img src="assets/img/landing/Logo.svg" alt="">
+                    <img src="assets/img/landing/Logo.svg" alt="Frigus">
                 </a>
- 
-                <nav class="nav" aria-label="Principal">
-                    <a href="index.html" aria-current="page">Página inicial</a>
-                    <a href="sobre-nos.html">Sobre nós</a>
-                    <a href="suporte.html">Suporte</a>
-                </nav>
- 
-                <div class="acoes">
-                    <a class="botao botao-claro " href="https://frigus-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
-                        <span class="texto-degrade">Entrar</span>
-                    </a>
-                    <a class="botao botao-azul" href="https://frigus-web.vercel.app/register" target="_blank" rel="noopener noreferrer">Fazer parte</a>
+
+                <!-- três traços: só aparece em telas menores -->
+                <button class="botao-menu-site" type="button" aria-controls="menu-site" aria-expanded="false" aria-label="Abrir menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                        <line class="traco traco-1" x1="4" y1="6" x2="20" y2="6"></line>
+                        <line class="traco traco-2" x1="4" y1="12" x2="20" y2="12"></line>
+                        <line class="traco traco-3" x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- no computador os itens ficam soltos na barra; em telas menores viram o painel do menu -->
+                <div class="menu-site" id="menu-site">
+                    <nav class="nav" aria-label="Principal">
+                        <a href="index.html" aria-current="page">Página inicial</a>
+                        <a href="sobre-nos.html">Sobre nós</a>
+                        <a href="suporte.html">Suporte</a>
+                    </nav>
+
+                    <div class="acoes">
+                        <a class="botao botao-claro " href="https://frigus-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
+                            <span class="texto-degrade">Entrar</span>
+                        </a>
+                        <a class="botao botao-azul" href="https://frigus-web.vercel.app/register" target="_blank" rel="noopener noreferrer">Fazer parte</a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -525,7 +537,7 @@
  
         </div>
  
-        <div style="justify-content: space-between; display: flex;">
+        <div class="rodape-base" style="justify-content: space-between; display: flex;">
             <p class="rodape-copy">© 2026 Frigus. Todos os direitos reservados.</p>
 
             <div class="botao botao-rodape">
@@ -562,6 +574,7 @@
         });
     </script>
 
+    <script src="assets/js/landing/menu.js"></script>
     <script src="assets/js/script-carregando.js"></script>
 </body>
 </html>
