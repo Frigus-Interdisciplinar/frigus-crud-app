@@ -39,6 +39,11 @@ public class Login extends HttpServlet {
     private static final String sessao_nome = "cadastroNome";
     private static final String sessao_email = "cadastroEmail";
 
+    // limite de tentativas erradas por pessoa ( e-mail + endereço de quem acessa ): depois de 5 erros, espera 10 minutos
+    private static final int max_tentativas = 5;
+    private static final long espera_ms = 10 * 60 * 1000;
+    private static final java.util.concurrent.ConcurrentHashMap<String, long[]> tentativas = new java.util.concurrent.ConcurrentHashMap<>();
+
     // quanto tempo o login dura quando a pessoa marca "Manter conectado" ( em segundos )
     private static final int manter_conectado = 7 * 24 * 60 * 60;
 
@@ -117,11 +122,19 @@ public class Login extends HttpServlet {
                     return;
                 }
 
+                // muitas tentativas erradas seguidas: bloqueia por um tempo
+                String chaveTentativa = validar.normalizarEmail(email) + "|" + req.getRemoteAddr();
+                if (bloqueado(chaveTentativa)){
+                    voltaComErro(req, resp, "Muitas tentativas erradas. Aguarde alguns minutos e tente de novo.", jsp_login);
+                    return;
+                }
+
                 // buscando o super admin no banco
                 SuperAdmin superAdmin = superAdminDAO.buscarSuperAdmin(validar.normalizarEmail(email));
 
                 // a mensagem e a mesma para nao mostrar se o e-mail existe
                 if (superAdmin == null){
+                    registrarErro(chaveTentativa);
                     voltaComErro(req, resp, "E-mail ou senha incorretos.", jsp_login);
                     return;
                 }
@@ -135,9 +148,12 @@ public class Login extends HttpServlet {
                     senhaIgualBanco = false;
                 }
                 if (!senhaIgualBanco){
+                    registrarErro(chaveTentativa);
                     voltaComErro(req, resp, "E-mail ou senha incorretos.", jsp_login);
                     return;
                 }
+
+                tentativas.remove(chaveTentativa);
 
                 // salvando o admin na sessao ( com um id novo, para nao reaproveitar a sessao de antes do login )
                 HttpSession session = req.getSession();
@@ -253,6 +269,24 @@ public class Login extends HttpServlet {
             default:
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
+    }
+
+    // true se essa pessoa ja errou demais e ainda esta no tempo de espera
+    private static boolean bloqueado(String chave){
+        long[] t = tentativas.get(chave);
+        if (t == null){
+            return false;
+        }
+        if (System.currentTimeMillis() - t[1] > espera_ms){
+            tentativas.remove(chave);
+            return false;
+        }
+        return t[0] >= max_tentativas;
+    }
+
+    // conta mais um erro de senha ( t[0] = quantos erros, t[1] = quando foi o ultimo )
+    private static void registrarErro(String chave){
+        tentativas.merge(chave, new long[]{1, System.currentTimeMillis()}, (antigo, novo) -> new long[]{antigo[0] + 1, novo[1]});
     }
 
     // voltando para a pagina com erro
