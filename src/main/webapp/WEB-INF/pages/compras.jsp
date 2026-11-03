@@ -213,6 +213,8 @@
             <form class="gaveta-form" method="post" action="${ctx}/admin/compras">
                 <input type="hidden" name="action" value="alterarItem">
                 <input type="hidden" name="voltar" value="<c:out value='${pageContext.request.queryString}'/>">
+                <input type="hidden" name="idProdutoLista" value="">
+                <input type="hidden" name="descricao" value="">
                 <div class="gaveta-corpo">
                     <p class="gaveta-secao">Lista de compras</p>
                     <div class="filtro">
