@@ -111,7 +111,7 @@ public class ProdutoServlet extends HttpServlet {
         switch (action){
             case "inserir":{
                 // validando os campos do produto e do item
-                String erroCampos = validarCampos(req);
+                String erroCampos = validarCampos(req, null);
                 if (erroCampos != null){
                     voltaComErro(req, resp, erroCampos);
                     return;
@@ -186,7 +186,8 @@ public class ProdutoServlet extends HttpServlet {
 
             case "alterar":{
                 // validando os campos do produto e do item
-                String erroCampos = validarCampos(req);
+                // um item que já venceu pode ser editado sem trocar a data ( a data só é conferida se ela mudou )
+                String erroCampos = validarCampos(req, dataDoItemAntigo(req, armazenamento));
                 if (erroCampos != null){
                     voltaComErro(req, resp, erroCampos);
                     return;
@@ -339,8 +340,21 @@ public class ProdutoServlet extends HttpServlet {
         }
     }
 
+    // a data de validade que o item tinha antes da edição ( null se nao achar o item )
+    private LocalDate dataDoItemAntigo(HttpServletRequest req, String armazenamento){
+        if (armazenamento.equals("geladeira")){
+            Integer id = lerInt(req.getParameter("idProdutoGeladeira"));
+            ProdutosGeladeira item = id == null ? null : igDAO.buscarProdutoGeladeiraPorId(id);
+            return item == null ? null : item.getDtValidade();
+        }
+        Integer id = lerInt(req.getParameter("idProdutoFrigorifico"));
+        ProdutosFrigorifico item = id == null ? null : itfDAO.buscarProdutoFrigorificoPorId(id);
+        return item == null ? null : item.getDtValidade();
+    }
+
     // confere os campos do produto e do item, devolve a mensagem de erro ou null se esta tudo certo
-    private String validarCampos(HttpServletRequest req){
+    // dataAtual = a data que o item já tinha ao ser editado ( null no cadastro novo )
+    private String validarCampos(HttpServletRequest req, LocalDate dataAtual){
         String nome = req.getParameter("nomeProduto");
         String categoriaTxt = req.getParameter("categoria");
         String marca = req.getParameter("marca");
@@ -372,8 +386,8 @@ public class ProdutoServlet extends HttpServlet {
         if (dataValidade == null){
             return "A data de validade é inválida.";
         }
-        // produto vencido nao pode ser cadastrado
-        if (!validar.validarValidade(dataValidade)){
+        // produto vencido nao pode ser cadastrado ( na edição, manter a data que já estava é permitido )
+        if (!validar.validarValidade(dataValidade) && !dataValidade.equals(dataAtual)){
             return "A data de validade não pode ser anterior a data de amanhã.";
         }
         // lote é opcional: vazio vira 0 ("sem lote")
